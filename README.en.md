@@ -1,36 +1,65 @@
-# Nels.Dev
+<div align="center"><a name="readme-top"></a>
 
-#### Description
-{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}
+<h1>Nels.AI</h1>
 
-#### Software Architecture
-Software architecture description
+Built on .NET + Vue for an AI Agent application.
 
-#### Installation
+[English](./README.en.md) · 简体中文
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+</div>
 
-#### Instructions
+![Login](./doc/img/login.png)
+![Dialog](./doc/img/agent_debug.png)
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## ✨ Technology Stack
 
-#### Contribution
+- 🌈 **Backend**: Based on the ABP backend development framework
+- 🧩 **AI Framework**: semantic-kernel, kernel-memory
+- ⚡ **Frontend**: vue3 + js
 
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+## Project Goals
+Developing an AI Agent application based on .NET and Vue using semantic-kernel. This allows developers to quickly integrate with existing .NET projects and build AI applications rapidly.
 
+- Note that this is an ongoing project.
+- We are eagerly seeking developers proficient in Vue for collaboration.
+- Future plans include knowledge base management and workflow.
 
-#### Gitee Feature
+## 🚀 Quick Start
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### Download the Code
+```bash
+git clone https://github.com/nels-ai-source/nels.ai.git
+```
+### Start Backend Service
+#### 1. Restore Database
+Open "Package Manager Console", set "Nels.DbMigrator" as the startup project, and select "Nels.Aigc.EntityFrameworkCore" as the default project.
+
+Run the command: Update Database. Note that you need to have PostgreSQL installed and modify the connection string in "appsettings".
+
+```bash
+PM> Update-Database
+```
+
+#### 2. Execute Seed Data
+Run the "Nels.DbMigrator" console application.
+
+#### 3. Start Service
+Run "Nels.HttpApi.Host".
+
+Start Frontend
+#### 1. Install Dependencies
+```bash
+npm install
+```
+#### 2. Start Frontend
+```bash
+npm run serve
+```
+## How to Contribute
+If you wish to contribute, feel free to submit a Pull Request or report a Bug.
+
+## Open Source Projects Used
+ABP
+semantic-kernel
+kernel-memory
+SCUI

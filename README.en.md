@@ -55,6 +55,15 @@ npm install
 ```bash
 npm run serve
 ```
+
+### Add Model Instance
+1. Log in to the backend, click on the "Model" page under "Settings" in the top menu.
+2. Select a model, click "Create Model Instance", and fill in the key and description.
+
+### Create Agent
+1. Log in to the backend, click on the "Agent" page in the top menu.
+2. After adding a new Agent, click on the Agent card to enter the details page and set the Prompt to start chatting.
+
 ## How to Contribute
 If you wish to contribute, feel free to submit a Pull Request or report a Bug.
 

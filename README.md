@@ -60,6 +60,14 @@ npm install
 npm run serve
 ```
 
+### 添加模型实例
+1. 登录后台，点击顶部菜单中的"设置"中的"模型"页面。
+2. 选中一个模型，点击"创建模型实例"，填写key 和描述。
+
+### 创建Agent
+1. 登录后台，点击顶部菜单中的"Agent"页面。
+2. 新增后，点击Agent卡片即可进入详情页面，设置Prompt开始聊天。
+
 ## 如何贡献
 
 如果你希望参与贡献，欢迎提交 [Pull Request](https://github.com/nels-ai-source/nels.ai/pulls)，或给我们 [报告 Bug](https://github.com/nels-ai-source/nels.ai/issues)。

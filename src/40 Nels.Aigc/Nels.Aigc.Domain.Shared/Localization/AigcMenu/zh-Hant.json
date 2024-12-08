@@ -1,0 +1,17 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "Menu:Home": "首页",
+    "Menu:Dashboard": "控制台",
+    "Menu:Aigc": "Aigc",
+    "Menu:Aigc.Agent": "智能体",
+    "Menu:Aigc.Agent.Agent": "智能体",
+    "Menu:Aigc.Agent.AgentDetail": "智能体详情",
+    "Menu:Aigc.Resource": "资源",
+    "Menu:Aigc.Resource.Knowledge": "知识库",
+    "Menu:Aigc.Resource.Plugin": "插件",
+    "Menu:Aigc.Setting": "设置",
+    "Menu:Aigc.Setting.Space": "空间",
+    "Menu:Aigc.Setting.Model": "模型"
+  }
+}

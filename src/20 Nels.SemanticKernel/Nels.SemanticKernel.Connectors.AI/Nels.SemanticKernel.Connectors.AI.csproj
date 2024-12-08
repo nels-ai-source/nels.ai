@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<AssemblyName>Nels.SemanticKernel.Connectors.AI</AssemblyName>
+	<RootNamespace>Nels.SemanticKernel</RootNamespace>
+	<TargetFrameworks>net9.0</TargetFrameworks>
+	<EnablePackageValidation>false</EnablePackageValidation>
+	<VersionSuffix>alpha</VersionSuffix>
+	<NoWarn>$(NoWarn);SKEXP0001,CS8632,CS8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.31.0" />
+    <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

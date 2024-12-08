@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nels.Abp.SysMng</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.Identity.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="9.0.0" />
+	<PackageReference Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nels.Abp.SysMng.Domain\Nels.Abp.SysMng.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

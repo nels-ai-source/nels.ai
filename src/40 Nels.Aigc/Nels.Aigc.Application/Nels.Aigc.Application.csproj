@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nels.Aigc</RootNamespace>
+	<NoWarn>$(NoWarn);SKEXP0080,SKEXP0040,CS8632,CS8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\10 Nels.Abp.SysMng\Nels.Abp.SysMng.Application\Nels.Abp.SysMng.Application.csproj" />
+    <ProjectReference Include="..\Nels.Aigc.Domain\Nels.Aigc.Domain.csproj" />
+    <ProjectReference Include="..\Nels.Aigc.Application.Contracts\Nels.Aigc.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Account.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.Identity.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

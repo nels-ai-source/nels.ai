@@ -1,0 +1,35 @@
+{
+  "culture": "zh-Hant",
+  "texts": {
+    "MyAccount": "我的账户",
+    "SamplePageMessage": "系统管理模块的示例页面",
+
+    "Permission:SysMng": "系统管理",
+
+    "Permission:SysMng.Menus": "菜单管理",
+    "Permission:SysMng.Menus.GetList": "查询",
+    "Permission:SysMng.Menus.Create": "新增",
+    "Permission:SysMng.Menus.Update": "编辑",
+    "Permission:SysMng.Menus.Delete": "删除",
+
+    "Permission:SysMng.OrganizationUnits": "组织单位",
+    "Permission:SysMng.OrganizationUnits.GetList": "查询",
+    "Permission:SysMng.OrganizationUnits.Create": "新增",
+    "Permission:SysMng.OrganizationUnits.Update": "编辑",
+    "Permission:SysMng.OrganizationUnits.Delete": "删除",
+
+    "Permission:SysMng.Roles": "角色管理",
+    "Permission:SysMng.Roles.GetList": "查询",
+    "Permission:SysMng.Roles.Create": "新增",
+    "Permission:SysMng.Roles.Update": "编辑",
+    "Permission:SysMng.Roles.Delete": "删除",
+    "Permission:SysMng.Roles.ManagePermissions": "设置权限",
+
+    "Permission:SysMng.Users": "用户管理",
+    "Permission:SysMng.Users.GetList": "查询",
+    "Permission:SysMng.Users.Create": "新增",
+    "Permission:SysMng.Users.Update": "编辑",
+    "Permission:SysMng.Users.Delete": "删除",
+    "Permission:SysMng.Users.ManagePermissions": "设置权限"
+  }
+}

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nels.Abp.SysMng</RootNamespace>
+	<NoWarn>$(NoWarn);SKEXP0080,SKEXP0040,CS8632,CS8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.Contracts" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.Identity.Application" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\00 Nels.Abp\Nels.Abp.Ddd.Application.Contracts\Nels.Abp.Ddd.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\00 Nels.Abp\Nels.Abp.Ddd.Application\Nels.Abp.Ddd.Application.csproj" />
+    <ProjectReference Include="..\..\20 Nels.SemanticKernel\Nels.SemanticKernel.Core\Nels.SemanticKernel.Core.csproj" />
+    <ProjectReference Include="..\Nels.Abp.SysMng.Application.Contracts\Nels.Abp.SysMng.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Nels.Abp.SysMng.Domain\Nels.Abp.SysMng.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

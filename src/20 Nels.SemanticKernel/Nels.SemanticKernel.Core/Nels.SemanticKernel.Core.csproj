@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <AssemblyName>Nels.SemanticKernel.Core</AssemblyName>
+	  <RootNamespace>Nels.SemanticKernel</RootNamespace>
+	  <TargetFrameworks>net9.0</TargetFrameworks>
+	  <EnablePackageValidation>false</EnablePackageValidation>
+	  <VersionSuffix>alpha</VersionSuffix>
+	  <NoWarn>$(NoWarn);SKEXP0001,SKEXP0010,CS8632,CS8618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="1.0.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.31.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nels.SemanticKernel.Connectors.AI\Nels.SemanticKernel.Connectors.AI.csproj" />
+  </ItemGroup>
+
+</Project>

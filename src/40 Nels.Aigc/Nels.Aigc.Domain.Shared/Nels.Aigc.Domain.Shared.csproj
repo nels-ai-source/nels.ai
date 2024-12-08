@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nels.Aigc</RootNamespace>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Identity.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.AuditLogging.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Domain.Shared" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.OpenIddict.Domain.Shared" Version="9.0.0" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.0" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+    <EmbeddedResource Include="Localization\Aigc\*.json" />
+	<Content Remove="Localization\Aigc\*.json" />
+  </ItemGroup>
+
+
+	<ItemGroup>
+	  <None Remove="Localization\AigcMenu\en.json" />
+	  <None Remove="Localization\AigcMenu\zh-Hans.json" />
+	  <None Remove="Localization\AigcMenu\zh-Hant.json" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Localization\AigcMenu\en.json" />
+	  <EmbeddedResource Include="Localization\AigcMenu\zh-Hans.json" />
+	  <EmbeddedResource Include="Localization\AigcMenu\zh-Hant.json" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\10 Nels.Abp.SysMng\Nels.Abp.SysMng.Domain.Shared\Nels.Abp.SysMng.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

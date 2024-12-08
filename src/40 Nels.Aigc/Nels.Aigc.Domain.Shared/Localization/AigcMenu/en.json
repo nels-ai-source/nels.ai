@@ -1,0 +1,17 @@
+{
+  "culture": "en",
+  "texts": {
+    "Menu:Home": "Home",
+    "Menu:Dashboard": "Dashboard",
+    "Menu:Aigc": "Aigc",
+    "Menu:Aigc.Agent": "Agent",
+    "Menu:Aigc.Agent.Agent": "Agent",
+    "Menu:Aigc.Agent.AgentDetail": "Agent Detail",
+    "Menu:Aigc.Resource": "Resource",
+    "Menu:Aigc.Resource.Knowledge": "Knowledge Base",
+    "Menu:Aigc.Resource.Plugin": "Plugin",
+    "Menu:Aigc.Setting": "Setting",
+    "Menu:Aigc.Setting.Space": "Space",
+    "Menu:Aigc.Setting.Model": "Model"
+  }
+}

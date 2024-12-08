@@ -1,0 +1,92 @@
+{
+  "folders": {
+    "items": {
+      "src": {
+        "items": {
+          "00 Nels.Abp": {},
+          "10 Nels.Abp.SysMng": {},
+          "20 Nels.SemanticKernel": {},
+          "40 Nels.Aigc": {}
+        }
+      }
+    }
+  },
+  "packages": {
+    "Nels.Abp.Ddd.Application": {
+      "path": "src/00%20Nels.Abp/Nels.Abp.Ddd.Application/Nels.Abp.Ddd.Application.abppkg",
+      "folder": "src/00 Nels.Abp"
+    },
+    "Nels.Abp.Ddd.Application.Contracts": {
+      "path": "src/00%20Nels.Abp/Nels.Abp.Ddd.Application.Contracts/Nels.Abp.Ddd.Application.Contracts.abppkg",
+      "folder": "src/00 Nels.Abp"
+    },
+    "Nels.Abp.SysMng.Application": {
+      "path": "src/10%20Nels.Abp.SysMng/Nels.Abp.SysMng.Application/Nels.Abp.SysMng.Application.abppkg",
+      "folder": "src/10 Nels.Abp.SysMng"
+    },
+    "Nels.Abp.SysMng.Application.Contracts": {
+      "path": "src/10%20Nels.Abp.SysMng/Nels.Abp.SysMng.Application.Contracts/Nels.Abp.SysMng.Application.Contracts.abppkg",
+      "folder": "src/10 Nels.Abp.SysMng"
+    },
+    "Nels.Abp.SysMng.Domain": {
+      "path": "src/10%20Nels.Abp.SysMng/Nels.Abp.SysMng.Domain/Nels.Abp.SysMng.Domain.abppkg",
+      "folder": "src/10 Nels.Abp.SysMng"
+    },
+    "Nels.Abp.SysMng.Domain.Shared": {
+      "path": "src/10%20Nels.Abp.SysMng/Nels.Abp.SysMng.Domain.Shared/Nels.Abp.SysMng.Domain.Shared.abppkg",
+      "folder": "src/10 Nels.Abp.SysMng"
+    },
+    "Nels.Abp.SysMng.EntityFrameworkCore": {
+      "path": "src/10%20Nels.Abp.SysMng/Nels.Abp.SysMng.EntityFrameworkCore/Nels.Abp.SysMng.EntityFrameworkCore.abppkg",
+      "folder": "src/10 Nels.Abp.SysMng"
+    },
+    "Nels.SemanticKernel.Connectors.AI": {
+      "path": "src/20%20Nels.SemanticKernel/Nels.SemanticKernel.Connectors.AI/Nels.SemanticKernel.Connectors.AI.abppkg",
+      "folder": "src/20 Nels.SemanticKernel"
+    },
+    "Nels.SemanticKernel.Core": {
+      "path": "src/20%20Nels.SemanticKernel/Nels.SemanticKernel.Core/Nels.SemanticKernel.Core.abppkg",
+      "folder": "src/20 Nels.SemanticKernel"
+    },
+    "Nels.SemanticKernel.GraphRag": {
+      "path": "src/20%20Nels.SemanticKernel/Nels.SemanticKernel.GraphRag/Nels.SemanticKernel.GraphRag.abppkg",
+      "folder": "src/20 Nels.SemanticKernel"
+    },
+    "Nels.Abp.Ddd.Domain": {
+      "path": "src/00%20Nels.Abp/Nels.Abp.Ddd.Domain/Nels.Abp.Ddd.Domain.abppkg",
+      "folder": "src/00 Nels.Abp"
+    },
+    "Nels.SemanticKernel.Process": {
+      "path": "src/20%20Nels.SemanticKernel/Nels.SemanticKernel.Process/Nels.SemanticKernel.Process.abppkg",
+      "folder": "src/20 Nels.SemanticKernel"
+    },
+    "Nels.HttpApi.Host": {
+      "path": "src/Nels.HttpApi.Host/Nels.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "Nels.Aigc.Application": {
+      "path": "src/40%20Nels.Aigc/Nels.Aigc.Application/Nels.Aigc.Application.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    },
+    "Nels.Aigc.Application.Contracts": {
+      "path": "src/40%20Nels.Aigc/Nels.Aigc.Application.Contracts/Nels.Aigc.Application.Contracts.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    },
+    "Nels.Aigc.Domain": {
+      "path": "src/40%20Nels.Aigc/Nels.Aigc.Domain/Nels.Aigc.Domain.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    },
+    "Nels.Aigc.Domain.Shared": {
+      "path": "src/40%20Nels.Aigc/Nels.Aigc.Domain.Shared/Nels.Aigc.Domain.Shared.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    },
+    "Nels.Aigc.EntityFrameworkCore": {
+      "path": "src/40%20Nels.Aigc/Nels.Aigc.EntityFrameworkCore/Nels.Aigc.EntityFrameworkCore.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    },
+    "Nels.DbMigrator": {
+      "path": "src/40%20Nels.Aigc/Nels.DbMigrator/Nels.DbMigrator.abppkg",
+      "folder": "src/40 Nels.Aigc"
+    }
+  }
+}

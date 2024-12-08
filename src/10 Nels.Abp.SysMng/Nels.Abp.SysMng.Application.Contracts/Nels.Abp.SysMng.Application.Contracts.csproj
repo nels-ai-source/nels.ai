@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\common.props" />
+
+  <PropertyGroup>
+	<TargetFrameworks>net9.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Nels.Abp.SysMng</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\GenerateStory.yaml" />
+    <None Remove="Resources\getIntent.prompt.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\GenerateStory.yaml" />
+    <EmbeddedResource Include="Resources\getIntent.prompt.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel.Yaml" Version="1.31.0" />
+    <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="9.0.0" />
+    <PackageReference Include="Volo.Abp.Identity.Application.Contracts" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\00 Nels.Abp\Nels.Abp.Ddd.Application.Contracts\Nels.Abp.Ddd.Application.Contracts.csproj" />
+    <ProjectReference Include="..\Nels.Abp.SysMng.Domain\Nels.Abp.SysMng.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

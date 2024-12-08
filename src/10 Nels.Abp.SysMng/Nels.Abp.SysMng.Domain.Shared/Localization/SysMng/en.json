@@ -1,0 +1,35 @@
+{
+  "culture": "en",
+  "texts": {
+    "MyAccount": "My Account",
+    "SamplePageMessage": "Sample page for the System Management module",
+
+    "Permission:SysMng": "System Management",
+
+    "Permission:SysMng.Menus": "Menu Management",
+    "Permission:SysMng.Menus.GetList": "Query",
+    "Permission:SysMng.Menus.Create": "Create",
+    "Permission:SysMng.Menus.Update": "Update",
+    "Permission:SysMng.Menus.Delete": "Delete",
+
+    "Permission:SysMng.OrganizationUnits": "Organization Units",
+    "Permission:SysMng.OrganizationUnits.GetList": "Query",
+    "Permission:SysMng.OrganizationUnits.Create": "Create",
+    "Permission:SysMng.OrganizationUnits.Update": "Update",
+    "Permission:SysMng.OrganizationUnits.Delete": "Delete",
+
+    "Permission:SysMng.Roles": "Role Management",
+    "Permission:SysMng.Roles.GetList": "Query",
+    "Permission:SysMng.Roles.Create": "Create",
+    "Permission:SysMng.Roles.Update": "Update",
+    "Permission:SysMng.Roles.Delete": "Delete",
+    "Permission:SysMng.Roles.ManagePermissions": "Manage Permissions",
+
+    "Permission:SysMng.Users": "User Management",
+    "Permission:SysMng.Users.GetList": "Query",
+    "Permission:SysMng.Users.Create": "Create",
+    "Permission:SysMng.Users.Update": "Update",
+    "Permission:SysMng.Users.Delete": "Delete",
+    "Permission:SysMng.Users.ManagePermissions": "Manage Permissions"
+  }
+}

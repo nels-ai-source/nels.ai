@@ -17,6 +17,7 @@ using Nels.SemanticKernel;
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process;
 using Nels.SemanticKernel.Services;
+using Nels.SemanticKernel.Connectors.Memory.Postgres;
 using OpenIddict.Validation.AspNetCore;
 using Serilog;
 using System;
@@ -39,6 +40,8 @@ using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Castle.Core.Configuration;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Nels;
 
@@ -112,23 +115,33 @@ public class HttpApiHostModule : AbpModule
             .WriteTo.Console()
             .CreateLogger();
     }
-    private void ConfigureAigc(ServiceConfigurationContext context)
+    public void ConfigureAigc(ServiceConfigurationContext context)
     {
-        context.Services.AddSingleton<IModelInstanceService, ModelInstanceAppService>();
-        context.Services.AddSingleton<IPromptService, PromptAppService>();
-        context.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        context.Services.AddScoped<IStreamResponse, SseStreamResponse>();
+        var configuration = context.Services.GetConfiguration();
+
+        AddPublicServices(context.Services, configuration);
 
         context.Services.AddKernelProcess(option =>
         {
         });
         context.Services.AddKernelBuilder(_builder =>
         {
-            _builder.Services.AddSingleton<IModelInstanceService, ModelInstanceAppService>();
-            _builder.Services.AddSingleton<IPromptService, PromptAppService>();
-            _builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
-            _builder.Services.AddScoped<IStreamResponse, SseStreamResponse>();
+            AddPublicServices(_builder.Services, configuration);
         });
+    }
+
+    private void AddPublicServices(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSingleton<IModelInstanceService, ModelInstanceAppService>();
+        services.AddSingleton<IPromptService, PromptAppService>();
+        services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped<IStreamResponse, SseStreamResponse>();
+
+        var connectionString = configuration.GetSection("ConnectionStrings").GetChildren().FirstOrDefault()?.Value;
+        if (connectionString != null)
+        {
+            services.AddPostgresMemoryStore(connectionString, 1536);
+        }
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

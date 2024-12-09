@@ -8,5 +8,7 @@ public static class StepTypeConst
     public const string Llm = nameof(Llm);
     public const string Message = nameof(Message);
 
+    public const string Knowledge = nameof(Knowledge);
+
     public const string MessageOnChatMessageAsync = nameof(MessageOnChatMessageAsync);
 }

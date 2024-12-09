@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nels.Aigc.EntityFrameworkCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nels.DbMigrator", "src\40 Nels.Aigc\Nels.DbMigrator\Nels.DbMigrator.csproj", "{0653F3D3-ACA6-48AE-B171-55184E24E6CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nels.SemanticKernel.Connectors.Memory", "src\20 Nels.SemanticKernel\Nels.SemanticKernel.Connectors.Memory\Nels.SemanticKernel.Connectors.Memory.csproj", "{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{0653F3D3-ACA6-48AE-B171-55184E24E6CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0653F3D3-ACA6-48AE-B171-55184E24E6CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0653F3D3-ACA6-48AE-B171-55184E24E6CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{1FF75035-AF31-4BDC-B21F-6B65FA93813D} = {1B0C25B9-7B3B-4619-9BCB-E737774E8ECB}
 		{DA49677D-7B28-4C30-9103-2C52016F743C} = {1B0C25B9-7B3B-4619-9BCB-E737774E8ECB}
 		{0653F3D3-ACA6-48AE-B171-55184E24E6CB} = {1B0C25B9-7B3B-4619-9BCB-E737774E8ECB}
+		{DABD5527-7BC6-4D0F-BC3B-882D06B2B07B} = {80458D15-F2F9-408D-9903-A9A8ABF363A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

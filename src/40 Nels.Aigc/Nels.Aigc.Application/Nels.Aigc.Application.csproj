@@ -6,7 +6,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>Nels.Aigc</RootNamespace>
-	<NoWarn>$(NoWarn);SKEXP0080,SKEXP0040,CS8632,CS8618</NoWarn>
+	<NoWarn>$(NoWarn);SKEXP0001;SKEXP0080,SKEXP0040,CS8632,CS8618</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

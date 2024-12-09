@@ -84,7 +84,9 @@ public abstract class RouteAbstractKeyCrudAppService<TEntity, TGetOutputDto, TGe
 
         await ValidateCreate(entity);
 
+        await BeforeInsertAsync(entity);
         await InsertAsync(entity);
+        await AfterInsertAsync(entity);
 
         return await MapToGetOutputDtoAsync(entity);
     }
@@ -108,7 +110,9 @@ public abstract class RouteAbstractKeyCrudAppService<TEntity, TGetOutputDto, TGe
 
         await ValidateUpdate(input, entity);
 
+        await BeforeUpdateAsync(entity);
         await UpdateAsync(entity);
+        await AfterUpdateAsync(entity);
 
         return await MapToGetOutputDtoAsync(entity);
     }
@@ -125,7 +129,11 @@ public abstract class RouteAbstractKeyCrudAppService<TEntity, TGetOutputDto, TGe
 
         await ValidateDelete(id);
 
+        var entity = await GetEntityByIdAsync(id);
+
+        await BeforeDeleteAsync(entity);
         await DeleteByIdAsync(id);
+        await AfterDeleteAsync(entity);
     }
     /// <summary>
     /// Asynchronously deletes multiple entities by their unique identifiers.
@@ -147,7 +155,15 @@ public abstract class RouteAbstractKeyCrudAppService<TEntity, TGetOutputDto, TGe
     protected virtual Task ValidateUpdate(TUpdateInput input, TEntity entity) { return Task.CompletedTask; }
     protected virtual Task ValidateDelete(TKey id) { return Task.CompletedTask; }
 
+    protected virtual async Task BeforeDeleteAsync(TEntity entity)
+    {
+        await Task.CompletedTask;
+    }
     protected abstract Task DeleteByIdAsync(TKey id);
+    protected virtual async Task AfterDeleteAsync(TEntity entity)
+    {
+        await Task.CompletedTask;
+    }
     protected abstract Task DeleteByIdsAsync(List<TKey> ids);
     /// <summary>
     /// Checks if the create policy exists, and creates it if necessary.
@@ -276,8 +292,24 @@ public abstract class RouteAbstractKeyCrudAppService<TEntity, TGetOutputDto, TGe
     {
         return await Repository.InsertAsync(entity, autoSave: true);
     }
+    protected virtual async Task<TEntity> BeforeInsertAsync(TEntity entity)
+    {
+        return await Task.FromResult(entity);
+    }
+    protected virtual async Task<TEntity> AfterInsertAsync(TEntity entity)
+    {
+        return await Task.FromResult(entity);
+    }
     protected virtual async Task<TEntity> UpdateAsync(TEntity entity)
     {
         return await Repository.UpdateAsync(entity, autoSave: true);
+    }
+    protected virtual async Task<TEntity> BeforeUpdateAsync(TEntity entity)
+    {
+        return await Task.FromResult(entity);
+    }
+    protected virtual async Task<TEntity> AfterUpdateAsync(TEntity entity)
+    {
+        return await Task.FromResult(entity);
     }
 }

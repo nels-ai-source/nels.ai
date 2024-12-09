@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nels.SemanticKernel.Connectors.Memory\Nels.SemanticKernel.Connectors.Memory.csproj" />
     <ProjectReference Include="..\Nels.SemanticKernel.Core\Nels.SemanticKernel.Core.csproj" />
   </ItemGroup>
 

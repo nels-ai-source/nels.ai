@@ -3,6 +3,7 @@ using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Liquid;
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process.Extensions;
+using Nels.SemanticKernel.Process.Logs;
 using Nels.SemanticKernel.Process.States;
 using Nels.SemanticKernel.Process.Templates;
 using System.Text.Json.Serialization;
@@ -15,9 +16,9 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
     private string _result;
 
     [KernelFunction(StepTypeConst.Message)]
-    public async ValueTask ExecuteAsync(KernelProcessStepContext context, Dictionary<string, object> content, CancellationToken cancellationToken)
+    public async ValueTask ExecuteAsync(KernelProcessStepContext context, Kernel kernel, CancellationToken cancellationToken)
     {
-        await base.StepExecuteAsync(context, content, cancellationToken);
+        await base.StepExecuteAsync(context, kernel, cancellationToken);
     }
     public override async ValueTask<bool> PreExecuteAsync(CancellationToken cancellationToken)
     {

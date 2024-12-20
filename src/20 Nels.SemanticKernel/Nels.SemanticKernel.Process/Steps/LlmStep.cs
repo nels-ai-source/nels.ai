@@ -1,4 +1,5 @@
-﻿using Microsoft.SemanticKernel;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Liquid;
@@ -6,6 +7,7 @@ using Nels.SemanticKernel.Extensions;
 using Nels.SemanticKernel.InternalUtilities;
 using Nels.SemanticKernel.InternalUtilities.Models;
 using Nels.SemanticKernel.Process.Extensions;
+using Nels.SemanticKernel.Process.Logs;
 using Nels.SemanticKernel.Process.States;
 using System.Text.Json.Serialization;
 
@@ -13,17 +15,15 @@ namespace Nels.SemanticKernel.Process.Steps;
 
 public class LlmStep : NelsKernelProcessStep<LlmStepState>
 {
-    private Kernel _kernel { get; set; }
     private readonly IPromptTemplateFactory _templateFactory = new LiquidPromptTemplateFactory();
     private LlmGetStreamingChatMessage _chatDeleegate;
     private string _result;
     public delegate Task<string> LlmGetStreamingChatMessage(MessageEventHandler messageEvent);
 
     [KernelFunction(StepTypeConst.Llm)]
-    public async ValueTask ExecuteAsync(KernelProcessStepContext context, Dictionary<string, object> content, Kernel kernel, CancellationToken cancellationToken)
+    public async ValueTask ExecuteAsync(KernelProcessStepContext context, Kernel kernel, CancellationToken cancellationToken)
     {
-        _kernel = kernel;
-        await base.StepExecuteAsync(context, content, cancellationToken);
+        await base.StepExecuteAsync(context, kernel, cancellationToken);
     }
 
     public override async ValueTask<bool> ExecutionAsync(CancellationToken cancellationToken)
@@ -52,12 +52,13 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
     public delegate ValueTask MessageEventHandler(LlmChatMessageEventData data);
     public async Task<string> GetStreamingChatMessageAsync(MessageEventHandler messageEvent)
     {
+        _state.Stopwatch.Start();
+
         var chatCompletionService = GetCompletionService() ?? throw new Exception();
         var promptExecutionSettings = new PromptExecutionSettings() { ExtensionData = _state.ExtensionData };
 
         var chatHistory = await GetChatMessagesAsync();
 
-        var usage = new CompletionUsage();
         _result = string.Empty;
         await foreach (var item in chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, promptExecutionSettings))
         {
@@ -65,20 +66,19 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
 
             _result += item.Content;
 
-            await _processStepContext.EmitEventAsync(new KernelProcessEvent { Id = StepEvent.LlmChatMessageEvent, Data = item.Content });
-
-            usage.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
-                && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : usage.PromptTokens + 1;
-            usage.CompletionTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
-                && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : usage.CompletionTokens + 1;
+            _state.StepLog.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
+                && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : _state.StepLog.PromptTokens + 1;
+            _state.StepLog.CompleteTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
+                && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : _state.StepLog.CompleteTokens + 1;
 
             await messageEvent(new LlmChatMessageEventData(_id, item.Content));
-
         };
 
         AddChatHistory(AuthorRole.Assistant, _result);
 
         await PostExecuteAsync(_cancellationToken);
+
+        _state.Stopwatch.Stop();
 
         return _result;
     }

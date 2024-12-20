@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
-using Volo.Abp.Guids;
 
 namespace Nels.Aigc.Entities;
 
@@ -28,10 +27,11 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>
     public virtual List<AgentPresetQuestions> PresetQuestions { get; set; } = [];
     public virtual AgentMetadata? Metadata { get; set; }
 
-    public void AddOrUpdateMetadata(Guid id, string metadata)
+    public void AddOrUpdateMetadata(Guid id, string steps, string states)
     {
-        Metadata ??= new AgentMetadata(id, this.Id, metadata);
-        Metadata.Metadata = metadata;
+        Metadata ??= new AgentMetadata(id, this.Id, steps, states);
+        Metadata.Steps = steps;
+        Metadata.States = states;
     }
 }
 public class AgentPresetQuestions : AuditedEntity<Guid>
@@ -50,11 +50,13 @@ public class AgentPresetQuestions : AuditedEntity<Guid>
 public class AgentMetadata : AuditedEntity<Guid>
 {
     protected AgentMetadata() { }
-    internal AgentMetadata(Guid id, Guid agentId, string metadata) : base(id)
+    internal AgentMetadata(Guid id, Guid agentId, string steps, string states) : base(id)
     {
         AgentId = agentId;
-        Metadata = metadata;
+        Steps = steps;
+        States = states;
     }
     public virtual Guid AgentId { get; set; }
-    public virtual string Metadata { get; set; } = string.Empty;
+    public virtual string Steps { get; set; } = string.Empty;
+    public virtual string States { get; set; } = string.Empty;
 }

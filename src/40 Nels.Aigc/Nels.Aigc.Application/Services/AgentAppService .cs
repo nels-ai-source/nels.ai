@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -31,6 +32,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     private readonly IProceessSerializer _proceessSerializer;
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<AgentMetadata, Guid> _metadataRepository;
+    private readonly IRepository<AgentInstance, Guid> _agentInstanceRepository;
 
     public AgentAppService(IRepository<Agent, Guid> repository,
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
@@ -63,9 +65,9 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
             item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
             item.Index = index++;
         }
-        if (string.IsNullOrWhiteSpace(updateInput.Metadata) == false)
+        if (string.IsNullOrWhiteSpace(updateInput.Steps) == false || string.IsNullOrWhiteSpace(updateInput.States) == false)
         {
-            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Metadata);
+            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Steps, updateInput.States);
         }
         return base.UpdateInputMapToEntityAsync(updateInput, entity);
     }
@@ -99,6 +101,68 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
             }
         }
         return await base.UpdateAsync(entity);
+    }
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task test()
+    {
+        ProcessBuilder process = new("AccountOpeningProcess");
+        var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
+        var llmStep_0 = process.AddStepFromType<LlmStep, LlmStepState>(new LlmStepState
+        {
+            ChatMessages = [new MessageContent { Role = "user", Content = "写一首七言律诗" }]
+        }, "llmStep_0");
+        var llmStep_1 = process.AddStepFromType<LlmStep, LlmStepState>(new LlmStepState
+        {
+            ChatMessages = [new MessageContent { Role = "user", Content = "写一个递归算法" }]
+        }, "llmStep_1");
+
+
+        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(new MessageStepState
+        {
+            Template = "message1:{{llmStep_0_output}}",
+            Inputs = [
+                new SemanticKernel.Process.Variables.InputVariable
+                {
+            Name = StepConst.DefaultOutput+"0",
+            Type = VariableTypeConst.String,
+            Value = new VariableValue
+            {
+                Type=VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep_0.Id,
+            }
+        },        new SemanticKernel.Process.Variables.InputVariable
+        {
+            Name = StepConst.DefaultOutput+"1",
+            Type = VariableTypeConst.String,
+            Value = new VariableValue
+            {
+                 Type=VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep_1.Id,
+            }
+        }
+            ]
+        }, nameof(MessageStep));
+
+        process.OnInputEvent("StartProcess")
+            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
+
+        startStep.OnFunctionResult()
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep_0))
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep_1));
+
+        llmStep_1.OnFunctionResult()
+             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep));
+
+        KernelProcess kernelProcess = process.Build();
+
+        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState { UserInput = "123" } });
+        var res = await con.GetStateAsync();
+        var json = _proceessSerializer.Serialize(res);
+        var http = _kernel.GetRequiredService<IHttpContextAccessor>();
+        var item = http.HttpContext.Items;
     }
 
     [HttpPost]
@@ -143,6 +207,8 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     public virtual async Task AgentStartAsync(AgentStartRequestDto request)
     {
         var agent = await GetAsync(request.AgentId) ?? throw new Exception();
+        var instance = request.InstanceId == null
+            ? new AgentInstance(GuidGenerator.Create()) : await _agentInstanceRepository.GetAsync(x => x.Id == request.InstanceId.Value);
 
         if (request.Streaming)
         {
@@ -151,56 +217,62 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         if (agent.AgentType == AgentType.Llm)
         {
-            await LlmAgentStartAsync(request, agent);
+            await LlmAgentStartAsync(request, agent, instance);
         }
         else if (agent.AgentType == AgentType.Workflow)
         {
-            await WorkflowAgentStartAsync(request, agent);
+            await WorkflowAgentStartAsync(request, agent, instance);
         }
     }
 
-    private async Task LlmAgentStartAsync(AgentStartRequestDto request, AgentDto agent)
+    private async Task LlmAgentStartAsync(AgentStartRequestDto request, AgentDto agent, AgentInstance agentInstance)
     {
-        var metadata = agent.Metadata == null ? new AgentLlmMetadataDto() : JsonSerializer.Deserialize<AgentLlmMetadataDto>(agent.Metadata) ?? throw new Exception();
 
-        ProcessBuilder process = new(agent.Id.ToString());
-        var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
-        metadata.LlmStepState.ChatMessages.Add(new MessageContent(AuthorRole.User.Label, request.UserInput));
-
-        var llmStep = process.AddStepFromType<LlmStep, LlmStepState>(metadata.LlmStepState, nameof(LlmStep));
-
-        metadata.MessageStepState.Inputs.Add(new SemanticKernel.Process.Variables.InputVariable
-        {
-            Name = StepConst.DefaultOutput,
-            Type = VariableTypeConst.String,
-            Value = new RefValue
-            {
-                Content = new VariableRefConent
-                {
-                    Id = llmStep.Id,
-                    Name = StepConst.DefaultOutput,
-                }
-            }
-        });
-        metadata.MessageStepState.Template = "{{" + StepConst.DefaultOutput + "}}";
-
-        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(metadata.MessageStepState, nameof(MessageStep));
-
-        process.OnInputEvent(StepEvent.StartProcessEvent)
-            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
-
-        startStep.OnEvent(StepEvent.ExecutedEvent)
-            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep, functionName: StepTypeConst.Llm, parameterName: "content"));
-
-        llmStep.OnEvent(StepEvent.ExecutedEvent)
-             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep, functionName: StepTypeConst.Message, parameterName: "content"));
-
-        KernelProcess kernelProcess = process.Build();
+        KernelProcess kernelProcess = string.IsNullOrWhiteSpace(agentInstance.Steps) ?
+            BuilderLlmKernelProcess(request, agent) :
+            _proceessSerializer.Deserialize(agentInstance.Steps);
 
         await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = StepEvent.StartProcessEvent });
 
     }
-    private async Task WorkflowAgentStartAsync(AgentStartRequestDto request, AgentDto agent)
+    private KernelProcess BuilderLlmKernelProcess(AgentStartRequestDto request, AgentDto agent)
+    {
+        var agentLlmState = string.IsNullOrWhiteSpace(agent.States) ? new AgentLlmStateDto() : JsonSerializer.Deserialize<AgentLlmStateDto>(agent.States) ?? throw new Exception();
+
+        ProcessBuilder process = new(agent.Id.ToString());
+        var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
+        agentLlmState.LlmStepState.ChatMessages.Add(new MessageContent(AuthorRole.User.Label, request.UserInput));
+
+        var llmStep = process.AddStepFromType<LlmStep, LlmStepState>(agentLlmState.LlmStepState, nameof(LlmStep));
+
+        agentLlmState.MessageStepState.Inputs.Add(new SemanticKernel.Process.Variables.InputVariable
+        {
+            Name = StepConst.DefaultOutput,
+            Type = VariableTypeConst.String,
+            Value = new VariableValue
+            {
+                Type = VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep.Id,
+
+            }
+        });
+        agentLlmState.MessageStepState.Template = "{{" + StepConst.DefaultOutput + "}}";
+
+        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(agentLlmState.MessageStepState, nameof(MessageStep));
+
+        process.OnInputEvent(StepEvent.StartProcessEvent)
+            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
+
+        startStep.OnFunctionResult()
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep, functionName: StepTypeConst.Llm));
+
+        llmStep.OnFunctionResult()
+             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep, functionName: StepTypeConst.Message));
+
+        return process.Build();
+    }
+    private async Task WorkflowAgentStartAsync(AgentStartRequestDto request, AgentDto agent, AgentInstance agentInstance)
     {
         await Task.CompletedTask;
     }

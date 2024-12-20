@@ -1,4 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.Process.Logs;
 using Nels.SemanticKernel.Process.States;
 using Nels.SemanticKernel.Process.Variables;
 using System.Text.Json.Serialization;
@@ -8,9 +9,9 @@ namespace Nels.SemanticKernel.Process.Steps;
 public class StartStep : NelsKernelProcessStep<StartStepState>
 {
     [KernelFunction(StepTypeConst.Start)]
-    public async ValueTask ExecuteAsync(KernelProcessStepContext context, CancellationToken cancellationToken)
+    public async ValueTask ExecuteAsync(KernelProcessStepContext context, Kernel kernel, CancellationToken cancellationToken)
     {
-        await base.StepExecuteAsync(context, null, cancellationToken);
+        await base.StepExecuteAsync(context, kernel, cancellationToken);
     }
 
     public override ValueTask PostExecuteAsync(CancellationToken cancellationToken)

@@ -1,8 +1,10 @@
-﻿namespace Nels.SemanticKernel.Process.Variables;
+﻿using Nels.SemanticKernel.Process.Logs;
+
+namespace Nels.SemanticKernel.Process.Variables;
 
 public class InputVariable : Variable
 {
-    public IVariableValue Value { get; set; }
+    public VariableValue Value { get; set; }
 
     public object GetValue(StepState state)
     {

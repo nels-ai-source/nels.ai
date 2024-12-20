@@ -9,6 +9,8 @@ namespace Nels.Aigc.Dtos;
 public class AgentStartRequestDto
 {
     public virtual Guid AgentId { get; set; }
+
+    public virtual Guid? InstanceId { get; set; }
     public virtual string UserInput { get; set; } = string.Empty;
     public virtual bool Streaming { get; set; }
 }

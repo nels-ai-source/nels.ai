@@ -1,5 +1,4 @@
-﻿using Nels.SemanticKernel.Process.Logs;
-using static Nels.SemanticKernel.Process.Steps.LlmStep;
+﻿using static Nels.SemanticKernel.Process.Steps.LlmStep;
 
 namespace Nels.SemanticKernel.Process.Variables;
 
@@ -9,19 +8,19 @@ public class VariableValue
     public string Content { get; set; }
     public string RefKey { get; set; }
 
-    public object GetValue(StepState state)
+    public object GetValue(Dictionary<string, object> context)
     {
         if (Type == VariableValueTypeConst.Ref)
         {
-            return GetRefValue(state);
+            return GetRefValue(context);
         }
 
         return Content;
     }
 
-    private object GetRefValue(StepState state)
+    private object GetRefValue(Dictionary<string, object> context)
     {
-        if (state.Context.TryGetValue(RefKey, out var values) == false) return string.Empty;
+        if (context.TryGetValue(RefKey, out var values) == false) return string.Empty;
         if (values is LlmGetStreamingChatMessage message) return message;
         if (values is Dictionary<string, object> keyValues)
         {

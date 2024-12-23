@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.VisualBasic;
 using Nels.Abp.Ddd.Application.Services;
 using Nels.Aigc.Dtos;
 using Nels.Aigc.Entities;
@@ -32,16 +33,19 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     private readonly IProceessSerializer _proceessSerializer;
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<AgentMetadata, Guid> _metadataRepository;
-    private readonly IRepository<AgentInstance, Guid> _agentInstanceRepository;
+    private readonly AgentChatDomainService _agentChatDomainService;
+    private readonly IRepository<AgentConversation, Guid> _agentConversationRepository;
 
     public AgentAppService(IRepository<Agent, Guid> repository,
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
         IRepository<AgentMetadata, Guid> metadataRepository,
-        Kernel kernel,
+         IRepository<AgentConversation, Guid> agentConversationRepository,
         ILanguageProvider languageProvider,
         IStreamResponse streamResponse,
         IOptions<AbpLocalizationOptions> localizationOptions,
-        IProceessSerializer proceessSerializer) : base(repository)
+        IProceessSerializer proceessSerializer,
+        AgentChatDomainService agentChatDomainService,
+        Kernel kernel) : base(repository)
     {
         CreatePolicyName = AigcPermissions.Agent.Create;
         UpdatePolicyName = AigcPermissions.Agent.Update;
@@ -51,60 +55,18 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         _presetQuestionsRepository = presetQuestionsRepository;
         _metadataRepository = metadataRepository;
+        _agentConversationRepository = agentConversationRepository;
+        _agentChatDomainService = agentChatDomainService;
 
         _kernel = kernel;
         _streamResponse = streamResponse;
         _proceessSerializer = proceessSerializer;
     }
 
-    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, Agent entity)
-    {
-        var index = 0;
-        foreach (var item in updateInput.PresetQuestions)
-        {
-            item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
-            item.Index = index++;
-        }
-        if (string.IsNullOrWhiteSpace(updateInput.Steps) == false || string.IsNullOrWhiteSpace(updateInput.States) == false)
-        {
-            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Steps, updateInput.States);
-        }
-        return base.UpdateInputMapToEntityAsync(updateInput, entity);
-    }
 
-    protected override async Task<Agent> GetEntityByIdAsync(Guid id)
-    {
-        var entity = await Repository.GetAsync(id);
-        entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
-        entity.Metadata = await _metadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
-
-        entity.PresetQuestions = entity.PresetQuestions.OrderBy(x => x.Index).ToList();
-        return entity;
-    }
-    [UnitOfWork]
-    protected override async Task<Agent> UpdateAsync(Agent entity)
-    {
-        await _presetQuestionsRepository.DeleteAsync(x => x.AgentId == entity.Id);
-        if (entity.PresetQuestions.Count != 0)
-        {
-            await _presetQuestionsRepository.InsertManyAsync(entity.PresetQuestions);
-        }
-        if (entity.Metadata != null)
-        {
-            if (await _metadataRepository.AnyAsync(x => x.Id == entity.Metadata.Id))
-            {
-                await _metadataRepository.UpdateAsync(entity.Metadata);
-            }
-            else
-            {
-                await _metadataRepository.InsertAsync(entity.Metadata);
-            }
-        }
-        return await base.UpdateAsync(entity);
-    }
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task test()
+    public virtual async Task testAsync()
     {
         ProcessBuilder process = new("AccountOpeningProcess");
         var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
@@ -158,7 +120,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         KernelProcess kernelProcess = process.Build();
 
-        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState { UserInput = "123" } });
+        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState() });
         var res = await con.GetStateAsync();
         var json = _proceessSerializer.Serialize(res);
         var http = _kernel.GetRequiredService<IHttpContextAccessor>();
@@ -167,7 +129,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task ExecuteProcess()
+    public virtual async Task ExecuteProcessAsync()
     {
         //ProcessBuilder process = new("AccountOpeningProcess");
         //var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
@@ -197,45 +159,76 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         //  var content = JsonSerializer.Serialize<KernelProcessStepStateMetadata>(processStateInfo, s_jsonOptions);
 
-        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState { UserInput = "123" } });
+        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState() });
 
         var res = await con.GetStateAsync();
     }
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task AgentStartAsync(AgentStartRequestDto request)
+    public virtual async Task AgentStartAsync(StartRequest request)
     {
         var agent = await GetAsync(request.AgentId) ?? throw new Exception();
-        var instance = request.InstanceId == null
-            ? new AgentInstance(GuidGenerator.Create()) : await _agentInstanceRepository.GetAsync(x => x.Id == request.InstanceId.Value);
+        var agentConversation = request.AgentConversationId == null
+            ? new AgentConversation(GuidGenerator.Create()) : await _agentConversationRepository.GetAsync(x => x.Id == request.AgentConversationId.Value);
+        agentConversation.AgentId = agent.Id;
 
+        var processState = AgentStartProcess(request, agentConversation);
+
+        if (agent.AgentType == AgentType.Llm)
+        {
+            await LlmAgentStartAsync(request, agent, agentConversation);
+        }
+        else if (agent.AgentType == AgentType.Workflow)
+        {
+            await WorkflowAgentStartAsync(request, agent, agentConversation);
+        }
+
+        var agentChat = (processState.AgentChat as AgentChat) ?? throw new Exception();
+
+        agentConversation.Title = string.IsNullOrWhiteSpace(agentConversation.Title) ? agentChat.Question : agentConversation.Title;
+        await _agentChatDomainService.InsertAgentChatAsync(agentChat);
+
+        agentConversation = request.AgentConversationId == null ? await _agentConversationRepository.InsertAsync(agentConversation) : await _agentConversationRepository.UpdateAsync(agentConversation);
+        if (request.Streaming)
+        {
+            await _streamResponse.WriteDataAsync(ProcessEventType.Down, new { ConversationId = agentConversation.Id, ChatId = agentChat.Id });
+        }
+    }
+
+    private ProcessState AgentStartProcess(StartRequest request, AgentConversation agentConversation)
+    {
+        var processState = new ProcessState
+        {
+            AgentId = agentConversation.AgentId,
+            AgentConversationId = agentConversation.Id,
+            AgentChat = new AgentChat(GuidGenerator.Create(), agentConversation.AgentId, agentConversation.Id)
+        };
+        var httpContextAccessor = _kernel.GetRequiredService<IHttpContextAccessor>();
+        if (httpContextAccessor.HttpContext.Items.ContainsKey(nameof(processState)))
+        {
+            httpContextAccessor.HttpContext.Items[nameof(processState)] = processState;
+        }
+        else
+        {
+            httpContextAccessor.HttpContext.Items.Add(nameof(ProcessState), processState);
+        }
         if (request.Streaming)
         {
             _streamResponse.EnableStream();
         }
-
-        if (agent.AgentType == AgentType.Llm)
-        {
-            await LlmAgentStartAsync(request, agent, instance);
-        }
-        else if (agent.AgentType == AgentType.Workflow)
-        {
-            await WorkflowAgentStartAsync(request, agent, instance);
-        }
+        return processState;
     }
 
-    private async Task LlmAgentStartAsync(AgentStartRequestDto request, AgentDto agent, AgentInstance agentInstance)
+    private async Task LlmAgentStartAsync(StartRequest request, AgentDto agent, AgentConversation agentConversation)
     {
+        KernelProcess kernelProcess = BuilderLlmKernelProcess(request, agent);
 
-        KernelProcess kernelProcess = string.IsNullOrWhiteSpace(agentInstance.Steps) ?
-            BuilderLlmKernelProcess(request, agent) :
-            _proceessSerializer.Deserialize(agentInstance.Steps);
-
-        await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = StepEvent.StartProcessEvent });
+        await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = StepEvent.StartProcessEvent, Data = request });
 
     }
-    private KernelProcess BuilderLlmKernelProcess(AgentStartRequestDto request, AgentDto agent)
+
+    private KernelProcess BuilderLlmKernelProcess(StartRequest request, AgentDto agent)
     {
         var agentLlmState = string.IsNullOrWhiteSpace(agent.States) ? new AgentLlmStateDto() : JsonSerializer.Deserialize<AgentLlmStateDto>(agent.States) ?? throw new Exception();
 
@@ -262,7 +255,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(agentLlmState.MessageStepState, nameof(MessageStep));
 
         process.OnInputEvent(StepEvent.StartProcessEvent)
-            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
+            .SendEventTo(new ProcessFunctionTargetBuilder(startStep, parameterName: "request"));
 
         startStep.OnFunctionResult()
             .SendEventTo(new ProcessFunctionTargetBuilder(llmStep, functionName: StepTypeConst.Llm));
@@ -272,8 +265,56 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         return process.Build();
     }
-    private async Task WorkflowAgentStartAsync(AgentStartRequestDto request, AgentDto agent, AgentInstance agentInstance)
+
+    private async Task WorkflowAgentStartAsync(StartRequest request, AgentDto agent, AgentConversation agentConversation)
     {
         await Task.CompletedTask;
+    }
+
+    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, Agent entity)
+    {
+        var index = 0;
+        foreach (var item in updateInput.PresetQuestions)
+        {
+            item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
+            item.Index = index++;
+        }
+        if (string.IsNullOrWhiteSpace(updateInput.Steps) == false || string.IsNullOrWhiteSpace(updateInput.States) == false)
+        {
+            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Steps, updateInput.States);
+        }
+        return base.UpdateInputMapToEntityAsync(updateInput, entity);
+    }
+
+    protected override async Task<Agent> GetEntityByIdAsync(Guid id)
+    {
+        var entity = await Repository.GetAsync(id);
+        entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
+        entity.Metadata = await _metadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
+
+        entity.PresetQuestions = entity.PresetQuestions.OrderBy(x => x.Index).ToList();
+        return entity;
+    }
+
+    [UnitOfWork]
+    protected override async Task<Agent> UpdateAsync(Agent entity)
+    {
+        await _presetQuestionsRepository.DeleteAsync(x => x.AgentId == entity.Id);
+        if (entity.PresetQuestions.Count != 0)
+        {
+            await _presetQuestionsRepository.InsertManyAsync(entity.PresetQuestions);
+        }
+        if (entity.Metadata != null)
+        {
+            if (await _metadataRepository.AnyAsync(x => x.Id == entity.Metadata.Id))
+            {
+                await _metadataRepository.UpdateAsync(entity.Metadata);
+            }
+            else
+            {
+                await _metadataRepository.InsertAsync(entity.Metadata);
+            }
+        }
+        return await base.UpdateAsync(entity);
     }
 }

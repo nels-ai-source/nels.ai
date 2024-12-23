@@ -18,7 +18,10 @@ public interface IAigcDbContext : ISysMngDbContext, IEfCoreDbContext
     public DbSet<Agent> Agents { get; set; }
     public DbSet<AgentPresetQuestions> AgentPresetQuestions { get; set; }
     public DbSet<AgentMetadata> AgentMetadatas { get; set; }
-
+    public DbSet<AgentConversation> AgentConversations { get; set; }
+    public DbSet<AgentChat> AgentChats { get; set; }
+    public DbSet<AgentMessage> AgentMessages { get; set; }
+    public DbSet<AgentStepLog> AgentStepLogs { get; set; }
     public DbSet<Space> Spaces { get; set; }
     public DbSet<SpaceUser> SpaceUsers { get; set; }
 

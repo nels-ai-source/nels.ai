@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nels.Aigc.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Nels.Aigc.Migrations
 {
     [DbContext(typeof(AigcDbContext))]
-    partial class AigcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221160247_agentChat")]
+    partial class agentChat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -410,7 +413,7 @@ namespace Nels.Aigc.Migrations
 
                     b.HasIndex("AgentConversationId");
 
-                    b.ToTable("ai_AgentChat", (string)null);
+                    b.ToTable("AgentChats");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentConversation", b =>
@@ -448,7 +451,7 @@ namespace Nels.Aigc.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ai_AgentConversation", (string)null);
+                    b.ToTable("AgentConversations");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
@@ -508,7 +511,7 @@ namespace Nels.Aigc.Migrations
 
                     b.HasIndex("AgentChatId");
 
-                    b.ToTable("ai_AgentMessage", (string)null);
+                    b.ToTable("AgentMessages");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMetadata", b =>
@@ -638,7 +641,7 @@ namespace Nels.Aigc.Migrations
 
                     b.HasIndex("AgentChatId");
 
-                    b.ToTable("ai_AgentStepLog", (string)null);
+                    b.ToTable("AgentStepLogs");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.Knowledge", b =>

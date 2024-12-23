@@ -1,10 +1,9 @@
 <template>
     <el-main>
         <el-scrollbar ref="scrollbarRef">
-            <bubble :item="item" v-for="item in messages" v-bind:key="item.id" />
-
-            <el-empty v-if="messages.length==0" :description="$t('chats.noData')" :image-size="100"></el-empty>
-
+            <welcome :introductionText="introductionText" />
+            <prompts :presetQuestions="presetQuestions" @prompt="handleSendMessage"/>
+            <bubble :item="item" v-for="item in localMessages" v-bind:key="item.id" />
         </el-scrollbar>
 
     </el-main>
@@ -19,6 +18,8 @@ import { reactive, nextTick } from 'vue';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import config from '@/config';
 import tool from '@/utils/tool';
+import welcome from './components/welcome';
+import prompts from './components/prompts';
 import bubble from './components/bubble';
 import conversations from './components/conversations';
 import sender from './components/sender';
@@ -26,12 +27,22 @@ import { v4 as uuidv4 } from 'uuid';
 export default {
     name: 'application',
     components: {
+        welcome,
+        prompts,
         bubble,
         conversations,
         sender,
     },
     props: {
-        items: {
+        introductionText: {
+            type: String,
+            default: '',
+        },
+        presetQuestions: {
+            type: Array,
+            default: () => [],
+        },
+        messages: {
             type: Array,
             Required: true,
         },
@@ -42,7 +53,7 @@ export default {
     },
     data() {
         return {
-            messages: reactive([...this.items]),
+            localMessages: reactive([...this.messages]),
             userPrompt: '',
             assistantLoading: false,
         };
@@ -102,10 +113,10 @@ export default {
             });
         },
         handleClearData() {
-            this.messages = [];
+            this.localMessages = [];
         },
         addUserMessage(id, message) {
-            this.messages.push({
+            this.localMessages.push({
                 id: id,
                 role: 'user',
                 content: message,
@@ -114,7 +125,7 @@ export default {
             });
         },
         addAssistantMessage(id, options) {
-            this.messages.push({
+            this.localMessages.push({
                 id: id,
                 role: 'assistant',
                 content: '',
@@ -123,9 +134,9 @@ export default {
             });
         },
         addMessageContent(id, content) {
-            let targetIndex = this.messages.findIndex((item) => item.id == id);
+            let targetIndex = this.localMessages.findIndex((item) => item.id == id);
             if (targetIndex !== -1) {
-                let item = this.messages[targetIndex];
+                let item = this.localMessages[targetIndex];
                 item.content += content;
             }
         },
@@ -581,5 +592,123 @@ export default {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+.ant-flex {
+    display: flex;
+}
+.ant-btn-icon-xxs {
+    padding: var(--ant-padding-xxs);
+    font-size: var(--ant-font-size);
+}
+
+.ant-bubble ::v-deep {
+    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Roboto,
+        Ubuntu, Cantarell, Noto Sans, sans-serif, Helvetica, Apple Color Emoji,
+        Arial, Segoe UI Emoji, Segoe UI Symbol;
+    font-size: 1em;
+    color: #000000;
+}
+::v-deep ol,
+::v-deep ul {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+::v-deep li {
+    font-size: 1em;
+    border-radius: 0.3em;
+    padding: 0.2em 0.4em;
+    color: #24292e;
+    margin-bottom: 0.5em;
+}
+
+::v-deep ol {
+    list-style-type: decimal;
+}
+
+::v-deep ul {
+    list-style-type: disc;
+}
+
+::v-deep p {
+    margin: 0.5em 0;
+    line-height: 1.6;
+}
+
+::v-deep h1,
+::v-deep h2,
+::v-deep h3,
+::v-deep h4,
+::v-deep h5,
+::v-deep h6 {
+    font-weight: bold;
+    color: #24292e;
+}
+
+::v-deep h1 {
+    font-size: 2em;
+    border-bottom: 2px solid #e1e4e8;
+    padding-bottom: 0.3em;
+}
+
+::v-deep h2 {
+    font-size: 1.75em;
+    border-bottom: 1px solid #e1e4e8;
+    padding-bottom: 0.3em;
+}
+
+::v-deep h3 {
+    font-size: 1.5em !important;
+}
+
+::v-deep h4 {
+    font-size: 1.25em;
+}
+
+::v-deep h5 {
+    font-size: 1em;
+}
+
+::v-deep h6 {
+    font-size: 0.875em;
+}
+
+::v-deep blockquote {
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    background-color: #f6f8fa;
+    border-left: 5px solid #e1e4e8;
+    color: #6a737d;
+}
+
+::v-deep pre {
+    border-radius: 10px;
+}
+::v-deep code {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+        Liberation Mono, monospace !important;
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+}
+
+::v-deep code:not(pre code) {
+    padding: 0px;
+    font-weight: 600;
+}
+
+::v-deep pre code {
+    display: block;
+    overflow: auto;
+    font-size: 1em;
+    padding: 1em;
+    border-radius: 1px;
+}
+
+::v-deep a {
+    color: #0366d6;
+    text-decoration: none;
+}
+::v-deep a:hover {
+    text-decoration: underline;
 }
 </style>

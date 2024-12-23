@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.Process.Consts;
+using Nels.SemanticKernel.Process.Interfaces;
 using Nels.SemanticKernel.Process.States;
 using Nels.SemanticKernel.Process.Steps;
-using System.Diagnostics;
+using System.Threading;
 using static Nels.SemanticKernel.Process.Steps.LlmStep;
 
 namespace Nels.SemanticKernel.Process;
@@ -20,7 +22,8 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
     protected KernelProcessStepContext _processStepContext;
     protected Kernel _kernel;
     protected IHttpContextAccessor _httpContextAccessor;
-
+    protected ProcessState _processState;
+    protected IStepLog _stepLog;
     private readonly string ExecutedEvent = $"ExecutedEvent_{0}";
     private readonly List<LlmGetStreamingChatMessage> _chatMessages = [];
 
@@ -30,6 +33,7 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
         _id = state.Id ?? new Guid().ToString();
         _name = state.Name ?? string.Empty;
         _state = state.State ?? (IStepState)new StepState();
+
         return base.ActivateAsync(state);
     }
     protected CancellationToken _cancellationToken;
@@ -46,7 +50,11 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
 
         _httpContextAccessor = _kernel.GetRequiredService<IHttpContextAccessor>();
 
-        _state.Context = _httpContextAccessor.HttpContext.Items;
+        if (_httpContextAccessor.HttpContext.Items.TryGetValue(nameof(ProcessState), out object? processState))
+        {
+            _processState = (ProcessState)processState;
+            _stepLog = _processState.AgentChat.AddStepLog(Guid.Parse(_id));
+        }
 
         if (await PreExecuteAsync(_cancellationToken) == false)
         {
@@ -92,6 +100,7 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
     }
     public virtual ValueTask PostExecuteAsync(CancellationToken cancellationToken)
     {
+        _stepLog.SetDuration(_state.Stopwatch.ElapsedMilliseconds);
         return default;
     }
 
@@ -104,7 +113,7 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
             _chatMessages.Clear();
             foreach (var input in state.Inputs)
             {
-                var value = input.GetValue(_state);
+                var value = input.GetValue(_processState.Context);
                 if (value is LlmGetStreamingChatMessage message)
                 {
                     _chatMessages.Add(message);

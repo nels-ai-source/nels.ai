@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Liquid;
@@ -7,7 +6,6 @@ using Nels.SemanticKernel.Extensions;
 using Nels.SemanticKernel.InternalUtilities;
 using Nels.SemanticKernel.InternalUtilities.Models;
 using Nels.SemanticKernel.Process.Extensions;
-using Nels.SemanticKernel.Process.Logs;
 using Nels.SemanticKernel.Process.States;
 using System.Text.Json.Serialization;
 
@@ -29,7 +27,7 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
     public override async ValueTask<bool> ExecutionAsync(CancellationToken cancellationToken)
     {
         _chatDeleegate = new LlmGetStreamingChatMessage(GetStreamingChatMessageAsync);
-        _state.Context.AddOrUpdate(_id, _chatDeleegate);
+        _processState.Context.AddOrUpdate(_id, _chatDeleegate);
         await base.ExecutionAsync(cancellationToken);
 
         return false;
@@ -40,11 +38,11 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
         if (_state.ResponseFormat == ResponseFormatConst.Json)
         {
             var resultDictionary = JsonResultTranslator.Translate<Dictionary<string, object>>(_result) ?? [];
-            _state.Context.AddOrUpdate(_id, resultDictionary);
+            _processState.Context.AddOrUpdate(_id, resultDictionary);
             await base.PostExecuteAsync(cancellationToken);
             return;
         }
-        _state.Context.AddDefaultOutput(_id, _result);
+        _processState.Context.AddDefaultOutput(_id, _result);
         await base.PostExecuteAsync(cancellationToken);
     }
 
@@ -65,20 +63,19 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
             if (string.IsNullOrWhiteSpace(item.Content)) continue;
 
             _result += item.Content;
-
-            _state.StepLog.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
-                && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : _state.StepLog.PromptTokens + 1;
-            _state.StepLog.CompleteTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
-                && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : _state.StepLog.CompleteTokens + 1;
+            _stepLog.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
+                && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : _stepLog.PromptTokens + 1;
+            _stepLog.CompleteTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
+                && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : _stepLog.CompleteTokens + 1;
 
             await messageEvent(new LlmChatMessageEventData(_id, item.Content));
         };
 
         AddChatHistory(AuthorRole.Assistant, _result);
 
-        await PostExecuteAsync(_cancellationToken);
-
         _state.Stopwatch.Stop();
+
+        await PostExecuteAsync(_cancellationToken);
 
         return _result;
     }

@@ -118,7 +118,7 @@ public class AppAppService : RouteCrudGetAllAppService<App, AppDto, Guid>
             await _settingManager.SetForCurrentUserAsync(SysMngSettingConst.CurrentAppIdName, applicationId.ToString());
         }
 
-        var permissions = await _appDomainService.GetUserPermissionGrants(_currentUser.Id ?? Guid.Empty);
+        var permissions = await _appDomainService.GetUserPermissionGrantsAsync(_currentUser.Id ?? Guid.Empty);
         var menus = await GetAppMenusAsync(applicationId);
 
         var userMenuOutput = new UserMenuOutputDto
@@ -139,8 +139,8 @@ public class AppAppService : RouteCrudGetAllAppService<App, AppDto, Guid>
 
         currentApp.DisplayName = GetDisplayName(currentApp.DisplayName);
 
-        var permissions = await _appDomainService.GetUserPermissionGrants(_currentUser.Id ?? Guid.Empty);
-        var (businesses, pages) = await _appDomainService.GetAppMeuns(Guid.Parse(currentAppId.ToString()), permissions);
+        var permissions = await _appDomainService.GetUserPermissionGrantsAsync(_currentUser.Id ?? Guid.Empty);
+        var (businesses, pages) = await _appDomainService.GetAppMeunsAsync(Guid.Parse(currentAppId.ToString()), permissions);
         businesses.ForEach(x => x.DisplayName = GetDisplayName(x.DisplayName));
         pages.ForEach(x => x.DisplayName = GetDisplayName(x.DisplayName));
 

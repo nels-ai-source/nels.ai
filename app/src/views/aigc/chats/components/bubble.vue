@@ -106,7 +106,8 @@ export default {
     },
 };
 </script>
-<style scoped>
+<style>
+
 .ant-bubble {
     display: flex;
     column-gap: var(--ant-padding-sm);
@@ -138,13 +139,11 @@ export default {
     background-color: var(--ant-color-fill-content);
     padding: var(--ant-padding-sm) var(--ant-padding);
     border-radius: var(--ant-border-radius-lg);
-    border-bottom-left-radius: 0;
 }
 .ant-bubble .ant-bubble-content-filled-end {
     background-color: var(--ant-color-fill-content-end);
     padding: var(--ant-padding-sm) var(--ant-padding);
     border-radius: var(--ant-border-radius-lg);
-    border-bottom-right-radius: 0;
 }
 .ant-bubble .ant-bubble-content {
     position: relative;
@@ -171,119 +170,5 @@ export default {
 .ant-btn-icon-xxs {
     padding: var(--ant-padding-xxs);
     font-size: var(--ant-font-size);
-}
-
-.ant-bubble ::v-deep {
-    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Roboto,
-        Ubuntu, Cantarell, Noto Sans, sans-serif, Helvetica, Apple Color Emoji,
-        Arial, Segoe UI Emoji, Segoe UI Symbol;
-    font-size: 1em;
-    color: #000000;
-}
-.ant-bubble ::v-deep ol,
-.ant-bubble ::v-deep ul {
-    margin: 1em 0;
-    padding-left: 2em;
-}
-
-.ant-bubble ::v-deep li {
-    font-size: 1em;
-    border-radius: 0.3em;
-    padding: 0.2em 0.4em;
-    color: #24292e;
-    margin-bottom: 0.5em;
-}
-
-.ant-bubble ::v-deep ol {
-    list-style-type: decimal;
-}
-
-.ant-bubble ::v-deep ul {
-    list-style-type: disc;
-}
-
-.ant-bubble ::v-deep p {
-    margin: 0.5em 0;
-    line-height: 1.6;
-}
-
-.ant-bubble ::v-deep h1,
-.ant-bubble ::v-deep h2,
-.ant-bubble ::v-deep h3,
-.ant-bubble ::v-deep h4,
-.ant-bubble ::v-deep h5,
-.ant-bubble ::v-deep h6 {
-    margin: 1em 0 0.5em;
-    font-weight: bold;
-    color: #24292e;
-}
-
-.ant-bubble ::v-deep h1 {
-    font-size: 2em;
-    border-bottom: 2px solid #e1e4e8;
-    padding-bottom: 0.3em;
-}
-
-.ant-bubble ::v-deep h2 {
-    font-size: 1.75em;
-    border-bottom: 1px solid #e1e4e8;
-    padding-bottom: 0.3em;
-}
-
-.ant-bubble ::v-deep h3 {
-    font-size: 1.5em !important;
-}
-
-.ant-bubble ::v-deep h4 {
-    font-size: 1.25em;
-}
-
-.ant-bubble ::v-deep h5 {
-    font-size: 1em;
-}
-
-.ant-bubble ::v-deep h6 {
-    font-size: 0.875em;
-}
-
-.ant-bubble ::v-deep blockquote {
-    margin: 1em 0;
-    padding: 0.5em 1em;
-    background-color: #f6f8fa;
-    border-left: 5px solid #e1e4e8;
-    color: #6a737d;
-}
-
-.ant-bubble ::v-deep pre {
-    border-radius: 10px;
-}
-
-.ant-bubble ::v-deep code {
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-        Liberation Mono, monospace !important;
-    padding: 0.2em 0.4em;
-    border-radius: 0.3em;
-}
-
-.ant-bubble ::v-deep code:not(pre code) {
-    padding: 0px;
-    font-weight: 600;
-}
-
-.ant-bubble ::v-deep pre code {
-    display: block;
-    overflow: auto;
-    font-size: 1em;
-    padding: 1em;
-    border-radius: 1px;
-}
-
-.ant-bubble ::v-deep a {
-    color: #0366d6;
-    text-decoration: none;
-}
-
-.ant-bubble ::v-deep a:hover {
-    text-decoration: underline;
 }
 </style>

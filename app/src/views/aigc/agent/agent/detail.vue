@@ -49,7 +49,7 @@
                 <el-container>
                     <el-header>{{$t('agentDetail.previewAndDebug')}}</el-header>
 
-                    <chats :items="msgList" :agentId="agentId" ref="chatsRef" />
+                    <chats :messages="msgList" :agentId="agentId" :introductionText="form.introductionText" :presetQuestions="form.presetQuestions" ref="chatsRef" />
 
                 </el-container>
             </el-aside>

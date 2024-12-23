@@ -1,14 +1,12 @@
-﻿using Nels.SemanticKernel.Process.Logs;
-
-namespace Nels.SemanticKernel.Process.Variables;
+﻿namespace Nels.SemanticKernel.Process.Variables;
 
 public class InputVariable : Variable
 {
     public VariableValue Value { get; set; }
 
-    public object GetValue(StepState state)
+    public object GetValue(Dictionary<string, object> context)
     {
-        return Value.GetValue(state);
+        return Value.GetValue(context);
     }
     public bool IdEqual(string id)
     {

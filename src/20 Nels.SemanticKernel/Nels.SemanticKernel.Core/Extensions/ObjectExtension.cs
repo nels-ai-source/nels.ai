@@ -5,7 +5,7 @@ namespace Nels.SemanticKernel.Extensions;
 
 public static class ObjectExtension
 {
-    public static void AddOrUpdate(this IDictionary<object, object> dictionary, string key, object value)
+    public static void AddOrUpdate(this Dictionary<string, object> dictionary, string key, object value)
     {
         if (dictionary.ContainsKey(key))
         {

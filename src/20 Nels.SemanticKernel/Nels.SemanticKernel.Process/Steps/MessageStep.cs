@@ -2,8 +2,8 @@
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Liquid;
 using Nels.SemanticKernel.Interfaces;
+using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Extensions;
-using Nels.SemanticKernel.Process.Logs;
 using Nels.SemanticKernel.Process.States;
 using Nels.SemanticKernel.Process.Templates;
 using System.Text.Json.Serialization;
@@ -39,7 +39,8 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
         {
             _result = HandlebarsTemplate.Render(_state.Template, arguments);
         }
-        _state.Context.AddDefaultOutput(_id, _result);
+        _processState.Context.AddDefaultOutput(_id, _result);
+        _processState.AgentChat.AddMessage(MessageRoleConsts.Assistant, _result);
         return base.PostExecuteAsync(cancellationToken);
     }
 

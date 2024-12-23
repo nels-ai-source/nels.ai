@@ -51,6 +51,30 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
+        builder.Entity<AgentConversation>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentConversation), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentChat>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentChat), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentMessage>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentMessage), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentStepLog>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentStepLog), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
         builder.Entity<Space>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Space), SysMngDbProperties.DbSchema);

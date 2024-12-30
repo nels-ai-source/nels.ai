@@ -4,6 +4,7 @@ using Nels.SemanticKernel.Process.Steps;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.Json.Serialization;
+using Nels.SemanticKernel.Process.Variables;
 
 namespace Nels.SemanticKernel.Process.Services;
 
@@ -41,6 +42,7 @@ public class ProcessStateTypeResolver : DefaultJsonTypeInfoResolver
     private static readonly Type s_genericType = typeof(KernelProcessStep<>);
     private readonly Dictionary<string, Type> _types = new() { { "process", typeof(KernelProcessState) }, };
 
+
     public void RegisterKernelProcessStepType<T>() where T : KernelProcessStep
     {
         // Load all types from the resources assembly that derive from KernelProcessStep
@@ -57,6 +59,7 @@ public class ProcessStateTypeResolver : DefaultJsonTypeInfoResolver
             }
         }
     }
+
 
     /// <inheritdoc />
     public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)

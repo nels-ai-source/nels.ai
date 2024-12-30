@@ -21,7 +21,7 @@ public class AppDomainService(IRepository<App, Guid> appRepository, IRepository<
     private readonly IRepository<PermissionGrant> _permissionGrantRepository = permissionGrantRepository;
 
     [UnitOfWork]
-    public async Task InitAppPages(App app, List<BusinessUnit> businessUnits, List<Page> pages)
+    public async Task InitAppPagesAsync(App app, List<BusinessUnit> businessUnits, List<Page> pages)
     {
         if (app != null)
         {
@@ -41,7 +41,7 @@ public class AppDomainService(IRepository<App, Guid> appRepository, IRepository<
             await _repository.InsertManyAsync(pages);
         }
     }
-    public async Task<List<string>> GetUserPermissionGrants(Guid userId)
+    public async Task<List<string>> GetUserPermissionGrantsAsync(Guid userId)
     {
         List<PermissionGrant> permissionGrants = [];
         var roleName = await _userRepository.GetRoleNamesAsync(userId);
@@ -55,7 +55,7 @@ public class AppDomainService(IRepository<App, Guid> appRepository, IRepository<
 
         return await Task.FromResult(permissionGrants.Select(x => x.Name).Distinct().ToList());
     }
-    public async Task<(List<BusinessUnit> businesses, List<Page> pages)> GetAppMeuns(Guid appId, List<string> permissions)
+    public async Task<(List<BusinessUnit> businesses, List<Page> pages)> GetAppMeunsAsync(Guid appId, List<string> permissions)
     {
         var businesses = await _unitRepository.GetListAsync(x => x.ApplicationId.Equals(appId));
         var pageQueryable = await _repository.GetQueryableAsync();

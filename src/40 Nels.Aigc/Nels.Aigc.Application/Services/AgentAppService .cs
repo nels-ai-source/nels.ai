@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -9,13 +10,16 @@ using Nels.Aigc.Enums;
 using Nels.Aigc.Permissions;
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process;
+using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Interfaces;
 using Nels.SemanticKernel.Process.Steps;
 using Nels.SemanticKernel.Process.Variables;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Localization;
 using Volo.Abp.Uow;
@@ -27,19 +31,29 @@ namespace Nels.Aigc.Services;
 public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 {
     private readonly IStreamResponse _streamResponse;
-    private readonly Kernel _kernel;
     private readonly IProceessSerializer _proceessSerializer;
+
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<AgentMetadata, Guid> _metadataRepository;
+    private readonly IRepository<AgentConversation, Guid> _agentConversationRepository;
+    private readonly IRepository<AgentChat, Guid> _agentChatRepository;
+    private readonly IRepository<AgentMessage, Guid> _agentMessageRepository;
+
+    private readonly AgentChatDomainService _agentChatDomainService;
+    private readonly Kernel _kernel;
 
     public AgentAppService(IRepository<Agent, Guid> repository,
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
         IRepository<AgentMetadata, Guid> metadataRepository,
-        Kernel kernel,
+        IRepository<AgentConversation, Guid> agentConversationRepository,
+        IRepository<AgentMessage, Guid> agentMessageRepository,
+        IRepository<AgentChat, Guid> agentChatRepository,
         ILanguageProvider languageProvider,
         IStreamResponse streamResponse,
         IOptions<AbpLocalizationOptions> localizationOptions,
-        IProceessSerializer proceessSerializer) : base(repository)
+        IProceessSerializer proceessSerializer,
+        AgentChatDomainService agentChatDomainService,
+        Kernel kernel) : base(repository)
     {
         CreatePolicyName = AigcPermissions.Agent.Create;
         UpdatePolicyName = AigcPermissions.Agent.Update;
@@ -49,61 +63,84 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         _presetQuestionsRepository = presetQuestionsRepository;
         _metadataRepository = metadataRepository;
+        _agentConversationRepository = agentConversationRepository;
+        _agentChatRepository = agentChatRepository;
+        _agentMessageRepository = agentMessageRepository;
+
+        _agentChatDomainService = agentChatDomainService;
 
         _kernel = kernel;
         _streamResponse = streamResponse;
         _proceessSerializer = proceessSerializer;
     }
 
-    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, Agent entity)
-    {
-        var index = 0;
-        foreach (var item in updateInput.PresetQuestions)
-        {
-            item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
-            item.Index = index++;
-        }
-        if (string.IsNullOrWhiteSpace(updateInput.Metadata) == false)
-        {
-            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Metadata);
-        }
-        return base.UpdateInputMapToEntityAsync(updateInput, entity);
-    }
 
-    protected override async Task<Agent> GetEntityByIdAsync(Guid id)
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task testAsync()
     {
-        var entity = await Repository.GetAsync(id);
-        entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
-        entity.Metadata = await _metadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
+        ProcessBuilder process = new("AccountOpeningProcess");
+        var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
+        var llmStep_0 = process.AddStepFromType<LlmStep, LlmStepState>(new LlmStepState
+        {
+            ChatMessages = [new MessageContent { Role = "user", Content = "写一首七言律诗" }]
+        }, "llmStep_0");
+        var llmStep_1 = process.AddStepFromType<LlmStep, LlmStepState>(new LlmStepState
+        {
+            ChatMessages = [new MessageContent { Role = "user", Content = "写一个递归算法" }]
+        }, "llmStep_1");
 
-        entity.PresetQuestions = entity.PresetQuestions.OrderBy(x => x.Index).ToList();
-        return entity;
-    }
-    [UnitOfWork]
-    protected override async Task<Agent> UpdateAsync(Agent entity)
-    {
-        await _presetQuestionsRepository.DeleteAsync(x => x.AgentId == entity.Id);
-        if (entity.PresetQuestions.Count != 0)
+
+        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(new MessageStepState
         {
-            await _presetQuestionsRepository.InsertManyAsync(entity.PresetQuestions);
-        }
-        if (entity.Metadata != null)
+            Template = "message1:{{llmStep_0_output}}",
+            Inputs = [
+                new SemanticKernel.Process.Variables.InputVariable
+                {
+            Name = StepConst.DefaultOutput+"0",
+            Type = VariableTypeConst.String,
+            Value = new VariableValue
+            {
+                Type=VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep_0.Id,
+            }
+        },        new SemanticKernel.Process.Variables.InputVariable
         {
-            if (await _metadataRepository.AnyAsync(x => x.Id == entity.Metadata.Id))
+            Name = StepConst.DefaultOutput+"1",
+            Type = VariableTypeConst.String,
+            Value = new VariableValue
             {
-                await _metadataRepository.UpdateAsync(entity.Metadata);
-            }
-            else
-            {
-                await _metadataRepository.InsertAsync(entity.Metadata);
+                 Type=VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep_1.Id,
             }
         }
-        return await base.UpdateAsync(entity);
+            ]
+        }, nameof(MessageStep));
+
+        process.OnInputEvent("StartProcess")
+            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
+
+        startStep.OnFunctionResult()
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep_0))
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep_1));
+
+        llmStep_1.OnFunctionResult()
+             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep));
+
+        KernelProcess kernelProcess = process.Build();
+
+        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState() });
+        var res = await con.GetStateAsync();
+        var json = _proceessSerializer.Serialize(res);
+        var http = _kernel.GetRequiredService<IHttpContextAccessor>();
+        var item = http.HttpContext.Items;
     }
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task ExecuteProcess()
+    public virtual async Task ExecuteProcessAsync()
     {
         //ProcessBuilder process = new("AccountOpeningProcess");
         //var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
@@ -133,75 +170,239 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         //  var content = JsonSerializer.Serialize<KernelProcessStepStateMetadata>(processStateInfo, s_jsonOptions);
 
-        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState { UserInput = "123" } });
+        var con = await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = "StartProcess", Data = new StartStepState() });
 
         var res = await con.GetStateAsync();
     }
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task AgentStartAsync(AgentStartRequestDto request)
+    public virtual async Task AgentStartAsync(StartRequest request)
     {
         var agent = await GetAsync(request.AgentId) ?? throw new Exception();
+        var agentConversation = request.AgentConversationId == null
+            ? new AgentConversation(GuidGenerator.Create()) : await _agentConversationRepository.GetAsync(x => x.Id == request.AgentConversationId.Value);
+        agentConversation.AgentId = agent.Id;
 
+        var processState = AgentStartProcess(request, agentConversation);
+
+        if (agent.AgentType == AgentType.Llm)
+        {
+            await LlmAgentStartAsync(request, agent, agentConversation);
+        }
+        else if (agent.AgentType == AgentType.Workflow)
+        {
+            await WorkflowAgentStartAsync(request, agent, agentConversation);
+        }
+
+        var agentChat = (processState.AgentChat as AgentChat) ?? throw new Exception();
+
+        agentConversation.SetTitle(string.IsNullOrWhiteSpace(agentConversation.Title) ? agentChat.Question : agentConversation.Title);
+        await _agentChatDomainService.InsertAgentChatAsync(agentChat);
+
+        agentConversation = request.AgentConversationId == null ? await _agentConversationRepository.InsertAsync(agentConversation) : await _agentConversationRepository.UpdateAsync(agentConversation);
+        if (request.Streaming)
+        {
+            await _streamResponse.WriteDataAsync(ProcessEventType.Down, new { ConversationId = agentConversation.Id, ChatId = agentChat.Id });
+        }
+    }
+
+    private ProcessState AgentStartProcess(StartRequest request, AgentConversation agentConversation)
+    {
+        var processState = new ProcessState
+        {
+            AgentId = agentConversation.AgentId,
+            AgentConversationId = agentConversation.Id,
+            AgentChat = new AgentChat(GuidGenerator.Create(), agentConversation.AgentId, agentConversation.Id)
+        };
+        var httpContextAccessor = _kernel.GetRequiredService<IHttpContextAccessor>();
+        if (httpContextAccessor.HttpContext.Items.ContainsKey(nameof(processState)))
+        {
+            httpContextAccessor.HttpContext.Items[nameof(processState)] = processState;
+        }
+        else
+        {
+            httpContextAccessor.HttpContext.Items.Add(nameof(ProcessState), processState);
+        }
         if (request.Streaming)
         {
             _streamResponse.EnableStream();
         }
-
-        if (agent.AgentType == AgentType.Llm)
-        {
-            await LlmAgentStartAsync(request, agent);
-        }
-        else if (agent.AgentType == AgentType.Workflow)
-        {
-            await WorkflowAgentStartAsync(request, agent);
-        }
+        return processState;
     }
 
-    private async Task LlmAgentStartAsync(AgentStartRequestDto request, AgentDto agent)
+    private async Task LlmAgentStartAsync(StartRequest request, AgentDto agent, AgentConversation agentConversation)
     {
-        var metadata = agent.Metadata == null ? new AgentLlmMetadataDto() : JsonSerializer.Deserialize<AgentLlmMetadataDto>(agent.Metadata) ?? throw new Exception();
+        KernelProcess kernelProcess = BuilderLlmKernelProcess(request, agent);
+
+        await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = StepEvent.StartProcessEvent, Data = request });
+
+    }
+
+    private KernelProcess BuilderLlmKernelProcess(StartRequest request, AgentDto agent)
+    {
+        var agentLlmState = string.IsNullOrWhiteSpace(agent.States) ? new AgentLlmStateDto() : JsonSerializer.Deserialize<AgentLlmStateDto>(agent.States) ?? throw new Exception();
 
         ProcessBuilder process = new(agent.Id.ToString());
         var startStep = process.AddStepFromType<StartStep>(nameof(StartStep));
-        metadata.LlmStepState.ChatMessages.Add(new MessageContent(AuthorRole.User.Label, request.UserInput));
+        agentLlmState.LlmStepState.ChatMessages.Add(new MessageContent(AuthorRole.User.Label, request.UserInput));
 
-        var llmStep = process.AddStepFromType<LlmStep, LlmStepState>(metadata.LlmStepState, nameof(LlmStep));
+        var llmStep = process.AddStepFromType<LlmStep, LlmStepState>(agentLlmState.LlmStepState, nameof(LlmStep));
 
-        metadata.MessageStepState.Inputs.Add(new SemanticKernel.Process.Variables.InputVariable
+        agentLlmState.MessageStepState.Inputs.Add(new SemanticKernel.Process.Variables.InputVariable
         {
             Name = StepConst.DefaultOutput,
             Type = VariableTypeConst.String,
-            Value = new RefValue
+            Value = new VariableValue
             {
-                Content = new VariableRefConent
-                {
-                    Id = llmStep.Id,
-                    Name = StepConst.DefaultOutput,
-                }
+                Type = VariableValueTypeConst.Ref,
+                Content = StepConst.DefaultOutput,
+                RefKey = llmStep.Id,
+
             }
         });
-        metadata.MessageStepState.Template = "{{" + StepConst.DefaultOutput + "}}";
+        agentLlmState.MessageStepState.Template = "{{" + StepConst.DefaultOutput + "}}";
 
-        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(metadata.MessageStepState, nameof(MessageStep));
+        var messageStep = process.AddStepFromType<MessageStep, MessageStepState>(agentLlmState.MessageStepState, nameof(MessageStep));
 
         process.OnInputEvent(StepEvent.StartProcessEvent)
-            .SendEventTo(new ProcessFunctionTargetBuilder(startStep));
+            .SendEventTo(new ProcessFunctionTargetBuilder(startStep, parameterName: "request"));
 
-        startStep.OnEvent(StepEvent.ExecutedEvent)
-            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep, functionName: StepTypeConst.Llm, parameterName: "content"));
+        startStep.OnFunctionResult()
+            .SendEventTo(new ProcessFunctionTargetBuilder(llmStep, functionName: StepTypeConst.Llm));
 
-        llmStep.OnEvent(StepEvent.ExecutedEvent)
-             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep, functionName: StepTypeConst.Message, parameterName: "content"));
+        llmStep.OnFunctionResult()
+             .SendEventTo(new ProcessFunctionTargetBuilder(messageStep, functionName: StepTypeConst.Message));
 
-        KernelProcess kernelProcess = process.Build();
-
-        await kernelProcess.StartAsync(_kernel, new KernelProcessEvent { Id = StepEvent.StartProcessEvent });
-
+        return process.Build();
     }
-    private async Task WorkflowAgentStartAsync(AgentStartRequestDto request, AgentDto agent)
+
+    private async Task WorkflowAgentStartAsync(StartRequest request, AgentDto agent, AgentConversation agentConversation)
     {
         await Task.CompletedTask;
     }
+
+    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, Agent entity)
+    {
+        var index = 0;
+        foreach (var item in updateInput.PresetQuestions)
+        {
+            item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
+            item.Index = index++;
+        }
+        if (string.IsNullOrWhiteSpace(updateInput.Steps) == false || string.IsNullOrWhiteSpace(updateInput.States) == false)
+        {
+            entity.AddOrUpdateMetadata(GuidGenerator.Create(), updateInput.Steps, updateInput.States);
+        }
+        return base.UpdateInputMapToEntityAsync(updateInput, entity);
+    }
+
+    protected override async Task<Agent> GetEntityByIdAsync(Guid id)
+    {
+        var entity = await Repository.GetAsync(id);
+        entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
+        entity.Metadata = await _metadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
+
+        entity.PresetQuestions = [.. entity.PresetQuestions.OrderBy(x => x.Index)];
+        return entity;
+    }
+
+    [UnitOfWork]
+    protected override async Task<Agent> UpdateAsync(Agent entity)
+    {
+        await _presetQuestionsRepository.DeleteAsync(x => x.AgentId == entity.Id);
+        if (entity.PresetQuestions.Count != 0)
+        {
+            await _presetQuestionsRepository.InsertManyAsync(entity.PresetQuestions);
+        }
+        if (entity.Metadata != null)
+        {
+            if (await _metadataRepository.AnyAsync(x => x.Id == entity.Metadata.Id))
+            {
+                await _metadataRepository.UpdateAsync(entity.Metadata);
+            }
+            else
+            {
+                await _metadataRepository.InsertAsync(entity.Metadata);
+            }
+        }
+        return await base.UpdateAsync(entity);
+    }
+
+    #region conversation
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task<AgentDto> GetAgentConversationsAsync(Guid agentId)
+    {
+        var entity = await Repository.GetAsync(agentId) ?? throw new BusinessException("not found");
+        var entities = await _agentConversationRepository.GetListAsync(x => x.AgentId == agentId && x.CreatorId == CurrentUser.Id);
+
+        var dto = Map<Agent, AgentDto>(entity);
+        dto.Conversations = MapList<AgentConversation, AgentConversationDto>([.. entities.OrderByDescending(x => x.CreationTime)]);
+
+        return dto;
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task UpdateConversationTitleAsync(AgentConversationDto conversationDto)
+    {
+        var entity = await _agentConversationRepository.GetAsync(conversationDto.Id);
+        entity.SetTitle(conversationDto.Title);
+
+        await _agentConversationRepository.UpdateAsync(entity, true);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task DeleteConversationAsync(Guid conversationId)
+    {
+        await _agentConversationRepository.DeleteAsync(x => x.Id == conversationId);
+        await _agentChatRepository.DeleteAsync(x => x.AgentConversationId == conversationId);
+        await _agentMessageRepository.DeleteAsync(x => x.AgentConversationId == conversationId);
+    }
+    #endregion
+
+    #region chat
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task RegenChatAsync(Guid chatId)
+    {
+
+        var entities = await _agentMessageRepository.GetListAsync(x => x.AgentChatId == chatId && x.CreatorId == CurrentUser.Id);
+        if (entities == null) return;
+
+        var userMessage = entities.FirstOrDefault(x => x.Role == MessageRoleConsts.User);
+        if (userMessage == null) return;
+
+        await _agentMessageRepository.DeleteManyAsync(entities);
+
+        StartRequest request = new()
+        {
+            AgentId = userMessage.AgentId,
+            AgentConversationId = userMessage.AgentConversationId,
+            Streaming = true,
+            UserInput = userMessage.Content,
+        };
+
+        await AgentStartAsync(request);
+    }
+    #endregion
+
+    #region message
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task DeleteMessageAsync(Guid messageId)
+    {
+        await _agentMessageRepository.DeleteAsync(x => x.Id == messageId && x.CreatorId == CurrentUser.Id);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task<List<AgentMessageDto>> GetAgentMessagesAsync(Guid agentConversationId)
+    {
+        var entities = await _agentMessageRepository.GetListAsync(x => x.AgentConversationId == agentConversationId && x.CreatorId == CurrentUser.Id);
+        return MapList<AgentMessage, AgentMessageDto>([.. entities.OrderBy(x => x.CreationTime).ThenBy(x => x.Index)]);
+    }
+    #endregion
 }

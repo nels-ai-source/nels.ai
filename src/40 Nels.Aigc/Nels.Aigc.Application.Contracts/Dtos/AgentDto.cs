@@ -17,7 +17,10 @@ public class AgentDto : AuditedEntityDto<Guid>
     public virtual AgentType AgentType { get; set; } = AgentType.Llm;
     public virtual string IntroductionText { get; set; } = string.Empty;
     public virtual List<AgentPresetQuestionsDto> PresetQuestions { get; set; } = [];
-    public virtual string? Metadata { get; set; } = string.Empty;
+    public virtual string Steps { get; set; } = string.Empty;
+    public virtual string States { get; set; } = string.Empty;
+
+    public virtual List<AgentConversationDto> Conversations { get; set; }
 }
 
 public class AgentPresetQuestionsDto

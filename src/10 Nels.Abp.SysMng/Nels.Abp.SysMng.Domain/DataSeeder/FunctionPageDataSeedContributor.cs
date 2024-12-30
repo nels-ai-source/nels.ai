@@ -50,7 +50,7 @@ public class FunctionPageDataSeedContributor(
         if (AppDomainService == null) return;
         foreach (var appGroup in definitionContext.AppGroups)
         {
-            await AppDomainService.InitAppPages(appGroup.Value.App, appGroup.Value.BusinessUnits.ToList(), appGroup.Value.Page.ToList());
+            await AppDomainService.InitAppPagesAsync(appGroup.Value.App, appGroup.Value.BusinessUnits.ToList(), appGroup.Value.Page.ToList());
         }
     }
 }

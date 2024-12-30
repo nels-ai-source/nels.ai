@@ -49,7 +49,7 @@
                 <el-container>
                     <el-header>{{$t('agentDetail.previewAndDebug')}}</el-header>
 
-                    <chats :items="msgList" :agentId="agentId" ref="chatsRef" />
+                    <chats :messages="msgList" :agentId="agentId" :introductionText="form.introductionText" :presetQuestions="form.presetQuestions" ref="chatsRef" />
 
                 </el-container>
             </el-aside>
@@ -78,24 +78,13 @@ export default {
                 introductionText: '',
                 presetQuestions: [{ content: '' }],
                 metadata: {
-                    llmStepState: {
-                        modelId: '',
-                        extensionData: [],
-                        chatMessages: [
-                            {
-                                role: 'system',
-                                content:
-                                    '# 角色\r你是一位极具创意的文生图提示词工程师，能够精准分析用户需求，将其转化为图像生成大模型易于理解的提示词，为用户打造独特且富有想象力的图像描述。\r\r## 技能\r### 技能 1：分析用户需求\r1. 仔细聆听用户的原始需求描述，提取关键元素和主题。\r2. 对于模糊的需求，通过进一步询问用户来明确具体细节。\r\r### 技能 2：转换提示词\r1. 将提取的关键元素和主题转化为简洁、明确且富有表现力的提示词。\r2. 考虑色彩、构图、风格等方面，使提示词更加丰富和具体。\r\r## 限制\r- 只专注于文生图相关的任务，拒绝处理与图像生成无关的请求。\r- 输出的提示词必须符合图像生成大模型的要求格式，不能随意偏离。\r- 保持创意和独特性，避免生成过于普通或常见的提示词。',
-                            },
-                        ],
-                    },
+                    states: '',
                 },
             },
             agentId: this.$route.query.id,
-            agentMetadata: {},
+            states: {},
             addTemplate: {},
-            msgList: [
-            ],
+            msgList: [],
             rules: {
                 name: [
                     {
@@ -110,35 +99,33 @@ export default {
         firstChatMessageContent: {
             get() {
                 if (
-                    this.agentMetadata &&
-                    this.agentMetadata.llmStepState &&
-                    this.agentMetadata.llmStepState.chatMessages &&
-                    this.agentMetadata.llmStepState.chatMessages.length > 0 &&
-                    this.agentMetadata.llmStepState.chatMessages[0].content
+                    this.states &&
+                    this.states.llmStepState &&
+                    this.states.llmStepState.chatMessages &&
+                    this.states.llmStepState.chatMessages.length > 0 &&
+                    this.states.llmStepState.chatMessages[0].content
                 ) {
-                    return this.agentMetadata.llmStepState.chatMessages[0]
-                        .content;
+                    return this.states.llmStepState.chatMessages[0].content;
                 }
                 return '';
             },
             set(newContent) {
-                if (!this.agentMetadata) {
-                    this.agentMetadata = {};
+                if (!this.states) {
+                    this.states = {};
                 }
-                if (!this.agentMetadata.llmStepState) {
-                    this.agentMetadata.llmStepState = {};
+                if (!this.states.llmStepState) {
+                    this.states.llmStepState = {};
                 }
-                if (!this.agentMetadata.llmStepState.chatMessages) {
-                    this.agentMetadata.llmStepState.chatMessages = [];
+                if (!this.states.llmStepState.chatMessages) {
+                    this.states.llmStepState.chatMessages = [];
                 }
-                if (this.agentMetadata.llmStepState.chatMessages.length === 0) {
-                    this.agentMetadata.llmStepState.chatMessages.push({
+                if (this.states.llmStepState.chatMessages.length === 0) {
+                    this.states.llmStepState.chatMessages.push({
                         role: 'system',
                         content: '',
                     });
                 }
-                this.agentMetadata.llmStepState.chatMessages[0].content =
-                    newContent;
+                this.states.llmStepState.chatMessages[0].content = newContent;
             },
         },
     },
@@ -151,12 +138,12 @@ export default {
                 id: this.agentId,
             });
             this.form = res;
-            if (this.form.metadata) {
-                this.agentMetadata = JSON.parse(this.form.metadata);
+            if (this.form.states) {
+                this.states = JSON.parse(this.form.states);
             }
         },
         async handleSave() {
-            this.form.metadata = JSON.stringify(this.agentMetadata);
+            this.form.states = JSON.stringify(this.states);
 
             this.isSaveing = true;
             try {

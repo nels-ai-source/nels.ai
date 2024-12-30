@@ -31,7 +31,7 @@
                             <el-tag v-if="item.agentType==1" size="small">{{ $t('agent.agentType1') }}</el-tag>
                         </div>
                         <div class="handler">
-
+                            <el-button type="primary" icon="el-icon-caret-right" @click="handleRun(item)" circle></el-button>
                             <el-button icon="el-icon-star" circle></el-button>
 
                             <el-dropdown trigger="click">
@@ -102,13 +102,12 @@ export default {
             });
         },
         detail(o) {
-            const url = this.$router.resolve({
+            this.$router.push({
                 path: '/aigc/agent/agent/detail',
                 query: {
                     id: o.id,
                 },
-            }).href;
-            window.open(url, '_blank');
+            });
         },
         async del(o) {
             this.$confirm(
@@ -129,6 +128,15 @@ export default {
         async handleSaveSuccess() {
             await this.getList();
         },
+        async handleRun(o) {
+            this.$router.push({
+                path: '/aigc/agent/run',
+                query: {
+                    id: o.id,
+                },
+            });
+        },
+        async handleStar() {},
     },
 };
 </script>

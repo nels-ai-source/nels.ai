@@ -18,12 +18,16 @@ public class AigcApplicationAutoMapperProfile : Profile
         CreateMap<Prompt, PromptDto>().ReverseMap();
 
         CreateMap<Agent, AgentDto>()
-            .ForMember(dest => dest.Metadata, opt => opt.MapFrom(x => x.Metadata == null ? null : x.Metadata.Metadata))
+            .ForMember(dest => dest.Steps, opt => opt.MapFrom(x => x.Metadata == null ? null : x.Metadata.Steps))
+            .ForMember(dest => dest.States, opt => opt.MapFrom(x => x.Metadata == null ? null : x.Metadata.States))
             .ReverseMap().Ignore(dest => dest.Metadata);
 
         CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>()
             .ReverseMap();
 
+        CreateMap<AgentConversation, AgentConversationDto>().ReverseMap();
+        CreateMap<AgentChat, AgentChatDto>().ReverseMap();
+        CreateMap<AgentMessage, AgentMessageDto>().ReverseMap();
 
         CreateMap<Model, ModelDto>().ReverseMap();
         CreateMap<ModelInstance, ModelInstanceDto>().ReverseMap();

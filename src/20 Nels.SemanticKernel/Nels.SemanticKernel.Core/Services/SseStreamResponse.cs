@@ -45,4 +45,6 @@ public class EventType
     public static string Text = "text";
 
     public static string Data = "data";
+
+    public static string Down = "down";
 }

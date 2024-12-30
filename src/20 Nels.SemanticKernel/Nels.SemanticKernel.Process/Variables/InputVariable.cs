@@ -2,11 +2,11 @@
 
 public class InputVariable : Variable
 {
-    public IVariableValue Value { get; set; }
+    public VariableValue Value { get; set; }
 
-    public object GetValue(StepState state)
+    public object GetValue(Dictionary<string, object> context)
     {
-        return Value.GetValue(state);
+        return Value.GetValue(context);
     }
     public bool IdEqual(string id)
     {

@@ -2,8 +2,9 @@
 using Nels.Abp.SysMng.FunctionPage;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Volo.Abp;
+using System.IO;
+using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.FileSystem;
 using Volo.Abp.Data;
 using Volo.Abp.Domain;
 using Volo.Abp.Identity;
@@ -13,6 +14,7 @@ using Volo.Abp.PermissionManagement;
 namespace Nels.Abp.SysMng;
 
 [DependsOn(
+    typeof(AbpBlobStoringFileSystemModule),
     typeof(AbpDddDomainModule),
     typeof(AbpIdentityDomainModule),
     typeof(NelsAbpSysMngDomainSharedModule)
@@ -32,6 +34,22 @@ public class NelsAbpSysMngDomainModule : AbpModule
         {
             options.SaveStaticPermissionsToDatabase = false;
             options.IsDynamicPermissionStoreEnabled = false;
+        });
+    //https://abp.io/docs/latest/framework/infrastructure/blob-storing#blob-storage-providers
+        Configure<AbpBlobStoringOptions>(options =>
+        {
+            options.Containers.ConfigureDefault(container =>
+            {
+                container.UseFileSystem(fileSystem =>
+                {
+                    var basePath = Path.Combine(AppContext.BaseDirectory, "files");
+                    if (!Directory.Exists(basePath))
+                    {
+                        Directory.CreateDirectory(basePath);
+                    }
+                    fileSystem.BasePath = basePath;
+                });
+            });
         });
     }
     #region functionPage

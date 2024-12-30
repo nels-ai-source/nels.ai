@@ -2,6 +2,7 @@
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Liquid;
+using Microsoft.SemanticKernel.Services;
 using Nels.SemanticKernel.Extensions;
 using Nels.SemanticKernel.InternalUtilities;
 using Nels.SemanticKernel.InternalUtilities.Models;
@@ -11,11 +12,12 @@ using System.Text.Json.Serialization;
 
 namespace Nels.SemanticKernel.Process.Steps;
 
-public class LlmStep : NelsKernelProcessStep<LlmStepState>
+public class LlmStep() : NelsKernelProcessStep<LlmStepState>()
 {
     private readonly IPromptTemplateFactory _templateFactory = new LiquidPromptTemplateFactory();
     private LlmGetStreamingChatMessage _chatDeleegate;
     private string _result;
+
     public delegate Task<string> LlmGetStreamingChatMessage(MessageEventHandler messageEvent);
 
     [KernelFunction(StepTypeConst.Llm)]
@@ -58,6 +60,9 @@ public class LlmStep : NelsKernelProcessStep<LlmStepState>
         var chatHistory = await GetChatMessagesAsync();
 
         _result = string.Empty;
+
+        _stepLog.ModelId = chatCompletionService.GetModelId() ?? string.Empty;
+
         await foreach (var item in chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, promptExecutionSettings))
         {
             if (string.IsNullOrWhiteSpace(item.Content)) continue;

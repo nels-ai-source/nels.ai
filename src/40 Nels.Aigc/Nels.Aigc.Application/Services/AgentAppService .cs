@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.VisualBasic;
 using Nels.Abp.Ddd.Application.Services;
 using Nels.Aigc.Dtos;
 using Nels.Aigc.Entities;
@@ -11,13 +10,16 @@ using Nels.Aigc.Enums;
 using Nels.Aigc.Permissions;
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process;
+using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Interfaces;
 using Nels.SemanticKernel.Process.Steps;
 using Nels.SemanticKernel.Process.Variables;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Localization;
 using Volo.Abp.Uow;
@@ -29,17 +31,21 @@ namespace Nels.Aigc.Services;
 public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 {
     private readonly IStreamResponse _streamResponse;
-    private readonly Kernel _kernel;
     private readonly IProceessSerializer _proceessSerializer;
+
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<AgentMetadata, Guid> _metadataRepository;
-    private readonly AgentChatDomainService _agentChatDomainService;
     private readonly IRepository<AgentConversation, Guid> _agentConversationRepository;
+    private readonly IRepository<AgentMessage, Guid> _agentMessageRepository;
+
+    private readonly AgentChatDomainService _agentChatDomainService;
+    private readonly Kernel _kernel;
 
     public AgentAppService(IRepository<Agent, Guid> repository,
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
         IRepository<AgentMetadata, Guid> metadataRepository,
-         IRepository<AgentConversation, Guid> agentConversationRepository,
+        IRepository<AgentConversation, Guid> agentConversationRepository,
+        IRepository<AgentMessage, Guid> agentMessageRepository,
         ILanguageProvider languageProvider,
         IStreamResponse streamResponse,
         IOptions<AbpLocalizationOptions> localizationOptions,
@@ -57,6 +63,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         _metadataRepository = metadataRepository;
         _agentConversationRepository = agentConversationRepository;
         _agentChatDomainService = agentChatDomainService;
+        _agentMessageRepository = agentMessageRepository;
 
         _kernel = kernel;
         _streamResponse = streamResponse;
@@ -186,7 +193,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 
         var agentChat = (processState.AgentChat as AgentChat) ?? throw new Exception();
 
-        agentConversation.Title = string.IsNullOrWhiteSpace(agentConversation.Title) ? agentChat.Question : agentConversation.Title;
+        agentConversation.SetTitle(string.IsNullOrWhiteSpace(agentConversation.Title) ? agentChat.Question : agentConversation.Title);
         await _agentChatDomainService.InsertAgentChatAsync(agentChat);
 
         agentConversation = request.AgentConversationId == null ? await _agentConversationRepository.InsertAsync(agentConversation) : await _agentConversationRepository.UpdateAsync(agentConversation);
@@ -292,7 +299,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
         entity.Metadata = await _metadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
 
-        entity.PresetQuestions = entity.PresetQuestions.OrderBy(x => x.Index).ToList();
+        entity.PresetQuestions = [.. entity.PresetQuestions.OrderBy(x => x.Index)];
         return entity;
     }
 
@@ -317,4 +324,79 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         }
         return await base.UpdateAsync(entity);
     }
+
+    #region conversation
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task<AgentDto> GetAgentConversationsAsync(Guid agentId)
+    {
+        var entity = await Repository.GetAsync(agentId) ?? throw new BusinessException("not found");
+        var entities = await _agentConversationRepository.GetListAsync(x => x.AgentId == agentId && x.CreatorId == CurrentUser.Id);
+
+        var dto = Map<Agent, AgentDto>(entity);
+        dto.Conversations = MapList<AgentConversation, AgentConversationDto>([.. entities.OrderByDescending(x => x.CreationTime)]);
+
+        return dto;
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task UpdateConversationTitleAsync(AgentConversationDto conversationDto)
+    {
+        var entity = await _agentConversationRepository.GetAsync(conversationDto.Id);
+        entity.SetTitle(conversationDto.Title);
+
+        await _agentConversationRepository.UpdateAsync(entity, true);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task DeleteConversationAsync(Guid conversationId)
+    {
+        await _agentConversationRepository.DeleteAsync(x => x.Id == conversationId);
+    }
+    #endregion
+
+    #region chat
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task RegenChatAsync(Guid chatId)
+    {
+
+        var entities = await _agentMessageRepository.GetListAsync(x => x.AgentChatId == chatId && x.CreatorId == CurrentUser.Id);
+        if (entities == null) return;
+
+        var userMessage = entities.FirstOrDefault(x => x.Role == MessageRoleConsts.User);
+        if (userMessage == null) return;
+
+        await _agentMessageRepository.DeleteManyAsync(entities);
+
+        StartRequest request = new()
+        {
+            AgentId = userMessage.AgentId,
+            AgentConversationId = userMessage.AgentConversationId,
+            Streaming = true,
+            UserInput = userMessage.Content,
+        };
+
+        await AgentStartAsync(request);
+    }
+    #endregion
+
+    #region message
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task DeleteMessageAsync(Guid messageId)
+    {
+        await _agentMessageRepository.DeleteAsync(x => x.Id == messageId && x.CreatorId == CurrentUser.Id);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public virtual async Task<List<AgentMessageDto>> GetAgentMessagesAsync(Guid agentConversationId)
+    {
+        var entities = await _agentMessageRepository.GetListAsync(x => x.AgentConversationId == agentConversationId && x.CreatorId == CurrentUser.Id);
+        return MapList<AgentMessage, AgentMessageDto>([.. entities.OrderBy(x=>x.CreationTime).ThenBy(x => x.Index)]);
+    }
+    #endregion
 }

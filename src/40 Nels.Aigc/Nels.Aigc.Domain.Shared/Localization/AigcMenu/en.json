@@ -5,6 +5,7 @@
     "Menu:Dashboard": "Dashboard",
     "Menu:Aigc": "Aigc",
     "Menu:Aigc.Agent": "Agent",
+    "Menu:Aigc.AgentRun": "Agent",
     "Menu:Aigc.Agent.Agent": "Agent",
     "Menu:Aigc.Agent.AgentDetail": "Agent Detail",
     "Menu:Aigc.Resource": "Resource",

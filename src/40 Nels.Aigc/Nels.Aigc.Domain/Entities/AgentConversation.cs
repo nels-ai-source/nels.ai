@@ -1,10 +1,12 @@
-﻿using Nels.Aigc.Consts;
+﻿using Google.Protobuf;
+using Nels.Aigc.Consts;
 using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -25,6 +27,11 @@ public class AgentConversation : AuditedEntity<Guid>, IAggregateRoot<Guid>
     public virtual string Metadata { get; set; } = string.Empty;
 
     public virtual List<AgentChat> Chats { get; set; }
+
+    public virtual void SetTitle(string title)
+    {
+        Title = title.Length > AgentConversationConsts.MaxTitleLength ? title[..AgentConversationConsts.MaxTitleLength] : title;
+    }
 }
 public class AgentChat : AuditedEntity<Guid>, IAgentChat
 {
@@ -47,13 +54,25 @@ public class AgentChat : AuditedEntity<Guid>, IAgentChat
     [MaxLength(AgentConversationConsts.MaxAnswerLength)]
     public virtual string Answer { get; set; }
 
+    [Required]
+    public virtual double Duration => StepLogs.Sum(x => x.Duration);
+
+    [Required]
+    public virtual int PromptTokens => StepLogs.Sum(x => x.PromptTokens);
+
+    [Required]
+    public virtual int CompleteTokens => StepLogs.Sum(x => x.CompleteTokens);
+
+    [Required]
+    public virtual int Tokens => StepLogs.Sum(x => x.Tokens);
+
     public virtual List<AgentStepLog> StepLogs { get; set; } = [];
 
     public virtual List<AgentMessage> Messages { get; set; } = [];
 
-    public virtual IStepLog AddStepLog(Guid stepId)
+    public virtual IStepLog AddStepLog(Guid id, Guid stepId)
     {
-        AgentStepLog agentStepLog = new(Guid.NewGuid())
+        AgentStepLog agentStepLog = new(id)
         {
             AgentId = AgentId,
             AgentConversationId = AgentConversationId,
@@ -65,16 +84,18 @@ public class AgentChat : AuditedEntity<Guid>, IAgentChat
         return agentStepLog;
     }
 
-    public virtual void AddMessage(string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null)
+    public virtual void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null)
     {
-        AgentMessage message = new(Guid.NewGuid())
+        AgentMessage message = new(id)
         {
             AgentId = AgentId,
             AgentConversationId = AgentConversationId,
+            AgentChatId = Id,
             Role = role,
             Content = content,
             Type = type,
             ContentType = contentType,
+            Index = Messages.Count,
             Metadata = metadata ?? string.Empty
         };
         Messages.Add(message);
@@ -86,14 +107,14 @@ public class AgentChat : AuditedEntity<Guid>, IAgentChat
         var userMessage = Messages.FirstOrDefault(x => x.Role == MessageRoleConsts.User)?.Content ?? string.Empty;
         var assistantMessage = Messages.LastOrDefault(x => x.Role == MessageRoleConsts.Assistant)?.Content ?? string.Empty;
 
-        Question = userMessage.Length > AgentConversationConsts.MaxQuestionLength ? userMessage.Substring(0, AgentConversationConsts.MaxQuestionLength) : userMessage;
-        Answer = assistantMessage.Length > AgentConversationConsts.MaxAnswerLength ? assistantMessage.Substring(0, AgentConversationConsts.MaxAnswerLength) : assistantMessage;
+        Question = userMessage.Length > AgentConversationConsts.MaxQuestionLength ? userMessage[..AgentConversationConsts.MaxQuestionLength] : userMessage;
+        Answer = assistantMessage.Length > AgentConversationConsts.MaxAnswerLength ? assistantMessage[..AgentConversationConsts.MaxAnswerLength] : assistantMessage;
     }
 }
 
-public class AgentMessage : AuditedEntity<Guid>
+public class AgentMessage : FullAuditedEntity<Guid>, ISoftDelete
 {
-    internal AgentMessage() { }
+    protected AgentMessage() { }
     internal AgentMessage(Guid id) : base(id) { }
 
     [Required]
@@ -101,6 +122,9 @@ public class AgentMessage : AuditedEntity<Guid>
 
     [Required]
     public virtual Guid AgentConversationId { get; set; }
+
+    [Required]
+    public virtual Guid AgentChatId { get; set; }
 
     [Required]
     [MaxLength(AgentMessageConsts.MaxRoleLength)]
@@ -112,14 +136,16 @@ public class AgentMessage : AuditedEntity<Guid>
     [MaxLength(AgentMessageConsts.MaxContentTypeLength)]
     public virtual string ContentType { get; set; }
 
+    public virtual int Index { get; set; }
+
     public virtual string Content { get; set; }
 
     public virtual string Metadata { get; set; }
 }
 
-public class AgentStepLog : AuditedEntity<Guid>, IStepLog
+public class AgentStepLog : FullAuditedEntity<Guid>, IStepLog, ISoftDelete
 {
-    internal AgentStepLog() { }
+    protected AgentStepLog() { }
     internal AgentStepLog(Guid id) : base(id) { }
 
     [Required]
@@ -131,12 +157,15 @@ public class AgentStepLog : AuditedEntity<Guid>, IStepLog
     [Required]
     public virtual Guid AgentChatId { get; set; }
 
-    public int Index { get; set; }
-    public Guid StepId { get; set; }
-    public double Duration { get; set; } = 0.000;
-    public int PromptTokens { get; set; } = 0;
-    public int CompleteTokens { get; set; } = 0;
-    public int Tokens => PromptTokens + CompleteTokens;
+    [MaxLength(AgentStepLogConsts.MaxModelIdLength)]
+    public virtual string ModelId { get; set; } = string.Empty;
+
+    public virtual int Index { get; set; }
+    public virtual Guid StepId { get; set; }
+    public virtual double Duration { get; set; } = 0.000;
+    public virtual int PromptTokens { get; set; } = 0;
+    public virtual int CompleteTokens { get; set; } = 0;
+    public virtual int Tokens => PromptTokens + CompleteTokens;
 
     public void SetDuration(Double millisecond)
     {

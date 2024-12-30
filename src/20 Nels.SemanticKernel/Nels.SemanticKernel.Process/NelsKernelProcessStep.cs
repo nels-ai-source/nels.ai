@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.SemanticKernel;
-using Nels.SemanticKernel.Process.Consts;
+using Nels.SemanticKernel.InternalUtilities;
 using Nels.SemanticKernel.Process.Interfaces;
 using Nels.SemanticKernel.Process.States;
 using Nels.SemanticKernel.Process.Steps;
-using System.Threading;
 using static Nels.SemanticKernel.Process.Steps.LlmStep;
 
 namespace Nels.SemanticKernel.Process;
@@ -26,6 +25,7 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
     protected IStepLog _stepLog;
     private readonly string ExecutedEvent = $"ExecutedEvent_{0}";
     private readonly List<LlmGetStreamingChatMessage> _chatMessages = [];
+
 
     /// <inheritdoc/>
     public override ValueTask ActivateAsync(KernelProcessStepState<IStepState> state)
@@ -53,7 +53,7 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
         if (_httpContextAccessor.HttpContext.Items.TryGetValue(nameof(ProcessState), out object? processState))
         {
             _processState = (ProcessState)processState;
-            _stepLog = _processState.AgentChat.AddStepLog(Guid.Parse(_id));
+            _stepLog = _processState.AgentChat.AddStepLog(SequentialGuidGenerator.Create(), Guid.Parse(_id));
         }
 
         if (await PreExecuteAsync(_cancellationToken) == false)

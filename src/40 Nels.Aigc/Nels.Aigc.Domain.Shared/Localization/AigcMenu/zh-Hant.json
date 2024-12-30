@@ -5,6 +5,7 @@
     "Menu:Dashboard": "控制台",
     "Menu:Aigc": "Aigc",
     "Menu:Aigc.Agent": "智能体",
+    "Menu:Aigc.AgentRun": "智能体",
     "Menu:Aigc.Agent.Agent": "智能体",
     "Menu:Aigc.Agent.AgentDetail": "智能体详情",
     "Menu:Aigc.Resource": "资源",

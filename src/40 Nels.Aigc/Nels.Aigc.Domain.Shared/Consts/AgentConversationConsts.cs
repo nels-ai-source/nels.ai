@@ -13,3 +13,7 @@ public static class AgentMessageConsts
     public const int MaxTypeLength = 32;
     public const int MaxContentTypeLength = 32;
 }
+public static class AgentStepLogConsts
+{
+    public const int MaxModelIdLength = 32;
+}

@@ -25,6 +25,9 @@ public class AigcApplicationAutoMapperProfile : Profile
         CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>()
             .ReverseMap();
 
+        CreateMap<AgentConversation, AgentConversationDto>().ReverseMap();
+        CreateMap<AgentChat, AgentChatDto>().ReverseMap();
+        CreateMap<AgentMessage, AgentMessageDto>().ReverseMap();
 
         CreateMap<Model, ModelDto>().ReverseMap();
         CreateMap<ModelInstance, ModelInstanceDto>().ReverseMap();

@@ -1,8 +1,8 @@
 ﻿namespace Nels.SemanticKernel.Process;
 
-public class ProcessEventData(string stepId, string name, object content)
+public class ProcessEventData(Guid messageId, string name, object content)
 {
-    public string StepId { get; set; } = stepId;
+    public Guid MessageId { get; set; } = messageId;
     public string Name { get; set; } = name;
     public object Content { get; set; } = content;
 
@@ -12,8 +12,8 @@ public class ProcessEventData(string stepId, string name, object content)
         {
             return new Dictionary<string, object>
             {
-                { nameof(StepId),StepId},
-                { nameof(Content),Content}
+                { "messageId",MessageId},
+                { "content",Content}
             };
         }
     }

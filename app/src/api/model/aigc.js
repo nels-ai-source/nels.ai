@@ -38,6 +38,34 @@ export default {
                 return await http.post(`${this.url}?id=${id}`);
             },
         },
+        getAgentConversations: {
+            url: `${config.API_URL}/agent/getAgentConversations`,
+            name: 'getAgentConversations',
+            post: async function (params) {
+                return await http.post(`${this.url}?agentId=${params.id}`);
+            },
+        },       
+        updateConversationTitle: {
+            url: `${config.API_URL}/agent/updateConversationTitle`,
+            name: 'updateConversationTitle',
+            post: async function (data) {
+                return await http.post(`${this.url}`, data);
+            },
+        },
+        deleteConversation: {
+            url: `${config.API_URL}/agent/deleteConversation`,
+            name: 'deleteConversation',
+            post: async function (params) {
+                return await http.post(`${this.url}?conversationId=${params.id}`);
+            },
+        },      
+        getAgentMessages: {
+            url: `${config.API_URL}/agent/getAgentMessages`,
+            name: 'getAgentMessages',
+            post: async function (params) {
+                return await http.post(`${this.url}?agentConversationId=${params.id}`);
+            },
+        },
     },
     space: {
         list: {

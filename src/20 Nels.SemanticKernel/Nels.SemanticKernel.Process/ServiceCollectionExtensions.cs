@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.SemanticKernel;
-using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process.Interfaces;
 using Nels.SemanticKernel.Process.Services;
 using Nels.SemanticKernel.Process.Steps;
-using Nels.SemanticKernel.Services;
 
 namespace Nels.SemanticKernel.Process;
 
@@ -26,6 +23,7 @@ public static class ServiceCollectionExtensions
         options.RegisterKernelProcessStepType<StartStep>();
 
         processAction?.Invoke(options);
+
 
         services.AddSingleton<IProceessSerializer>(proceessSerializer);
         services.AddSingleton<KernelProcessOptions>(options);

@@ -1,171 +1,76 @@
 <template>
-    <el-main>
-        <el-scrollbar ref="scrollbarRef">
-            <welcome :introductionText="introductionText" />
-            <prompts :presetQuestions="presetQuestions" @prompt="handleSendMessage" />
-            <bubble :item="item" v-for="item in localMessages" v-bind:key="item.id" />
-        </el-scrollbar>
-
+    <el-main class="nopadding" style="height: 100%;">
+        <el-container>
+            <el-aside width="300px" style="padding: 10px;">
+                <conversations :items="agent.conversations" :activeId="agentConversationId" @change="handleConectionChange" @update="handleUpdateConection" @delete="handleDeleteConection" />
+            </el-aside>
+            <el-container>
+                <el-header>{{agent.name}}</el-header>
+                <chats :messages="msgList" :agentId="agentId" :agentConversationId="agentConversationId" :introductionText="agent.introductionText" :presetQuestions="agent.presetQuestions" ref="chatsRef" />
+            </el-container>
+        </el-container>
     </el-main>
-    <el-footer style="height: auto; border-top: none;">
-        <sender :loading="assistantLoading" :text="userPrompt" @send="handleSendMessage" @delete="handleClearData" />
-    </el-footer>
-
 </template>
 
 <script>
-import { nextTick } from 'vue';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import config from '@/config';
-import tool from '@/utils/tool';
-import welcome from './components/welcome';
-import prompts from './components/prompts';
-import bubble from './components/bubble';
-import conversations from './components/conversations';
-import sender from './components/sender';
-import { v4 as uuidv4 } from 'uuid';
+import chats from '@/views/aigc/chats/index';
+import conversations from '@/views/aigc/chats/components/conversations';
 export default {
-    name: 'application',
-    components: {
-        welcome,
-        prompts,
-        bubble,
-        conversations,
-        sender,
-    },
-    props: {
-        introductionText: {
-            type: String,
-            default: '',
-        },
-        presetQuestions: {
-            type: Array,
-            default: () => [],
-        },
-        messages: {
-            type: Array,
-            Required: true,
-        },
-        agentId: {
-            type: String,
-            default: '',
-        },
-        agentConversationId: {
-            type: String,
-            default: '',
-        },
-    },
+    name: 'dashboard',
+    components: { chats, conversations },
     data() {
         return {
-            localMessages: [...this.messages],
-            userPrompt: '',
-            assistantLoading: false,
+            agent: {
+                id: '',
+                name: '',
+                description: '',
+                introductionText: '',
+                presetQuestions: [{ content: '' }],
+                conversations: [],
+            },
+            agentId: this.$route.query.id,
+            agentConversationId: '',
+            msgList: [],
         };
     },
+    async mounted() {
+        await this.get();
+    },
     methods: {
-        async handleSendMessage(message) {
-            this.userPrompt = message;
-            let url = `${process.env.VUE_APP_API_BASEURL}${config.API_URL}/agent/AgentStart`;
-            let token = tool.cookie.get('TOKEN');
-
-            let headers = {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache',
-                Connection: 'keep-alive',
-            };
-            headers[config.TOKEN_NAME] = config.TOKEN_PREFIX + token;
-
-            this.assistantLoading = true;
-            let me = this;
-
-            await fetchEventSource(url, {
-                method: 'POST',
-                openWhenHidden: true,
-                headers: headers,
-                body: JSON.stringify({
-                    agentId: this.agentId,
-                    agentConversationId: this.agentConversationId,
-                    userInput: this.userPrompt,
-                    streaming: true,
-                }),
-                onopen() {
-                    let id = uuidv4();
-                    me.addUserMessage(id, me.userPrompt);
-                    me.assistantLoading = true;
-                },
-                onmessage(ev) {
-                    console.log('onmessage' + ev);
-                    if (ev.event == 'message_template') {
-                        let data = JSON.parse(ev.data);
-                        me.addAssistantMessage(data.messageId, {
-                            template: data.Content,
-                        });
-                    } else if (ev.event == 'data') {
-                        let data = JSON.parse(ev.data);
-                        me.addMessageContent(data.messageId, data.content);
-                        me.scrollToBottom();
-                    }
-                },
-                onclose() {
-                    console.log('onclose');
-                    me.assistantLoading = false;
-                    me.userPrompt = '';
-                },
-                onerror(err) {
-                    me.assistantLoading = false;
-                    throw err;
-                },
+        async get() {
+            let res = await this.$API.aigc.agent.getAgentConversations.post({
+                id: this.agentId,
             });
-        },
-        handleClearData() {
-            this.localMessages = [];
-        },
-        addUserMessage(id, message) {
-            this.localMessages.push({
-                id: id,
-                role: 'user',
-                content: message,
-                options: {},
-                bubbleOptions: { end: true },
-            });
-        },
-        addAssistantMessage(id, options) {
-            this.localMessages.push({
-                id: id,
-                role: 'assistant',
-                content: '',
-                options: options,
-                bubbleOptions: { start: true, footer: { copy: true } },
-            });
-        },
-        addMessageContent(id, content) {
-            let targetIndex = this.localMessages.findIndex(
-                (item) => item.id == id
-            );
-            if (targetIndex !== -1) {
-                let item = this.localMessages[targetIndex];
-                item.content += content;
+            this.agent = res;
+            if (this.agent?.conversations.length > 0) {
+                let agentConversationId = this.agent.conversations[0].id;
+                await this.handleConectionChange(agentConversationId);
+            } else {
+                this.agentConversationId = '';
+                this.msgList = [];
             }
         },
-        scrollToBottom() {
-            nextTick(() => {
-                const scrollbarRef = this.$refs.scrollbarRef;
-                if (scrollbarRef) {
-                    scrollbarRef.setScrollTop(scrollbarRef.$el.scrollHeight);
-                    console.log(scrollbarRef.$el.scrollHeight);
-                }
+        async handleConectionChange(agentConversationId) {
+            let res = await this.$API.aigc.agent.getAgentMessages.post({
+                id: agentConversationId,
             });
+            this.msgList = res;
+            this.agentConversationId = agentConversationId;
         },
-    },
-    watch: {
-        messages(val) {
-            this.localMessages = val;
+        handleUpdateConection(agentConversationId) {
+            console.log(agentConversationId);
+        },
+        async handleDeleteConection(agentConversationId) {
+            await this.$API.aigc.agent.deleteConversation.post({
+                id: agentConversationId,
+            });
+            await this.get();
         },
     },
 };
 </script>
 
-<style scoped>
+<style>
 .css-var-r4c {
     --ant-blue: #1677ff;
     --ant-purple: #722ed1;
@@ -520,207 +425,5 @@ export default {
     --ant-box-shadow-tabs-overflow-top: inset 0 10px 8px -8px rgba(0, 0, 0, 0.08);
     --ant-box-shadow-tabs-overflow-bottom: inset 0 -10px 8px -8px
         rgba(0, 0, 0, 0.08);
-}
-
-.ant-space-horizontal {
-    display: inline-flex;
-    flex-direction: row;
-}
-.ant-space-align-center {
-    align-items: center;
-}
-.ant-btn-icon-xxs {
-    padding: var(--ant-padding-xxs);
-    font-size: var(--ant-font-size);
-}
-.ant-btn-icon-sm {
-    padding: var(--ant-padding-sm);
-    font-size: var(--ant-size-popup-arrow);
-}
-.ant-typography {
-    --ant-typography-title-margin-top: 1.2em;
-    --ant-typography-title-margin-bottom: 0.5em;
-}
-.ant-typography.ant-typography-secondary {
-    color: var(--ant-color-text-description);
-}
-.ant-badge {
-    --ant-badge-indicator-z-index: auto;
-    --ant-badge-indicator-height: 20px;
-    --ant-badge-indicator-height-sm: 14px;
-    --ant-badge-dot-size: 6px;
-    --ant-badge-text-font-size: 12px;
-    --ant-badge-text-font-size-sm: 12px;
-    --ant-badge-text-font-weight: normal;
-    --ant-badge-status-size: 6px;
-}
-.ant-input-css-var {
-    --ant-input-padding-block: 4px;
-    --ant-input-padding-block-sm: 0px;
-    --ant-input-padding-block-lg: 7px;
-    --ant-input-padding-inline: 11px;
-    --ant-input-padding-inline-sm: 7px;
-    --ant-input-padding-inline-lg: 11px;
-    --ant-input-addon-bg: rgba(0, 0, 0, 0.02);
-    --ant-input-active-border-color: #1677ff;
-    --ant-input-hover-border-color: #4096ff;
-    --ant-input-active-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
-    --ant-input-error-active-shadow: 0 0 0 2px rgba(255, 38, 5, 0.06);
-    --ant-input-warning-active-shadow: 0 0 0 2px rgba(255, 215, 5, 0.1);
-    --ant-input-hover-bg: #ffffff;
-    --ant-input-active-bg: #ffffff;
-    --ant-input-input-font-size: 14px;
-    --ant-input-input-font-size-lg: 16px;
-    --ant-input-input-font-size-sm: 14px;
-}
-.el-button + .el-button {
-    margin-left: 5px;
-}
-.ant-typography {
-    --ant-typography-title-margin-top: 1.2em;
-    --ant-typography-title-margin-bottom: 0.5em;
-}
-.ant-space-gap-col-small {
-    column-gap: var(--ant-padding-xs);
-}
-.ant-space-gap-row-small {
-    row-gap: var(--ant-padding-xs);
-}
-.ant-space-align-center {
-    align-items: center;
-}
-.ant-space {
-    display: inline-flex;
-}
-.anticon {
-    display: inline-flex;
-    align-items: center;
-    color: inherit;
-    font-style: normal;
-    line-height: 0;
-    text-align: center;
-    text-transform: none;
-    vertical-align: -0.125em;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-.ant-flex {
-    display: flex;
-}
-.ant-btn-icon-xxs {
-    padding: var(--ant-padding-xxs);
-    font-size: var(--ant-font-size);
-}
-
-.ant-bubble ::v-deep {
-    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Roboto,
-        Ubuntu, Cantarell, Noto Sans, sans-serif, Helvetica, Apple Color Emoji,
-        Arial, Segoe UI Emoji, Segoe UI Symbol;
-    font-size: 1em;
-    color: #000000;
-}
-::v-deep ol,
-::v-deep ul {
-    margin: 1em 0;
-    padding-left: 2em;
-}
-
-::v-deep li {
-    font-size: 1em;
-    border-radius: 0.3em;
-    padding: 0.2em 0.4em;
-    color: #24292e;
-    margin-bottom: 0.5em;
-}
-
-::v-deep ol {
-    list-style-type: decimal;
-}
-
-::v-deep ul {
-    list-style-type: disc;
-}
-
-::v-deep p {
-    margin: 0.5em 0;
-    line-height: 1.6;
-}
-
-::v-deep h1,
-::v-deep h2,
-::v-deep h3,
-::v-deep h4,
-::v-deep h5,
-::v-deep h6 {
-    font-weight: bold;
-    color: #24292e;
-}
-
-::v-deep h1 {
-    font-size: 2em;
-    border-bottom: 2px solid #e1e4e8;
-    padding-bottom: 0.3em;
-}
-
-::v-deep h2 {
-    font-size: 1.75em;
-    border-bottom: 1px solid #e1e4e8;
-    padding-bottom: 0.3em;
-}
-
-::v-deep h3 {
-    font-size: 1.5em !important;
-}
-
-::v-deep h4 {
-    font-size: 1.25em;
-}
-
-::v-deep h5 {
-    font-size: 1em;
-}
-
-::v-deep h6 {
-    font-size: 0.875em;
-}
-
-::v-deep blockquote {
-    margin: 1em 0;
-    padding: 0.5em 1em;
-    background-color: #f6f8fa;
-    border-left: 5px solid #e1e4e8;
-    color: #6a737d;
-}
-
-::v-deep pre {
-    border-radius: 10px;
-}
-::v-deep code {
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-        Liberation Mono, monospace !important;
-    padding: 0.2em 0.4em;
-    border-radius: 0.3em;
-}
-
-::v-deep code:not(pre code) {
-    padding: 0px;
-    font-weight: 600;
-}
-
-::v-deep pre code {
-    display: block;
-    overflow: auto;
-    font-size: 1em;
-    padding: 1em;
-    border-radius: 1px;
-}
-
-::v-deep a {
-    color: #0366d6;
-    text-decoration: none;
-}
-::v-deep a:hover {
-    text-decoration: underline;
 }
 </style>

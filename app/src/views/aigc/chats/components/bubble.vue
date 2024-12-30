@@ -4,16 +4,14 @@
             <el-avatar :size="this.avatarSize" :icon="this.avatarIcon"></el-avatar>
         </div>
         <div :class="bubbleWrapperClass">
-            <div class="ant-bubble-header" v-if="this.processedData.bubbleOptions.header">{{this.processedData.bubbleOptions.header}}</div>
-            <div :class="['ant-bubble-content',bubbleContentClass]" v-html="renderMarkdown">
-
-            </div>
-            <div class="ant-bubble-footer" v-if="processedData.bubbleOptions.footer">
+            <!-- <div class="ant-bubble-header" v-if="this.processedData.bubbleOptions.header">{{this.processedData.bubbleOptions.header}}</div> -->
+            <div :class="['ant-bubble-content',bubbleContentClass]" v-html="renderMarkdown"></div>
+            <div class="ant-bubble-footer" v-if="this.item.role==='assistant'">
                 <div class="ant-space ant-space-horizontal ant-space-align-center css-var-r4c" style="gap: 4px;">
-                    <div class="ant-space-item" v-if="processedData.bubbleOptions.footer.copy">
+                    <div class="ant-space-item">
                         <el-button text size="small" icon="el-icon-document-copy" class="ant-btn-icon-xxs" @click="handleCopy" />
                     </div>
-                    <div class="ant-space-item" v-if="processedData.bubbleOptions.footer.refresh">
+                    <div class="ant-space-item">
                         <el-button text size="small" icon="el-icon-refresh" class="ant-btn-icon-xxs" @click="handleRefresh" />
                     </div>
                 </div>
@@ -65,31 +63,28 @@ export default {
     },
     computed: {
         bubbleClass() {
-            if (this.item?.bubbleOptions?.start) {
+            if (this.item?.role === 'assistant') {
                 return 'ant-bubble-start';
             }
             return 'ant-bubble-end';
         },
         bubbleWrapperClass() {
-            if (this.item?.bubbleOptions?.start) {
+            if (this.item?.role === 'assistant') {
                 return 'ant-bubble-content-wrapper';
             }
             return '';
         },
         bubbleContentClass() {
-            if (this.item?.bubbleOptions?.start) {
+            if (this.item?.role === 'assistant') {
                 return 'ant-bubble-content-filled';
             }
             return 'ant-bubble-content-filled-end';
         },
         bubbleContentShadowClass() {
-            if (this.item?.bubbleOptions?.start) {
+            if (this.item?.role === 'assistant') {
                 return 'ant-bubble-content-shadow';
             }
             return 'ant-bubble-content-shadow-end';
-        },
-        processedData() {
-            return this.item;
         },
         renderMarkdown() {
             return this.md.render(this.item.content);
@@ -107,7 +102,6 @@ export default {
 };
 </script>
 <style>
-
 .ant-bubble {
     display: flex;
     column-gap: var(--ant-padding-sm);
@@ -170,5 +164,9 @@ export default {
 .ant-btn-icon-xxs {
     padding: var(--ant-padding-xxs);
     font-size: var(--ant-font-size);
+}
+.ant-space-horizontal {
+    display: inline-flex;
+    flex-direction: row;
 }
 </style>

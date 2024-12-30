@@ -9,13 +9,14 @@ public interface IAgentChat
     Guid AgentConversationId { get; set; }
     string Question { get; set; }
     string Answer { get; set; }
-    IStepLog AddStepLog(Guid stepId);
-    void AddMessage(string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null);
+    IStepLog AddStepLog(Guid id, Guid stepId);
+    void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null);
 }
 
 public interface IStepLog
 {
     Guid StepId { get; set; }
+    string ModelId { get; set; }
     double Duration { get; }
     int PromptTokens { get; set; }
     int CompleteTokens { get; set; }

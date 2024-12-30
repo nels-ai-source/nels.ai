@@ -72,6 +72,18 @@ public class AigcFunctionPageProvider(IGuidGenerator guidGenerator, ILocalizable
                 Icon = "el-icon-memo",
                 Sort = "10"
             },
+            new(Guid.Parse("c79904ee-319a-4a81-a6b7-cbbcd2d37059"))
+            {
+                ApplicationId = appId,
+                BusinessUnitId = agentUnitId,
+                Name = "agentRun",
+                DisplayName = "Menu:Aigc.AgentRun",
+                Path = "/aigc/agent/run",
+                Icon = "el-icon-caret-right",
+                Hidden =true,
+                Fullpage=true,
+                Sort = "00"
+            },
             new(Guid.Parse("a1838115-2b23-45f0-acf4-1a14a7b893f2"))
             {
                 ApplicationId = appId,

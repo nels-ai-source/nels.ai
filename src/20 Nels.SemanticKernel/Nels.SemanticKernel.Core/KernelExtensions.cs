@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.DashScope;
 using Nels.SemanticKernel.DeepSeek;
 using Nels.SemanticKernel.Kimi;
-using Nels.SemanticKernel.DashScope;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.InternalUtilities;
 using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Extensions;
 using Nels.SemanticKernel.Process.States;
@@ -7,9 +8,10 @@ using System.Text.Json.Serialization;
 
 namespace Nels.SemanticKernel.Process.Steps;
 
-public class StartStep : NelsKernelProcessStep<StartStepState>
+public class StartStep() : NelsKernelProcessStep<StartStepState>()
 {
     private StartRequest _request;
+
     [KernelFunction(StepTypeConst.Start)]
     public async ValueTask ExecuteAsync(KernelProcessStepContext context, StartRequest request, Kernel kernel, CancellationToken cancellationToken)
     {
@@ -22,8 +24,10 @@ public class StartStep : NelsKernelProcessStep<StartStepState>
         var output = _state.Outputs.FirstOrDefault();
         if (output == null) return base.PostExecuteAsync(cancellationToken);
 
+        var messageId = SequentialGuidGenerator.Create();
+
         _processState.Context.AddDefaultOutput(_id, _request.UserInput);
-        _processState.AgentChat.AddMessage(MessageRoleConsts.User, _request.UserInput);
+        _processState.AgentChat.AddMessage(messageId, MessageRoleConsts.User, _request.UserInput, MessageTypeConsts.Question);
 
         return base.PostExecuteAsync(cancellationToken);
     }

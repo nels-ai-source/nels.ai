@@ -1,5 +1,4 @@
-﻿using Google.Protobuf;
-using Nels.Aigc.Consts;
+﻿using Nels.Aigc.Consts;
 using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Interfaces;
 using System;
@@ -12,7 +11,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Nels.Aigc.Entities;
 
-public class AgentConversation : AuditedEntity<Guid>, IAggregateRoot<Guid>
+public class AgentConversation : FullAuditedEntity<Guid>, IAggregateRoot<Guid>, ISoftDelete
 {
     public AgentConversation() { }
     public AgentConversation(Guid id) : base(id) { }
@@ -33,7 +32,7 @@ public class AgentConversation : AuditedEntity<Guid>, IAggregateRoot<Guid>
         Title = title.Length > AgentConversationConsts.MaxTitleLength ? title[..AgentConversationConsts.MaxTitleLength] : title;
     }
 }
-public class AgentChat : AuditedEntity<Guid>, IAgentChat
+public class AgentChat : FullAuditedEntity<Guid>, IAgentChat, ISoftDelete
 {
     public AgentChat() { }
     public AgentChat(Guid id, Guid agentId, Guid agentConversationId) : base(id)

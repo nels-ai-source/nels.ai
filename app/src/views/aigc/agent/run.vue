@@ -2,6 +2,7 @@
     <el-main class="nopadding" style="height: 100%;">
         <el-container>
             <el-aside width="300px" style="padding: 10px;">
+                <el-button size="large" round icon="el-icon-plus" @click="handleCreateConection">开启新会话</el-button>
                 <conversations :items="agent.conversations" :activeId="agentConversationId" @change="handleConectionChange" @update="handleUpdateConection" @delete="handleDeleteConection" />
             </el-aside>
             <el-container>
@@ -46,8 +47,7 @@ export default {
                 let agentConversationId = this.agent.conversations[0].id;
                 await this.handleConectionChange(agentConversationId);
             } else {
-                this.agentConversationId = '';
-                this.msgList = [];
+                this.handleCreateConection();
             }
         },
         async handleConectionChange(agentConversationId) {
@@ -56,6 +56,10 @@ export default {
             });
             this.msgList = res;
             this.agentConversationId = agentConversationId;
+        },
+        handleCreateConection() {
+            this.agentConversationId = '';
+            this.msgList = [];
         },
         handleUpdateConection(agentConversationId) {
             console.log(agentConversationId);

@@ -36,6 +36,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<AgentMetadata, Guid> _metadataRepository;
     private readonly IRepository<AgentConversation, Guid> _agentConversationRepository;
+    private readonly IRepository<AgentChat, Guid> _agentChatRepository;
     private readonly IRepository<AgentMessage, Guid> _agentMessageRepository;
 
     private readonly AgentChatDomainService _agentChatDomainService;
@@ -46,6 +47,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         IRepository<AgentMetadata, Guid> metadataRepository,
         IRepository<AgentConversation, Guid> agentConversationRepository,
         IRepository<AgentMessage, Guid> agentMessageRepository,
+        IRepository<AgentChat, Guid> agentChatRepository,
         ILanguageProvider languageProvider,
         IStreamResponse streamResponse,
         IOptions<AbpLocalizationOptions> localizationOptions,
@@ -62,8 +64,10 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
         _presetQuestionsRepository = presetQuestionsRepository;
         _metadataRepository = metadataRepository;
         _agentConversationRepository = agentConversationRepository;
-        _agentChatDomainService = agentChatDomainService;
+        _agentChatRepository = agentChatRepository;
         _agentMessageRepository = agentMessageRepository;
+
+        _agentChatDomainService = agentChatDomainService;
 
         _kernel = kernel;
         _streamResponse = streamResponse;
@@ -354,6 +358,8 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     public virtual async Task DeleteConversationAsync(Guid conversationId)
     {
         await _agentConversationRepository.DeleteAsync(x => x.Id == conversationId);
+        await _agentChatRepository.DeleteAsync(x => x.AgentConversationId == conversationId);
+        await _agentMessageRepository.DeleteAsync(x => x.AgentConversationId == conversationId);
     }
     #endregion
 
@@ -396,7 +402,7 @@ public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
     public virtual async Task<List<AgentMessageDto>> GetAgentMessagesAsync(Guid agentConversationId)
     {
         var entities = await _agentMessageRepository.GetListAsync(x => x.AgentConversationId == agentConversationId && x.CreatorId == CurrentUser.Id);
-        return MapList<AgentMessage, AgentMessageDto>([.. entities.OrderBy(x=>x.CreationTime).ThenBy(x => x.Index)]);
+        return MapList<AgentMessage, AgentMessageDto>([.. entities.OrderBy(x => x.CreationTime).ThenBy(x => x.Index)]);
     }
     #endregion
 }

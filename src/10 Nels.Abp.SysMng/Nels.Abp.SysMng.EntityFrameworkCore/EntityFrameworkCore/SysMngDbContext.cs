@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nels.Abp.SysMng.Files;
 using Nels.Abp.SysMng.FunctionPage;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
@@ -42,6 +43,8 @@ public class SysMngDbContext(DbContextOptions<SysMngDbContext> options) : AbpDbC
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
     public DbSet<IdentitySession> Sessions { get; set; }
+
+    public DbSet<FileEntity> FileEntities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

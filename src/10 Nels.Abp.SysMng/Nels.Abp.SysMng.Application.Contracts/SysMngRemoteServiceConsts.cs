@@ -23,6 +23,8 @@ public class SysMngRemoteServiceConsts : RemoteServiceConsts
 
     public const string WfDefinitionRoute = "api/wfDefinition";
 
+    public const string fileRoute = "api/file";
+
     public const string ApiRouteExecute = "ApiRouteExecute";
 
 }

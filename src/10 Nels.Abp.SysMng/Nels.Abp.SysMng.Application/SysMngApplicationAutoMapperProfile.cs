@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Nels.Abp.SysMng.Files;
 using Nels.Abp.SysMng.FunctionPage;
 using Nels.Abp.SysMng.Identity;
 using Volo.Abp.AutoMapper;
@@ -83,6 +84,10 @@ public class SysMngApplicationAutoMapperProfile : Profile
 
         CreateMap<BizParameter, BizParameterDto>().ReverseMap();
         CreateMap<BizParameterValue, BizParameterValueDto>().ReverseMap();
+        #endregion
+
+        #region file
+        CreateMap<FileEntity, FileDto>().ReverseMap();
         #endregion
     }
 }

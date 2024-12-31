@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nels.Abp.SysMng.Files;
 using Nels.Abp.SysMng.FunctionPage;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
@@ -19,4 +20,5 @@ public interface ISysMngDbContext : IIdentityDbContext, ITenantManagementDbConte
 
     public DbSet<BizParameter> BizParameters { get; set; }
     public DbSet<BizParameterValue> BizParameterValues { get; set; }
+    public DbSet<FileEntity> FileEntities { get; set; }
 }

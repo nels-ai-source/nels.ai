@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nels.Abp.SysMng.EntityFrameworkCore;
+using Nels.Abp.SysMng.Files;
 using Nels.Abp.SysMng.FunctionPage;
 using Nels.Aigc.Entities;
 using Volo.Abp.Data;
@@ -48,7 +49,7 @@ public class AigcDbContext(DbContextOptions<AigcDbContext> options) : AbpDbConte
     public DbSet<BizParameterValue> BizParameterValues { get; set; }
 
     public DbSet<IdentitySession> Sessions { get; set; }
-
+    public DbSet<FileEntity> FileEntities { get; set; }
     #endregion
     public DbSet<Model> Models { get; set; }
     public DbSet<ModelInstance> ModelInstances { get; set; }

@@ -50,6 +50,12 @@ public class AigcPermissionDefinitionProvider : PermissionDefinitionProvider
 .AddChild(AigcPermissions.Knowledge.Create, GetDisplayName(AigcPermissions.Knowledge.Create))
 .AddChild(AigcPermissions.Knowledge.Update, GetDisplayName(AigcPermissions.Knowledge.Update))
 .AddChild(AigcPermissions.Knowledge.Delete, GetDisplayName(AigcPermissions.Knowledge.Delete));
+
+        myGroup.AddPermission(AigcPermissions.KnowledgeDocument.Default, GetDisplayName(AigcPermissions.KnowledgeDocument.Default))
+.AddChild(AigcPermissions.KnowledgeDocument.GetList, GetDisplayName(AigcPermissions.KnowledgeDocument.GetList))
+.AddChild(AigcPermissions.KnowledgeDocument.Create, GetDisplayName(AigcPermissions.KnowledgeDocument.Create))
+.AddChild(AigcPermissions.KnowledgeDocument.Update, GetDisplayName(AigcPermissions.KnowledgeDocument.Update))
+.AddChild(AigcPermissions.KnowledgeDocument.Delete, GetDisplayName(AigcPermissions.KnowledgeDocument.Delete));
         #endregion
 
 

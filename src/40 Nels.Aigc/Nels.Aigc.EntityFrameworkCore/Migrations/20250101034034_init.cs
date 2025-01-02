@@ -32,6 +32,27 @@ namespace Nels.Aigc.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ai_AgentConversation",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Metadata = table.Column<string>(type: "text", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ai_AgentConversation", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ai_Knowledge",
                 columns: table => new
                 {
@@ -87,6 +108,7 @@ namespace Nels.Aigc.Migrations
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Endpoint = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Properties = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -434,6 +456,25 @@ namespace Nels.Aigc.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "sys_File",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Size = table.Column<long>(type: "bigint", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Path = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_sys_File", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "sys_LinkUsers",
                 columns: table => new
                 {
@@ -744,7 +785,8 @@ namespace Nels.Aigc.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     AgentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Metadata = table.Column<string>(type: "text", nullable: false),
+                    Steps = table.Column<string>(type: "text", nullable: false),
+                    States = table.Column<string>(type: "text", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -781,6 +823,34 @@ namespace Nels.Aigc.Migrations
                         name: "FK_ai_AgentPresetQuestions_ai_Agent_AgentId",
                         column: x => x.AgentId,
                         principalTable: "ai_Agent",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ai_AgentChat",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentConversationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Question = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Answer = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ai_AgentChat", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ai_AgentChat_ai_AgentConversation_AgentConversationId",
+                        column: x => x.AgentConversationId,
+                        principalTable: "ai_AgentConversation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1095,6 +1165,72 @@ namespace Nels.Aigc.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ai_AgentMessage",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentConversationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentChatId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Role = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    ContentType = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Index = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    Metadata = table.Column<string>(type: "text", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ai_AgentMessage", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ai_AgentMessage_ai_AgentChat_AgentChatId",
+                        column: x => x.AgentChatId,
+                        principalTable: "ai_AgentChat",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ai_AgentStepLog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentConversationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AgentChatId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModelId = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Index = table.Column<int>(type: "integer", nullable: false),
+                    StepId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Duration = table.Column<double>(type: "double precision", nullable: false),
+                    PromptTokens = table.Column<int>(type: "integer", nullable: false),
+                    CompleteTokens = table.Column<int>(type: "integer", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ai_AgentStepLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ai_AgentStepLog_ai_AgentChat_AgentChatId",
+                        column: x => x.AgentChatId,
+                        principalTable: "ai_AgentChat",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OpenIddictTokens",
                 columns: table => new
                 {
@@ -1152,6 +1288,16 @@ namespace Nels.Aigc.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ai_AgentChat_AgentConversationId",
+                table: "ai_AgentChat",
+                column: "AgentConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ai_AgentMessage_AgentChatId",
+                table: "ai_AgentMessage",
+                column: "AgentChatId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ai_AgentMetadata_AgentId",
                 table: "ai_AgentMetadata",
                 column: "AgentId",
@@ -1161,6 +1307,11 @@ namespace Nels.Aigc.Migrations
                 name: "IX_ai_AgentPresetQuestions_AgentId",
                 table: "ai_AgentPresetQuestions",
                 column: "AgentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ai_AgentStepLog_AgentChatId",
+                table: "ai_AgentStepLog",
+                column: "AgentChatId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ai_KnowledgeDocumentParagraph_KnowledgeDocumentId",
@@ -1421,10 +1572,16 @@ namespace Nels.Aigc.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ai_AgentMessage");
+
+            migrationBuilder.DropTable(
                 name: "ai_AgentMetadata");
 
             migrationBuilder.DropTable(
                 name: "ai_AgentPresetQuestions");
+
+            migrationBuilder.DropTable(
+                name: "ai_AgentStepLog");
 
             migrationBuilder.DropTable(
                 name: "ai_Knowledge");
@@ -1484,6 +1641,9 @@ namespace Nels.Aigc.Migrations
                 name: "sys_FeatureValues");
 
             migrationBuilder.DropTable(
+                name: "sys_File");
+
+            migrationBuilder.DropTable(
                 name: "sys_LinkUsers");
 
             migrationBuilder.DropTable(
@@ -1541,6 +1701,9 @@ namespace Nels.Aigc.Migrations
                 name: "ai_Agent");
 
             migrationBuilder.DropTable(
+                name: "ai_AgentChat");
+
+            migrationBuilder.DropTable(
                 name: "ai_KnowledgeDocument");
 
             migrationBuilder.DropTable(
@@ -1563,6 +1726,9 @@ namespace Nels.Aigc.Migrations
 
             migrationBuilder.DropTable(
                 name: "sys_Users");
+
+            migrationBuilder.DropTable(
+                name: "ai_AgentConversation");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictApplications");

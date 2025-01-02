@@ -58,14 +58,12 @@ namespace Nels.Aigc.Migrations
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("FileEntities");
+                    b.ToTable("sys_File", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Abp.SysMng.FunctionPage.App", b =>

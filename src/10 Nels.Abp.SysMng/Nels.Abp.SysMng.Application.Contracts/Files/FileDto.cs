@@ -1,4 +1,4 @@
-﻿using Nels.Abp.SysMng.FunctionPage;
+﻿using Nels.Abp.SysMng.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Application.Dtos;
@@ -14,9 +14,7 @@ public class FileDto : AuditedEntityDto<Guid>
     [Required]
     public virtual long Size { get; set; } = 0;
 
-    [Required]
-    [StringLength(FileConsts.MaxNameLength)]
-    public virtual string Type { get; set; } = string.Empty;
+    public virtual DocumentType Type { get; set; }
 
     [Required]
     [StringLength(FileConsts.MaxPathLength)]

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nels.Abp.SysMng.Files;
 using Nels.Abp.SysMng.FunctionPage;
 using Volo.Abp;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -75,7 +76,12 @@ public static class SysMngDbContextModelCreatingExtensions
         });
         #endregion
 
+        builder.Entity<FileEntity>(b =>
+        {
+            b.ToTable(SysMngDbProperties.DbTablePrefix + "File", SysMngDbProperties.DbSchema);
 
+            b.ConfigureByConvention();
+        });
 
     }
 }

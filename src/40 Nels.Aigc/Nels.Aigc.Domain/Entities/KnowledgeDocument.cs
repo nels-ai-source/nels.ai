@@ -1,5 +1,5 @@
-﻿using Nels.Aigc.Consts;
-using Nels.Aigc.Enums;
+﻿using Nels.Abp.SysMng.Enums;
+using Nels.Aigc.Consts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,14 +11,16 @@ namespace Nels.Aigc.Entities;
 public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
 {
     public KnowledgeDocument() { }
-    public KnowledgeDocument(Guid id, string name, DocumentType documentType) : base(id)
+    public KnowledgeDocument(Guid id, string name, DocumentType documentType, Guid? fileId = null) : base(id)
     {
         Name = name;
         DocumentType = documentType;
+        FileId = fileId;
     }
-
     [Required]
     public virtual Guid KnowledgeId { get; set; }
+
+    public virtual Guid? FileId { get; set; }
 
     [Required]
     [MaxLength(KnowledgeDocumentConsts.MaxNameLength)]
@@ -39,6 +41,12 @@ public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
     public virtual bool IsEnabled { get; set; } = true;
 
     public virtual List<KnowledgeDocumentParagraph> KnowledgeDocumentParagraphs { get; set; } = [];
+
+    public virtual void AddParagraph(Guid id, int index, string content, bool isEnable = true)
+    {
+        KnowledgeDocumentParagraphs.Add(new KnowledgeDocumentParagraph(id, index, content, isEnable));
+        ParagraphCount += 1;
+    }
 }
 
 public class KnowledgeDocumentParagraph : AuditedEntity<Guid>

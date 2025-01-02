@@ -1,11 +1,8 @@
-﻿using Nels.Aigc.Consts;
-using Nels.Aigc.Enums;
+﻿using Nels.Abp.SysMng.Enums;
+using Nels.Aigc.Consts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
 namespace Nels.Aigc.Dtos
@@ -14,6 +11,8 @@ namespace Nels.Aigc.Dtos
     {
         [Required]
         public virtual Guid KnowledgeId { get; set; }
+
+        public virtual Guid? FileId { get; set; }
 
         [Required]
         [StringLength(KnowledgeDocumentConsts.MaxNameLength)]
@@ -61,5 +60,13 @@ namespace Nels.Aigc.Dtos
 
         [Required]
         public virtual bool Embedding { get; set; } = default!;
+    }
+
+    public class AddKnowledgeDocumentRequest 
+    {
+        [Required]
+        public virtual Guid KnowledgeId { get; set; }
+
+        public virtual Guid FileId { get; set; }
     }
 }

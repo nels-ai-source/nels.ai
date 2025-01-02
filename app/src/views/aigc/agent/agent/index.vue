@@ -6,7 +6,7 @@
         <div class="right-panel">
             <div class="right-panel-search">
                 <el-input v-model="search.keyword" :placeholder="$t('agent.namePlaceholder')" clearable></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="upsearch"></el-button>
+                <el-button type="primary" icon="el-icon-search" @click="getList"></el-button>
             </div>
         </div>
     </el-header>

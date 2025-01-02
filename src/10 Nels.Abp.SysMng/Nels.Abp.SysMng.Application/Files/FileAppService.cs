@@ -22,18 +22,20 @@ public class FileAppService : SysMngAppService
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task<FileDto> UploadFileAsync(IFormFile file)
+    public virtual async Task<FileDto> UploadAsync(IFormFile file)
     {
         var suffix = Path.GetExtension(file.FileName);
+        var provider = new FileContentTypeProvider();
 
         var patch = $"{DateTime.UtcNow:yyyyMM}/{Guid.NewGuid()}{suffix}";
 
         await _blobContainer.SaveAsync(patch, file.OpenReadStream());
 
+        var contentType = provider.Mappings[suffix];
         var entity = new FileEntity(GuidGenerator.Create())
         {
             Name = file.FileName,
-            Type = suffix,
+            Type = contentType,
             Size = file.Length,
             Path = patch,
         };
@@ -44,7 +46,7 @@ public class FileAppService : SysMngAppService
 
     [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> DownloadFileAsync(Guid id)
+    public async Task<IActionResult> DownloadAsync(Guid id)
     {
         var file = await _repository.GetAsync(id) ?? throw new Exception();
 

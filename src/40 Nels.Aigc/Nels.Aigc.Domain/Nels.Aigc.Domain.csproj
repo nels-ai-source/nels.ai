@@ -1,30 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\common.props" />
+	<Import Project="..\..\..\common.props" />
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Nels.Aigc</RootNamespace>
-	<NoWarn>$(NoWarn);SKEXP0080,SKEXP0040,CS8632,CS8618</NoWarn>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Nels.Aigc</RootNamespace>
+		<NoWarn>$(NoWarn);SKEXP0080,SKEXP0040,CS8632,CS8618,KMEXP00,SKEXP0001,SKEXP0020</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\10 Nels.Abp.SysMng\Nels.Abp.SysMng.Domain\Nels.Abp.SysMng.Domain.csproj" />
-    <ProjectReference Include="..\Nels.Aigc.Domain.Shared\Nels.Aigc.Domain.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\10 Nels.Abp.SysMng\Nels.Abp.SysMng.Domain\Nels.Abp.SysMng.Domain.csproj" />
+		<ProjectReference Include="..\Nels.Aigc.Domain.Shared\Nels.Aigc.Domain.Shared.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Volo.Abp.Emailing" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.Identity.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.OpenIddict.Domain" Version="9.0.0" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="9.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Volo.Abp.Emailing" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.Identity.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.OpenIddict.Domain" Version="9.0.0" />
+		<PackageReference Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="9.0.0" />
+	</ItemGroup>
 
 </Project>

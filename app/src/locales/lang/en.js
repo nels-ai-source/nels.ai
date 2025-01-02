@@ -42,6 +42,23 @@ export default {
         questions: 'Questions',
         previewAndDebug: 'Preview and Debug',
     },
+    knowledge: {
+        name: 'Name',
+        description: 'Description',
+        namePlaceholder: 'Please enter name',
+        lastModificationTime: 'Last modified',
+        btnAdd: 'Create Knowledge',
+    },
+    knowledgeDocument: {
+        btnAdd: 'Add Document',
+        namePlaceholder: 'Please enter the name',
+        name: 'Name',
+        documentType: 'Document Type',
+        length: 'Character Count',
+        retrievalCount: 'Retrieval Count',
+        paragraphCount: 'Paragraph Count',
+        isEnabled: 'Is Enabled'
+    },
     chats: {
         noData: 'No new messages',
     },

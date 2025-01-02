@@ -2,8 +2,8 @@
     <el-main class="nopadding" style="height: 100%;">
         <el-container>
             <el-aside width="300px" style="padding: 10px;">
-                <el-button size="large" round icon="el-icon-plus" @click="handleCreateConection">开启新会话</el-button>
-                <conversations :items="agent.conversations" :activeId="agentConversationId" @change="handleConectionChange" @update="handleUpdateConection" @delete="handleDeleteConection" />
+                <el-button size="large" round icon="el-icon-plus" @click="handleCreateConection" style="width:100%;margin-bottom: 10px;">开启新会话</el-button>
+                <conversations :items="agent.conversations" :activeId="agentConversationId" @activeChange="handleConectionChange" @rename="handleRenameConection" @delete="handleDeleteConection" />
             </el-aside>
             <el-container>
                 <el-header>{{agent.name}}</el-header>
@@ -61,8 +61,8 @@ export default {
             this.agentConversationId = '';
             this.msgList = [];
         },
-        handleUpdateConection(agentConversationId) {
-            console.log(agentConversationId);
+        handleRenameConection(agentConversationId, title) {
+            console.log(agentConversationId+title);
         },
         async handleDeleteConection(agentConversationId) {
             await this.$API.aigc.agent.deleteConversation.post({

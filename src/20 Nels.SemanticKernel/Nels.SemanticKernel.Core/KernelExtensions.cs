@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
 using Nels.SemanticKernel.DashScope;
 using Nels.SemanticKernel.DeepSeek;
@@ -26,6 +27,7 @@ public static class KernelExtensions
 
             _kernelBuilder.AddChatCompletionServices(textModelInstances).GetAwaiter().GetResult();
             _kernelBuilder.AddTextEmbeddingGenerations(embeddingInstances).GetAwaiter().GetResult();
+            _kernelBuilder.Services.AddDefaultContentDecoders();
 
             action?.Invoke(_kernelBuilder);
 

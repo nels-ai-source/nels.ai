@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nels.Abp.SysMng.Enums;
+using System;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -17,9 +18,10 @@ public class FileEntity : AuditedEntity<Guid>
     [Required]
     public virtual long Size { get; set; } = 0;
 
-    [Required]
-    [MaxLength(FileConsts.MaxNameLength)]
-    public virtual string Type { get; set; }
+    public virtual DocumentType Type { get; set; }
+
+    [MaxLength(FileConsts.MaxMimeTypeLength)]
+    public virtual string MimeType { get; set; }
 
     [Required]
     [MaxLength(FileConsts.MaxPathLength)]

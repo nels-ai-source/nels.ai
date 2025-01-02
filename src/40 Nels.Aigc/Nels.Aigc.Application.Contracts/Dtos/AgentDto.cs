@@ -9,6 +9,9 @@ namespace Nels.Aigc.Dtos;
 
 public class AgentDto : AuditedEntityDto<Guid>
 {
+    [Required]
+    public virtual Guid SpaceId { get; set; } = Guid.Empty;
+
     [StringLength(AgentConsts.MaxNameLength)]
     public virtual string Name { get; set; } = default!;
 
@@ -20,7 +23,7 @@ public class AgentDto : AuditedEntityDto<Guid>
     public virtual string Steps { get; set; } = string.Empty;
     public virtual string States { get; set; } = string.Empty;
 
-    public virtual List<AgentConversationDto> Conversations { get; set; }
+    public virtual List<AgentConversationDto> Conversations { get; set; } = [];
 }
 
 public class AgentPresetQuestionsDto

@@ -107,47 +107,26 @@ export default {
         },
     },
    
-	agent: {
-		list: {
-            url: `${config.API_URL}/agent/getList`,
-            name: '获取页面列表',
-            post: async function (params) {
-                return await http.post(this.url, params);
-            },
-        },
-        detail: {
-            url: `${config.API_URL}/agent/get`,
-            name: '获取页面',
-            post: async function (params) {
-                return await http.post(`${this.url}?id=${params.id}`);
-            },
-        },
-        create: {
-            url: `${config.API_URL}/agent/create`,
-            name: '创建页面',
-            post: async function (data = {}) {
-                return await http.post(this.url, data);
-            },
-        },
-        update: {
-            url: `${config.API_URL}/agent/update`,
-            name: '更新页面',
+	file: {
+        upload: {
+            url: `${config.API_URL}/file/upload`,
+            name: '上传',
             post: async function (data) {
                 return await http.post(this.url, data);
             },
         },
-        delete: {
-            url: `${config.API_URL}/agent/delete`,
-            name: '删除页面',
+        download: {
+            url: `${config.API_URL}/file/download`,
+            name: '下载',
             post: async function (id) {
                 return await http.post(`${this.url}?id=${id}`);
             },
         },
-        execute: {
-            url: `${config.API_URL}/agent/execute`,
-            name: '执行',
-            post: async function (id) {
-                return await http.post(`${this.url}?id=${id}`);
+        preview: {
+            url: `${config.API_URL}/file/preview`,
+            name: '预览',
+            get: async function (id) {
+                return await http.get(`${this.url}?id=${id}`);
             },
         },
     },

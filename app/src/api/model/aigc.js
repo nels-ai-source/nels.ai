@@ -44,7 +44,7 @@ export default {
             post: async function (params) {
                 return await http.post(`${this.url}?agentId=${params.id}`);
             },
-        },       
+        },
         updateConversationTitle: {
             url: `${config.API_URL}/agent/updateConversationTitle`,
             name: 'updateConversationTitle',
@@ -56,14 +56,18 @@ export default {
             url: `${config.API_URL}/agent/deleteConversation`,
             name: 'deleteConversation',
             post: async function (params) {
-                return await http.post(`${this.url}?conversationId=${params.id}`);
+                return await http.post(
+                    `${this.url}?conversationId=${params.id}`
+                );
             },
-        },      
+        },
         getAgentMessages: {
             url: `${config.API_URL}/agent/getAgentMessages`,
             name: 'getAgentMessages',
             post: async function (params) {
-                return await http.post(`${this.url}?agentConversationId=${params.id}`);
+                return await http.post(
+                    `${this.url}?agentConversationId=${params.id}`
+                );
             },
         },
     },
@@ -189,6 +193,81 @@ export default {
             name: 'setKey',
             post: async function (data = {}) {
                 return await http.post(this.url, data);
+            },
+        },
+    },
+
+    knowledge: {
+        list: {
+            url: `${config.API_URL}/knowledge/getList`,
+            name: 'getList',
+            post: async function (params) {
+                return await http.post(this.url, params);
+            },
+        },
+        detail: {
+            url: `${config.API_URL}/knowledge/get`,
+            name: 'get',
+            post: async function (params) {
+                return await http.post(`${this.url}?id=${params.id}`);
+            },
+        },
+        create: {
+            url: `${config.API_URL}/knowledge/create`,
+            name: 'create',
+            post: async function (data = {}) {
+                return await http.post(this.url, data);
+            },
+        },
+        update: {
+            url: `${config.API_URL}/knowledge/update`,
+            name: 'update',
+            post: async function (data) {
+                return await http.post(`${this.url}?id=${data.id}`, data);
+            },
+        },
+        delete: {
+            url: `${config.API_URL}/knowledge/delete`,
+            name: 'delete',
+            post: async function (id) {
+                return await http.post(`${this.url}?id=${id}`);
+            },
+        },
+    },
+    knowledgeDocument: {
+        list: {
+            url: `${config.API_URL}/knowledgeDocument/getList`,
+            name: 'getList',
+            post: async function (params) {
+                return await http.post(this.url, params);
+            },
+        },
+        detail: {
+            url: `${config.API_URL}/knowledgeDocument/get`,
+            name: 'get',
+            post: async function (params) {
+                return await http.post(`${this.url}?id=${params.id}`);
+            },
+        },
+        create: {
+            url: `${config.API_URL}/knowledgeDocument/create`,
+            name: 'create',
+            post: async function (data = {}) {
+                return await http.post(this.url, data);
+            },
+        },
+        update: {
+            url: `${config.API_URL}/knowledgeDocument/update`,
+            name: 'update',
+            post: async function (data) {
+                return await http.post(`${this.url}?id=${data.id}`, data);
+            },
+        },
+        delete: {
+            url: `${config.API_URL}/knowledgeDocument/delete`,
+            name: 'delete',
+            post: async function (id) {
+                return await http.post(`${this.url}?id=${id}`);
             },
         },
     },

@@ -1,13 +1,15 @@
 <template>
     <ul class="ant-conversations css-var-r4c ">
-        <li :class="['ant-conversations-item', activeItemClass(item)]" v-for="item in data" v-bind:key="item.id" @click="handleChange(item)">
+        <li :class="['ant-conversations-item', activeItemClass(item)]" v-for="item in data" v-bind:key="item.id">
             <span class="ant-typography ant-typography-ellipsis ant-conversations-label css-var-r4c " :aria-label="item.title">
                 <el-input v-model="item.title" v-if="editId===item.id">
                     <template #append>
-                        <el-button icon="el-icon-select" @click="handleUpdate(item)" />
+                        <el-button icon="el-icon-select" @click="handleRename(item)" />
                     </template>
                 </el-input>
-                <template v-else> {{item.title}}</template>
+                <template v-else>
+                    <div @click="handleChange(item)"> {{item.title}}</div>
+                </template>
             </span>
 
             <el-dropdown trigger="click">
@@ -50,10 +52,13 @@ export default {
             return item?.id === this.id ? 'ant-conversations-item-active' : '';
         },
         handleChange(item) {
-            this.$emit('change', item.id);
+            if (this.activeId !== item.id) {
+                this.$emit('activeChange', item.id);
+            }
         },
-        handleUpdate(item) {
-            this.$emit('update', item.id);
+        handleRename(item) {
+            this.$emit('rename', item.id, item.title);
+            this.editId = '';
         },
         handleDelete(item) {
             this.$emit('delete', item.id);

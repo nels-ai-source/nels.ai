@@ -106,6 +106,17 @@ public class AigcFunctionPageProvider(IGuidGenerator guidGenerator, ILocalizable
                 Icon = "el-icon-coin",
                 Sort = "10"
             },
+           new(Guid.Parse("c21f815e-8b18-4630-804a-a2680182c764"))
+            {
+                ApplicationId = appId,
+                BusinessUnitId = resourceUnitId,
+                Name = "knowledgeDetail",
+                DisplayName = "Menu:Aigc.Resource.KnowledgeDetail",
+                Path = "/aigc/resource/knowledge/detail",
+                Icon = "el-icon-view",
+                Hidden =true,
+                Sort = "01"
+            },
             new(Guid.Parse("5b719bd9-145d-4cd2-903b-174f766e86ce"))
             {
                 ApplicationId = appId,

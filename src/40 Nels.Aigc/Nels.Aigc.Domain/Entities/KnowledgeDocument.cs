@@ -11,8 +11,9 @@ namespace Nels.Aigc.Entities;
 public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
 {
     public KnowledgeDocument() { }
-    public KnowledgeDocument(Guid id, string name, DocumentType documentType, Guid? fileId = null) : base(id)
+    public KnowledgeDocument(Guid id, Guid knowledgeId, string name, DocumentType documentType, Guid? fileId = null) : base(id)
     {
+        KnowledgeId = knowledgeId;
         Name = name;
         DocumentType = documentType;
         FileId = fileId;
@@ -44,7 +45,7 @@ public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
 
     public virtual void AddParagraph(Guid id, int index, string content, bool isEnable = true)
     {
-        KnowledgeDocumentParagraphs.Add(new KnowledgeDocumentParagraph(id, index, content, isEnable));
+        KnowledgeDocumentParagraphs.Add(new KnowledgeDocumentParagraph(id, KnowledgeId, Id, index, content, isEnable));
         ParagraphCount += 1;
     }
 }
@@ -52,8 +53,10 @@ public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
 public class KnowledgeDocumentParagraph : AuditedEntity<Guid>
 {
     protected KnowledgeDocumentParagraph() { }
-    internal KnowledgeDocumentParagraph(Guid id, int index, string content, bool isEnable = true) : base(id)
+    internal KnowledgeDocumentParagraph(Guid id, Guid knowledgeId, Guid knowledgeDocumentId, int index, string content, bool isEnable = true) : base(id)
     {
+        KnowledgeId = knowledgeId;
+        KnowledgeDocumentId = knowledgeDocumentId;
         Index = index;
         Content = content;
         IsEnabled = isEnable;

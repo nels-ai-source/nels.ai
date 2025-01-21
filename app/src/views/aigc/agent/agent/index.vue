@@ -83,7 +83,7 @@ export default {
         async getList() {
             this.isLoading = true;
             try {
-                var res = await this.$API.aigc.agent.list.post(this.search);
+                var res = await this.$API.agent.list.post(this.search);
                 this.list = res.items;
             } finally {
                 this.isLoading = false;
@@ -120,7 +120,7 @@ export default {
                 }
             )
                 .then(async () => {
-                    await this.$API.aigc.agent.delete.post(o.id);
+                    await this.$API.agent.delete.post(o.id);
                     await this.getList();
                 })
                 .catch(() => {});

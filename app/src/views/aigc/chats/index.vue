@@ -104,6 +104,8 @@ export default {
                         let data = JSON.parse(ev.data);
                         me.addMessageContent(data.messageId, data.content);
                         me.scrollToBottom();
+                    } else if (ev.event == 'text') {
+                        me.addMessageContent(ev.id, ev.data);
                     }
                 },
                 onclose() {

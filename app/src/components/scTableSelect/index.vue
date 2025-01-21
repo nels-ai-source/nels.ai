@@ -22,7 +22,7 @@
 					<slot></slot>
 				</el-table>
 				<div class="sc-table-select__page">
-					<el-pagination small background layout="prev, pager, next" :total="total" :page-size="pageSize" v-model:currentPage="currentPage" @current-change="reload"></el-pagination>
+					<el-pagination  size="small" background layout="prev, pager, next" :total="total" :page-size="pageSize" v-model:currentPage="currentPage" @current-change="reload"></el-pagination>
 				</div>
 			</div>
 		</template>

@@ -28,4 +28,6 @@ public class Model : AuditedEntity<Guid>
 
     [MaxLength(ModelConsts.MaxPropertiesLength)]
     public virtual string Properties { get; set; } = string.Empty;
+
+    public virtual string Metadata { get; set; }
 }

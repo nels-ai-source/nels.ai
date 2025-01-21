@@ -68,7 +68,7 @@ export default {
             visible: false,
             active: 0,
             form: {
-                documentId: null,
+                documentId: '',
                 splitOptions: [],
                 splitType: 0,
                 maxTokensPerLine: 500,

@@ -1,4 +1,5 @@
-﻿using Nels.SemanticKernel.Process.Consts;
+﻿using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.Process.Consts;
 
 namespace Nels.SemanticKernel.Process.Interfaces;
 
@@ -10,7 +11,8 @@ public interface IAgentChat
     string Question { get; set; }
     string Answer { get; set; }
     IStepLog AddStepLog(Guid id, Guid stepId);
-    void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null);
+    void AddMessage(Guid id, ChatMessageContent content, string? metadata = null, bool insertFirst = false);
+    void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null, bool insertFirst = false);
 }
 
 public interface IStepLog

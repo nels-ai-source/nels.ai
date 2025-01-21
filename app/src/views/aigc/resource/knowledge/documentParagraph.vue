@@ -1,12 +1,7 @@
 <template>
-    <el-dialog :title="titleMap[mode]" v-model="visible" :width="500" destroy-on-close @closed="$emit('closed')">
+    <el-dialog :title="'#'+( this.form.index+1)" v-model="visible" :width="800" destroy-on-close @closed="$emit('closed')">
         <el-form :model="form" :rules="rules" :disabled="mode=='show'" ref="dialogForm" label-width="100px">
-            <el-form-item :label="$t('agent.name')" prop="name">
-                <el-input v-model="form.name" :placeholder="$t('agent.namePlaceholder')" clearable></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('agent.description')" prop="description">
-                <el-input v-model="form.description" clearable type="textarea"></el-input>
-            </el-form-item>
+            <el-input v-model="form.content" clearable type="textarea" :rows="10"></el-input>
         </el-form>
         <template #footer>
             <el-button @click="visible=false">{{$t('form.cancel')}}</el-button>
@@ -20,24 +15,18 @@ export default {
     emits: ['success', 'closed'],
     data() {
         return {
-            mode: 'add',
-            titleMap: {
-                add: this.$t('form.add'),
-                edit: this.$t('form.edit'),
-                show: this.$t('form.show'),
-            },
             visible: false,
             isSaveing: false,
             form: {
                 id: '',
-                name: '',
-                description: '',
+                content: '',
+                index: '',
             },
             rules: {
-                name: [
+                content: [
                     {
                         required: true,
-                        message: this.$t('agent.namePlaceholder'),
+                        message: this.$t('knowledge.namePlaceholder'),
                     },
                 ],
             },
@@ -45,8 +34,7 @@ export default {
     },
     mounted() {},
     methods: {
-        open(mode = 'add') {
-            this.mode = mode;
+        open() {
             this.visible = true;
             return this;
         },
@@ -55,14 +43,9 @@ export default {
                 if (valid) {
                     this.isSaveing = true;
                     try {
-                        if (this.mode == 'add') {
-                            delete this.form.id;
-                            await this.$API.agent.create.post(this.form);
-                        } else {
-                            await this.$API.agent.update.post(this.form);
-                        }
+                        await this.$API.aigc.knowledgeDocutemt.update.post(this.form);
 
-                        this.$emit('success', this.form, this.mode);
+                        this.$emit('success', this.form);
                         this.visible = false;
                         this.$message.success(this.$t('form.success'));
                     } finally {

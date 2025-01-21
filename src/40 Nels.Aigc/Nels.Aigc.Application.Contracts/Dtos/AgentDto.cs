@@ -7,6 +7,18 @@ using Volo.Abp.Application.Dtos;
 
 namespace Nels.Aigc.Dtos;
 
+public class LlmAgentDto : AgentDto
+{
+    public virtual string Prompt { get; set; } = string.Empty;
+    public virtual int ChatReducerCount { get; set; } = 0;
+    public virtual bool ToolAutoInvoke { get; set; } = false;
+}
+public class WorkflowAgentDto : AgentDto
+{
+    public virtual string Steps { get; set; } = string.Empty;
+    public virtual string States { get; set; } = string.Empty;
+}
+
 public class AgentDto : AuditedEntityDto<Guid>
 {
     [Required]
@@ -20,15 +32,13 @@ public class AgentDto : AuditedEntityDto<Guid>
     public virtual AgentType AgentType { get; set; } = AgentType.Llm;
     public virtual string IntroductionText { get; set; } = string.Empty;
     public virtual List<AgentPresetQuestionsDto> PresetQuestions { get; set; } = [];
-    public virtual string Steps { get; set; } = string.Empty;
-    public virtual string States { get; set; } = string.Empty;
-
     public virtual List<AgentConversationDto> Conversations { get; set; } = [];
 }
 
 public class AgentPresetQuestionsDto
 {
     public virtual Guid Id { get; set; }
+    public virtual Guid AgentId { get; set; }
     public virtual string Content { get; set; }
     public virtual int Index { get; set; }
 }

@@ -62,11 +62,23 @@ namespace Nels.Aigc.Dtos
         public virtual bool Embedding { get; set; } = default!;
     }
 
-    public class AddKnowledgeDocumentRequest 
+    public class UpdateKnowledgeDocumentParagraphDto
+    {
+        [Required]
+        public virtual Guid Id { get; set; }
+
+        [StringLength(KnowledgeDocumentParagraphConsts.MaxContentLength)]
+        [Required]
+        public virtual string Content { get; set; } = default!;
+    }
+
+    public class AddKnowledgeDocumentRequest
     {
         [Required]
         public virtual Guid KnowledgeId { get; set; }
 
         public virtual Guid FileId { get; set; }
+
+        public virtual int MaxTokensPerParagraph { get; set; } = 500;
     }
 }

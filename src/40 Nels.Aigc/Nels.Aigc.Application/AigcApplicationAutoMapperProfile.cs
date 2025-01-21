@@ -17,10 +17,36 @@ public class AigcApplicationAutoMapperProfile : Profile
         #region aigc
         CreateMap<Prompt, PromptDto>().ReverseMap();
 
-        CreateMap<Agent, AgentDto>()
-            .ForMember(dest => dest.Steps, opt => opt.MapFrom(x => x.Metadata == null ? string.Empty : x.Metadata.Steps))
-            .ForMember(dest => dest.States, opt => opt.MapFrom(x => x.Metadata == null ? string.Empty : x.Metadata.States))
+        CreateMap<AgentEntity, AgentDto>()
             .ReverseMap().Ignore(dest => dest.Metadata);
+
+        CreateMap<AgentEntity, LlmAgentDto>()
+            .Ignore(dest => dest.Prompt)
+            .ReverseMap().Ignore(dest => dest.Metadata);
+
+        CreateMap<LlmAgentMetadata, LlmAgentDto>()
+            .ForMember(dest => dest.Prompt, opt => opt.MapFrom(src => src.Prompt))
+            .ForMember(dest => dest.ChatReducerCount, opt => opt.MapFrom(src => src.ChatReducerCount))
+            .ForMember(dest => dest.ToolAutoInvoke, opt => opt.MapFrom(src => src.ToolAutoInvoke))
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatorId)
+            .Ignore(dest => dest.CreationTime)
+            .Ignore(dest => dest.LastModifierId)
+            .Ignore(dest => dest.LastModificationTime)
+            .ReverseMap()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.CreatorId)
+            .Ignore(dest => dest.CreationTime)
+            .Ignore(dest => dest.LastModifierId);
+
+
+        CreateMap<AgentEntity, WorkflowAgentDto>()
+            .Ignore(dest => dest.States)
+            .Ignore(dest => dest.Steps)
+            .ReverseMap().Ignore(dest => dest.Metadata);
+
+        CreateMap<WorkflowAgentMetadata, WorkflowAgentDto>()
+            .ReverseMap();
 
         CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>()
             .ReverseMap();

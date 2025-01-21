@@ -39,7 +39,7 @@ export default {
     },
     methods: {
         async get() {
-            let res = await this.$API.aigc.agent.getAgentConversations.post({
+            let res = await this.$API.agent.getAgentConversations.post({
                 id: this.agentId,
             });
             this.agent = res;
@@ -51,7 +51,7 @@ export default {
             }
         },
         async handleConectionChange(agentConversationId) {
-            let res = await this.$API.aigc.agent.getAgentMessages.post({
+            let res = await this.$API.agent.getAgentMessages.post({
                 id: agentConversationId,
             });
             this.msgList = res;
@@ -65,7 +65,7 @@ export default {
             console.log(agentConversationId+title);
         },
         async handleDeleteConection(agentConversationId) {
-            await this.$API.aigc.agent.deleteConversation.post({
+            await this.$API.agent.deleteConversation.post({
                 id: agentConversationId,
             });
             await this.get();

@@ -1,4 +1,8 @@
 export default {
+    utils: {
+        true: 'Yes',
+        false: 'No',
+    },
     form: {
         cancel: 'Cancel',
         save: 'Save',
@@ -57,7 +61,7 @@ export default {
         length: 'Character Count',
         retrievalCount: 'Retrieval Count',
         paragraphCount: 'Paragraph Count',
-        isEnabled: 'Is Enabled'
+        isEnabled: 'Is Enabled',
     },
     chats: {
         noData: 'No new messages',
@@ -84,7 +88,8 @@ export default {
     },
     login: {
         slogan: 'High Performance / Elegant / Graceful',
-        describe: 'Agent LLM management backend based on .NET SK+ Vue3 + Element-Plus.',
+        describe:
+            'Agent LLM management backend based on .NET SK+ Vue3 + Element-Plus.',
         signInTitle: 'User Login',
         accountLogin: 'Account Login',
         mobileLogin: 'Mobile Login',
@@ -107,9 +112,12 @@ export default {
         noAccount: 'No account yet?',
         createAccount: 'Create New Account',
         wechatLoginTitle: 'QR Code Login',
-        wechatLoginMsg: 'Please use WeChat to scan the QR code | Simulated auto-scan in 3 seconds',
-        wechatLoginResult: 'Scanned | Please click authorize login on the device',
-        noMenus: 'Current user has no menu permissions, please contact the system administrator',
+        wechatLoginMsg:
+            'Please use WeChat to scan the QR code | Simulated auto-scan in 3 seconds',
+        wechatLoginResult:
+            'Scanned | Please click authorize login on the device',
+        noMenus:
+            'Current user has no menu permissions, please contact the system administrator',
         noPermission: 'No permission to access',
     },
     user: {
@@ -117,14 +125,17 @@ export default {
         info: 'Personal Information',
         settings: 'Settings',
         nightmode: 'Dark Mode',
-        nightmode_msg: 'Suitable for low-light environments, current dark mode is beta version',
+        nightmode_msg:
+            'Suitable for low-light environments, current dark mode is beta version',
         language: 'Language',
-        language_msg: 'Translation in progress, only the text of this view is translated',
+        language_msg:
+            'Translation in progress, only the text of this view is translated',
         accountInfo: 'Account Information',
         clearCache: 'Clear Cache',
         outLogin: 'Logout',
         search: 'Search',
-        clearCacheConfirm: 'Clearing cache will initialize the system, including login status, theme, language settings, etc. Do you want to continue?',
+        clearCacheConfirm:
+            'Clearing cache will initialize the system, including login status, theme, language settings, etc. Do you want to continue?',
         outLoginConfirm: 'Are you sure you want to log out the current user?',
     },
 };

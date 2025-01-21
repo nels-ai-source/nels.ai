@@ -33,9 +33,9 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<Agent>(b =>
+        builder.Entity<AgentEntity>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Agent), SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + "Agent", SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });
@@ -45,9 +45,15 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<AgentMetadata>(b =>
+        builder.Entity<WorkflowAgentMetadata>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentMetadata), SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(WorkflowAgentMetadata), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<LlmAgentMetadata>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(LlmAgentMetadata), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });

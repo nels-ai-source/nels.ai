@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.DataFormats;
 using Microsoft.KernelMemory.DataFormats.Text;
 using Microsoft.SemanticKernel;
@@ -73,15 +74,18 @@ public class KnowledgeDocumentDomainService(IRepository<FileEntity, Guid> fileRe
         var connectionString = _configuration.GetConnectionString(AigcDbProperties.ConnectionStringName) ?? throw new BusinessException();
 
         IMemoryStore store = new PostgresMemoryStore(connectionString, 1536);
-        ITextEmbeddingGenerationService embeddingGenerator = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
+        ITextEmbeddingGenerationService? embeddingGenerator = _kernel.Services.GetService<ITextEmbeddingGenerationService>();
 
-        var _textMemory = new SemanticTextMemory(store, embeddingGenerator);
-
-        foreach (var paragraph in paragraphs)
+        if (embeddingGenerator != null)
         {
-            await _textMemory.SaveInformationAsync($"kn_{args.KnowledgeDocumentId}", paragraph.Content, paragraph.Id.ToString());
-            paragraph.Embedding = true;
+            var _textMemory = new SemanticTextMemory(store, embeddingGenerator);
+
+            foreach (var paragraph in paragraphs)
+            {
+                await _textMemory.SaveInformationAsync($"kn_{args.KnowledgeDocumentId}", paragraph.Content, paragraph.Id.ToString());
+                paragraph.Embedding = true;
+            }
+            await _paragraphRepository.UpdateManyAsync(paragraphs);
         }
-        await _paragraphRepository.UpdateManyAsync(paragraphs);
     }
 }

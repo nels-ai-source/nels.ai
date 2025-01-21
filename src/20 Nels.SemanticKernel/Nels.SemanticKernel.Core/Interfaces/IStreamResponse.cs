@@ -9,7 +9,7 @@ namespace Nels.SemanticKernel.Interfaces;
 public interface IStreamResponse
 {
     void EnableStream();
-    Task WriteMessagAsync(string? text);
+    Task WriteMessagAsync(Guid messageId, object content);
 
     Task WriteDataAsync(string eventType, dynamic data);
 }

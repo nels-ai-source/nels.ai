@@ -10,9 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.31.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
     <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
   </ItemGroup>
 
 </Project>

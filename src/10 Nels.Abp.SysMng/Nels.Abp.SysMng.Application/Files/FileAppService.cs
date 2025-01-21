@@ -26,18 +26,20 @@ public class FileAppService : SysMngAppService
     {
         var suffix = Path.GetExtension(file.FileName);
         var provider = new FileContentTypeProvider();
+        var mimeProvider = new FileExtensionContentTypeProvider();
 
         var patch = $"{DateTime.UtcNow:yyyyMM}/{Guid.NewGuid()}{suffix}";
-
         await _blobContainer.SaveAsync(patch, file.OpenReadStream());
+        var type = provider.Mappings[suffix];
+        var mimeType = mimeProvider.Mappings[suffix];
 
-        var contentType = provider.Mappings[suffix];
         var entity = new FileEntity(GuidGenerator.Create())
         {
             Name = file.FileName,
-            Type = contentType,
-            Size = file.Length,
+            Type = type,
+            Size = file.Length / 1024,
             Path = patch,
+            MimeType = mimeType
         };
         await _repository.InsertAsync(entity);
 

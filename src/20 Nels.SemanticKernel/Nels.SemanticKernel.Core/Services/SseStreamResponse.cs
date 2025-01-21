@@ -2,6 +2,7 @@
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Text;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -27,9 +28,13 @@ public class SseStreamResponse : IStreamResponse
         await SseWriteAsync(eventType, text);
     }
 
-    public async Task WriteMessagAsync(string text)
+    public async Task WriteMessagAsync(Guid messageId, object content)
     {
-        await SseWriteAsync(EventType.Text, text);
+        await WriteDataAsync(EventType.Text, new Dictionary<string, object>
+            {
+                { nameof(messageId),messageId},
+                { nameof(content),content}
+            });
     }
 
     private async Task SseWriteAsync(string eventType, string? text)

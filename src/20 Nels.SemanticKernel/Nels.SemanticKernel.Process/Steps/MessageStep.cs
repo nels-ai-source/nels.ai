@@ -31,7 +31,7 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
         _messageId = SequentialGuidGenerator.Create();
 
         var template = TemplateReplace(_state.Template, _state.Arguments);
-        await _streamResponse.WriteDataAsync(ProcessEventType.Message_Template, new ProcessEventData(_messageId, nameof(_state.Template), template).Properties);
+        await _streamResponse.WriteDataAsync(ProcessEventType.Message_Template, new ProcessEventData(_messageId, template).Properties);
         return result;
     }
     public override ValueTask PostExecuteAsync(CancellationToken cancellationToken)

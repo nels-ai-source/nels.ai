@@ -31,6 +31,13 @@ export default {
                 return await http.post(`${this.url}?id=${data.id}`, data);
             },
         },
+        updateLlmAgent: {
+            url: `${config.API_URL}/agent/updateLlmAgent`,
+            name: 'update',
+            post: async function (data) {
+                return await http.post(`${this.url}?id=${data.id}`, data);
+            },
+        },
         delete: {
             url: `${config.API_URL}/agent/delete`,
             name: 'delete',
@@ -239,35 +246,27 @@ export default {
             url: `${config.API_URL}/knowledgeDocument/getList`,
             name: 'getList',
             post: async function (params) {
-                return await http.post(this.url, params);
+                return await http.post(
+                    `${this.url}?knowledgeId=${params.knowledgeId}`
+                );
             },
         },
-        detail: {
-            url: `${config.API_URL}/knowledgeDocument/get`,
-            name: 'get',
+        paragraphList: {
+            url: `${config.API_URL}/knowledgeDocument/getParagraphList`,
+            name: 'getParagraphList',
             post: async function (params) {
-                return await http.post(`${this.url}?id=${params.id}`);
+                return await http.post(
+                    `${this.url}?knowledgeDocumentId=${params.knowledgeDocumentId}`
+                );
             },
         },
-        create: {
-            url: `${config.API_URL}/knowledgeDocument/create`,
-            name: 'create',
-            post: async function (data = {}) {
-                return await http.post(this.url, data);
-            },
-        },
-        update: {
-            url: `${config.API_URL}/knowledgeDocument/update`,
-            name: 'update',
+        uodateKnowledgeDocumentName: {
+            url: `${config.API_URL}/knowledgeDocument/uodateKnowledgeDocumentName`,
+            name: 'uodateKnowledgeDocumentName',
             post: async function (data) {
-                return await http.post(`${this.url}?id=${data.id}`, data);
-            },
-        },
-        delete: {
-            url: `${config.API_URL}/knowledgeDocument/delete`,
-            name: 'delete',
-            post: async function (id) {
-                return await http.post(`${this.url}?id=${id}`);
+                return await http.post(
+                    `${this.url}?knowledgeDocumentId=${data.knowledgeDocumentId}&name=${data.name}`
+                );
             },
         },
     },

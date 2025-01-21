@@ -1,4 +1,8 @@
 export default {
+    utils: {
+        true: '是',
+        false: '否',
+    },
     form: {
         cancel: '取消',
         save: '保存',
@@ -54,12 +58,12 @@ export default {
     knowledgeDocument: {
         btnAdd: '添加文档',
         namePlaceholder: '请输入名称',
-        name:'名称',
-        documentType:'文档类型',
+        name: '名称',
+        documentType: '文档类型',
         length: '字符数',
-        retrievalCount:'召回次数',
-        paragraphCount:'段落数',
-        isEnabled:'是否启用'
+        retrievalCount: '召回次数',
+        paragraphCount: '段落数',
+        isEnabled: '是否启用',
     },
     model: {
         addModelInstance: '创建模型实例',

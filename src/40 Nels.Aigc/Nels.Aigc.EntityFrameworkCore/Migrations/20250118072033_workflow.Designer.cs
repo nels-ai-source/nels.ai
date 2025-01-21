@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nels.Aigc.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Nels.Aigc.Migrations
 {
     [DbContext(typeof(AigcDbContext))]
-    partial class AigcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250118072033_workflow")]
+    partial class workflow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -513,6 +516,9 @@ namespace Nels.Aigc.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<Guid?>("MetadataId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -522,6 +528,8 @@ namespace Nels.Aigc.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MetadataId");
 
                     b.ToTable("ai_Agent", (string)null);
                 });
@@ -876,45 +884,6 @@ namespace Nels.Aigc.Migrations
                     b.HasIndex("KnowledgeDocumentId");
 
                     b.ToTable("ai_KnowledgeDocumentParagraph", (string)null);
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.LlmAgentMetadata", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AgentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ChatReducerCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("Prompt")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("ToolAutoInvoke")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ai_LlmAgentMetadata", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.Model", b =>
@@ -2937,6 +2906,15 @@ namespace Nels.Aigc.Migrations
                         .HasForeignKey("AgentConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentEntity", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.WorkflowAgentMetadata", "Metadata")
+                        .WithMany()
+                        .HasForeignKey("MetadataId");
+
+                    b.Navigation("Metadata");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>

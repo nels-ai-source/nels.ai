@@ -5,7 +5,7 @@
             <el-button type="primary" @click="handleSave" :loading="isSaveing"> {{$t('form.save')}}</el-button>
         </div>
     </el-header>
-    <el-main class="nopadding">
+    <el-main class="nopadding" v-loading="isLoading">
         <el-container>
             <el-container>
                 <el-header>{{ $t('agentDetail.work') }}</el-header>
@@ -20,7 +20,7 @@
                                     </div>
                                 </el-header>
                                 <el-main class="nopadding">
-                                    <sc-md-code-editor ref="chatMessages0" v-model="firstChatMessageContent" height="100%"></sc-md-code-editor>
+                                    <sc-md-code-editor ref="chatMessages0" v-model="form.prompt" height="100%"></sc-md-code-editor>
                                 </el-main>
                             </el-container>
                         </el-aside>
@@ -71,18 +71,18 @@ export default {
     data() {
         return {
             isSaveing: false,
+            isLoading: false,
             form: {
                 id: '',
                 name: '',
                 description: '',
                 introductionText: '',
-                presetQuestions: [{ content: '' }],
-                metadata: {
-                    states: '',
-                },
+                presetQuestions: [],
+                prompt: '',
+                chatReducerCount: 0,
+                toolAutoInvoke: false,
             },
             agentId: this.$route.query.id,
-            states: {},
             addTemplate: {},
             msgList: [],
             rules: {
@@ -95,59 +95,26 @@ export default {
             },
         };
     },
-    computed: {
-        firstChatMessageContent: {
-            get() {
-                if (
-                    this.states &&
-                    this.states.llmStepState &&
-                    this.states.llmStepState.chatMessages &&
-                    this.states.llmStepState.chatMessages.length > 0 &&
-                    this.states.llmStepState.chatMessages[0].content
-                ) {
-                    return this.states.llmStepState.chatMessages[0].content;
-                }
-                return '';
-            },
-            set(newContent) {
-                if (!this.states) {
-                    this.states = {};
-                }
-                if (!this.states.llmStepState) {
-                    this.states.llmStepState = {};
-                }
-                if (!this.states.llmStepState.chatMessages) {
-                    this.states.llmStepState.chatMessages = [];
-                }
-                if (this.states.llmStepState.chatMessages.length === 0) {
-                    this.states.llmStepState.chatMessages.push({
-                        role: 'system',
-                        content: '',
-                    });
-                }
-                this.states.llmStepState.chatMessages[0].content = newContent;
-            },
-        },
-    },
+    computed: {},
     async mounted() {
         await this.get();
     },
     methods: {
         async get() {
-            var res = await this.$API.aigc.agent.detail.post({
-                id: this.agentId,
-            });
-            this.form = res;
-            if (this.form.states) {
-                this.states = JSON.parse(this.form.states);
+            this.isLoading = true;
+            try {
+                let res = await this.$API.agent.getLlmAgent.post({
+                    id: this.agentId,
+                });
+                this.form = res;
+            } finally {
+                this.isLoading = false;
             }
         },
         async handleSave() {
-            this.form.states = JSON.stringify(this.states);
-
             this.isSaveing = true;
             try {
-                await this.$API.aigc.agent.update.post(this.form);
+                await this.$API.agent.updateLlmAgent.post(this.form);
                 this.$message.success(this.$t('form.success'));
             } finally {
                 this.isSaveing = false;

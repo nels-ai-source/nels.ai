@@ -1,6 +1,9 @@
-﻿using Nels.Aigc.Consts;
+﻿using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.ChatCompletion;
+using Nels.Aigc.Consts;
 using Nels.SemanticKernel.Process.Consts;
 using Nels.SemanticKernel.Process.Interfaces;
+using OpenAI.Assistants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -14,7 +17,10 @@ namespace Nels.Aigc.Entities;
 public class AgentConversation : FullAuditedEntity<Guid>, IAggregateRoot<Guid>, ISoftDelete
 {
     public AgentConversation() { }
-    public AgentConversation(Guid id) : base(id) { }
+    public AgentConversation(Guid id, Guid agentId) : base(id)
+    {
+        AgentId = agentId;
+    }
 
     [Required]
     public virtual Guid AgentId { get; set; }
@@ -83,7 +89,12 @@ public class AgentChat : FullAuditedEntity<Guid>, IAgentChat, ISoftDelete
         return agentStepLog;
     }
 
-    public virtual void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null)
+    public virtual void AddMessage(Guid id, ChatMessageContent content, string? metadata = null, bool insertFirst = false)
+    {
+        AddMessage(id: id, role: content.Role.Label, content: content.Content ?? string.Empty, type: GetMessageType(content), contentType: GetContentType(content),
+metadata: metadata, insertFirst: insertFirst);
+    }
+    public virtual void AddMessage(Guid id, string role, string content, string type = MessageTypeConsts.Answer, string contentType = MessageContentTypeConsts.Text, string? metadata = null, bool insertFirst = false)
     {
         AgentMessage message = new(id)
         {
@@ -97,11 +108,32 @@ public class AgentChat : FullAuditedEntity<Guid>, IAgentChat, ISoftDelete
             Index = Messages.Count,
             Metadata = metadata ?? string.Empty
         };
-        Messages.Add(message);
+        if (insertFirst)
+        {
+            Messages.Insert(0, message);
+        }
+        else
+        {
+            Messages.Add(message);
+        }
         SetQuestionAndAnswer();
     }
 
-    public virtual void SetQuestionAndAnswer()
+    private string GetMessageType(ChatMessageContent content)
+    {
+        if (content.Role == AuthorRole.User)
+        {
+            return MessageTypeConsts.Question;
+        }
+        return MessageTypeConsts.Answer;
+    }
+
+    private string GetContentType(ChatMessageContent content)
+    {
+        return MessageContentTypeConsts.Text;
+    }
+
+    private void SetQuestionAndAnswer()
     {
         var userMessage = Messages.FirstOrDefault(x => x.Role == MessageRoleConsts.User)?.Content ?? string.Empty;
         var assistantMessage = Messages.LastOrDefault(x => x.Role == MessageRoleConsts.Assistant)?.Content ?? string.Empty;

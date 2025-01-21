@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.KernelMemory;
 using Nels.Abp.SysMng;
 using Nels.Abp.SysMng.FunctionPage;
 using Nels.Aigc.MultiTenancy;
@@ -67,6 +68,8 @@ public class AigcDomainModule : AbpModule
         {
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
         });
+
+        context.Services.AddDefaultContentDecoders();
 
 #if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());

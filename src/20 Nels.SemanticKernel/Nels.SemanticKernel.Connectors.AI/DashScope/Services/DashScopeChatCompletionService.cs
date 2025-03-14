@@ -15,17 +15,10 @@ namespace Nels.SemanticKernel.DashScope.Services;
 
 public class DashScopeChatCompletionService : IChatCompletionService
 {
-    private Dictionary<string, object> AttributesInternal { get; } = new Dictionary<string, object>();
-    /// <summary>Core implementation shared by Azure OpenAI clients.</summary>
-    private readonly DashScopeMessageApiClient Client;
-    /// <summary>
-    /// Initializes a new instance of the <see cref="HuggingFaceChatCompletionService"/> class.
-    /// </summary>
-    /// <param name="model">The HuggingFace model for the chat completion service.</param>
-    /// <param name="endpoint">The uri endpoint including the port where HuggingFace server is hosted</param>
-    /// <param name="apiKey">Optional API key for accessing the HuggingFace service.</param>
-    /// <param name="httpClient">Optional HTTP client to be used for communication with the HuggingFace API.</param>
-    /// <param name="loggerFactory">Optional logger factory to be used for logging.</param>
+    private Dictionary<string, object> AttributesInternal { get; } = [];
+
+    private readonly DashScopeClient Client;
+
     public DashScopeChatCompletionService(
         string model,
         Uri endpoint = null,
@@ -38,7 +31,7 @@ public class DashScopeChatCompletionService : IChatCompletionService
         var clientEndpoint = endpoint ?? httpClient?.BaseAddress
             ?? throw new ArgumentNullException(nameof(endpoint), "Chat completion service requires a valid endpoint provided explicitly or via HTTP client base address");
 
-        Client = new DashScopeMessageApiClient(
+        Client = new DashScopeClient(
             modelId: model,
             endpoint: clientEndpoint,
             apiKey: apiKey,
@@ -52,9 +45,9 @@ public class DashScopeChatCompletionService : IChatCompletionService
     public IReadOnlyDictionary<string, object> Attributes => AttributesInternal;
     /// <inheritdoc />
     public Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(ChatHistory chatHistory, PromptExecutionSettings executionSettings = null, Kernel kernel = null, CancellationToken cancellationToken = default)
-        => Client.CompleteChatMessageAsync(chatHistory, executionSettings, cancellationToken);
+        => Client.CompleteChatMessageAsync(chatHistory, executionSettings, kernel, cancellationToken);
 
     /// <inheritdoc />
     public IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(ChatHistory chatHistory, PromptExecutionSettings executionSettings = null, Kernel kernel = null, CancellationToken cancellationToken = default)
-        => Client.StreamCompleteChatMessageAsync(chatHistory, executionSettings, cancellationToken);
+        => Client.StreamCompleteChatMessageAsync(chatHistory, executionSettings, kernel, cancellationToken);
 }

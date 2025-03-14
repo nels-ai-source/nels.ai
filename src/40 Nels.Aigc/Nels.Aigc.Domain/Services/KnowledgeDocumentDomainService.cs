@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.DataFormats;
-using Microsoft.KernelMemory.DataFormats.Text;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Postgres;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Memory;
+using Microsoft.SemanticKernel.Text;
 using Nels.Abp.SysMng.Files;
 using Nels.Aigc.Entities;
 using Nels.Aigc.Knowledges;

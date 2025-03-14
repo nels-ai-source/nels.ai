@@ -1,19 +1,17 @@
-﻿using DocumentFormat.OpenXml.Math;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.Agents.History;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Nels.Abp.Ddd.Domain.Services;
 using Nels.Aigc.Entities;
 using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process;
-using Nels.SemanticKernel.Process.Consts;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
+using ChatHistoryTruncationReducer = Microsoft.SemanticKernel.Agents.History.ChatHistoryTruncationReducer;
 
 namespace Nels.Aigc.Services;
 

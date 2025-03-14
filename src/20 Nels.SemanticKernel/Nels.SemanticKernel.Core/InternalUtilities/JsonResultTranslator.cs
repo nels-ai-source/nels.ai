@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 namespace Nels.SemanticKernel.InternalUtilities;
 
@@ -55,7 +56,7 @@ public static class JsonResultTranslator
     private static string ExtractJson(string result)
     {
         // Search for initial literal delimiter: ```
-        int startIndex = result.IndexOf(LiteralDelimiter, System.StringComparison.Ordinal);
+        int startIndex = result.IndexOf(LiteralDelimiter, StringComparison.Ordinal);
         if (startIndex < 0)
         {
             // No initial delimiter, return entire expression.
@@ -65,13 +66,13 @@ public static class JsonResultTranslator
         startIndex += LiteralDelimiter.Length;
 
         // Accommodate "json" prefix, if present.
-        if (JsonPrefix.Equals(result.Substring(startIndex, JsonPrefix.Length), System.StringComparison.OrdinalIgnoreCase))
+        if (JsonPrefix.Equals(result.Substring(startIndex, JsonPrefix.Length), StringComparison.OrdinalIgnoreCase))
         {
             startIndex += JsonPrefix.Length;
         }
 
         // Locate final literal delimiter
-        int endIndex = result.IndexOf(LiteralDelimiter, startIndex, System.StringComparison.OrdinalIgnoreCase);
+        int endIndex = result.IndexOf(LiteralDelimiter, startIndex, StringComparison.OrdinalIgnoreCase);
         if (endIndex < 0)
         {
             endIndex = result.Length;

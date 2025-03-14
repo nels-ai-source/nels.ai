@@ -13,6 +13,10 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.33.0" />
     <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.1" />
+    <PackageReference Include="xunit.assert" Version="2.9.3" />
+    <PackageReference Include="xunit.extensibility.core" Version="2.9.3" />
   </ItemGroup>
-
+	<ItemGroup>
+		<InternalsVisibleTo Include="Nels.SemanticKernel.Connectors.AI.UnitTests" />
+	</ItemGroup>
 </Project>

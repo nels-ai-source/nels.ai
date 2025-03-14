@@ -6,7 +6,7 @@ namespace Nels.SemanticKernel.DashScope.Core.Models;
 /// <summary>
 /// HTTP schema to perform embedding request.
 /// </summary>
-internal sealed class TextEmbeddingRequest
+internal sealed class DashScopeTextEmbeddingRequest
 {
     /// <summary>
     /// model

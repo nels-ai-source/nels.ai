@@ -14,7 +14,7 @@ namespace Nels.SemanticKernel.DashScope.Services;
 
 public class DashScopeTextEmbeddingGenerationService : ITextEmbeddingGenerationService
 {
-    private Dictionary<string, object> AttributesInternal { get; } = new Dictionary<string, object>();
+    private Dictionary<string, object> AttributesInternal { get; } = [];
     private DashScopeClient Client { get; }
 
     /// <inheritdoc />

@@ -7,7 +7,7 @@ namespace Nels.SemanticKernel.DashScope.Core.Models;
 /// <summary>
 /// Represents the response from the Qwen text embedding API.
 /// </summary>
-internal sealed class TextEmbeddingResponse
+internal sealed class DashScopeTextEmbeddingResponse
 {
     [JsonPropertyName("output")]
     [JsonRequired]

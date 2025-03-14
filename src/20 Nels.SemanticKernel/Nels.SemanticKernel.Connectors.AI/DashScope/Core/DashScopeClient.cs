@@ -16,11 +16,11 @@ using System.Threading.Tasks;
 
 namespace Nels.SemanticKernel.DashScope.Core;
 
-internal sealed class DashScopeClient
+internal partial class DashScopeClient
 {
     private readonly HttpClient _httpClient;
 
-    internal string ModelId { get; }
+    internal string ModelId { get; set; }
     internal string ApiKey { get; }
     internal Uri Endpoint { get; }
     internal string Separator { get; }
@@ -45,20 +45,11 @@ internal sealed class DashScopeClient
         Logger = logger ?? NullLogger.Instance;
     }
 
-    #region ClientCore
     internal static void ValidateMaxTokens(int? maxTokens)
     {
         if (maxTokens != null && maxTokens < 1)
         {
             throw new ArgumentException($"MaxTokens {maxTokens} is not valid, the value must be greater than zero");
-        }
-    }
-
-    internal static void ValidateMaxNewTokens(int maxNewTokens)
-    {
-        if (maxNewTokens < 0)
-        {
-            throw new ArgumentException($"MaxNewTokens {maxNewTokens} is not valid, the value must be greater than or equal to zero");
         }
     }
 
@@ -123,36 +114,4 @@ internal sealed class DashScopeClient
         return httpRequestMessage;
     }
 
-    #endregion
-
-    #region Embeddings
-    public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(
-IList<string> data,
-Kernel kernel,
-CancellationToken cancellationToken)
-    {
-        var endpoint = GetEmbeddingGenerationEndpoint();
-
-        if (data.Count > 1)
-        {
-            throw new NotSupportedException("Currently this interface does not support multiple embeddings results per data item, use only one data item");
-        }
-
-        var request = new TextEmbeddingRequest
-        {
-            Model = ModelId,
-            Input = new EmbeddingInput { Texts = data }
-        };
-        using var httpRequestMessage = CreatePost(request, endpoint, ApiKey);
-
-        string body = await SendRequestAndGetStringBodyAsync(httpRequestMessage, cancellationToken)
-            .ConfigureAwait(false);
-
-        var response = DeserializeResponse<TextEmbeddingResponse>(body);
-
-        // Currently only one embedding per data is supported
-        return response.Output.Embeddings.Select(embedding => embedding.Embedding).ToList();
-    }
-    private Uri GetEmbeddingGenerationEndpoint() => new Uri($"{Endpoint}{Separator}api/v1/services/embeddings/text-embedding/text-embedding");
-    #endregion
 }

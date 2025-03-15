@@ -19,10 +19,4 @@ public static class EmbeddedResource
         using var reader = new StreamReader(resource);
         return reader.ReadToEnd();
     }
-
-    public static PromptTemplateConfig ToPromptTemplateConfig(string name)
-    {
-        var text = Read(name);
-        return KernelFunctionYaml.ToPromptTemplateConfig(text);
-    }
 }

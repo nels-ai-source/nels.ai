@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
-using ChatHistoryTruncationReducer = Microsoft.SemanticKernel.Agents.History.ChatHistoryTruncationReducer;
 
 namespace Nels.Aigc.Services;
 

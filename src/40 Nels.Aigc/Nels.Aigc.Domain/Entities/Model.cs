@@ -1,7 +1,10 @@
 ﻿using Nels.Aigc.Consts;
 using Nels.SemanticKernel.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -25,9 +28,35 @@ public class Model : AuditedEntity<Guid>
     [MaxLength(ModelConsts.MaxEndpointLength)]
     public virtual string Endpoint { get; set; } = string.Empty;
 
+    [MaxLength(ModelInstanceConsts.MaxAccessKeyLength)]
+    public virtual string AccessKey { get; set; } = string.Empty;
+
+    [MaxLength(ModelInstanceConsts.MaxSecretKeyLength)]
+    public virtual string SecretKey { get; set; } = string.Empty;
+
+    [Required]
+    public virtual bool IsEnabled { get; set; }
+
+    [MaxLength(ModelInstanceConsts.MaxDeploymentNameLength)]
+    public virtual string DeploymentName { get; set; } = string.Empty;
 
     [MaxLength(ModelConsts.MaxPropertiesLength)]
     public virtual string Properties { get; set; } = string.Empty;
 
-    public virtual string Metadata { get; set; }= string.Empty;
+    [Required]
+    public virtual ModelConnector Connector { get; set; }
+
+    [MaxLength(ModelConsts.MaxCapabilitiesLength)]
+    public virtual string? Capabilities { get; set; }
+
+    [NotMapped]
+    public virtual List<ModelCapability> ModelCapabilities
+    {
+        get => string.IsNullOrEmpty(Capabilities)
+            ? []
+            : Capabilities.Split(';').Select(x => Enum.Parse<ModelCapability>(x.Trim('[', ']'))).ToList();
+        set => Capabilities = string.Join(";", value.Select(x => $"[{(int)x}]"));
+    }
+
+    public virtual string Metadata { get; set; } = string.Empty;
 }

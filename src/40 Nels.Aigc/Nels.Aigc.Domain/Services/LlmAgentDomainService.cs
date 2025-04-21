@@ -16,7 +16,7 @@ namespace Nels.Aigc.Services;
 
 public class LlmAgentDomainService(
     IStreamResponse streamResponse,
-    IRepository<AgentConversation, Guid> agentConversationRepository,
+    IRepository<AgentConversationEntity, Guid> agentConversationRepository,
     IRepository<AgentMessage, Guid> agentMessageRepository,
     AgentChatDomainService agentChatDomainService,
     Kernel kernel) : DomainService
@@ -38,6 +38,8 @@ public class LlmAgentDomainService(
                 }),
                 HistoryReducer = metadata.ChatReducerCount > 0 ? new ChatHistoryTruncationReducer(metadata.ChatReducerCount * 2) : null,
             };
+
+            var service = kernel.GetRequiredService<IChatCompletionService>();
 
             await foreach (StreamingChatMessageContent response in chat.InvokeStreamingAsync(chatAgent))
             {
@@ -69,7 +71,7 @@ public class LlmAgentDomainService(
         {
             Agent = agent,
             Conversation = request.AgentConversationId == null ?
-               new AgentConversation(conversation, agent.Id) :
+               new AgentConversationEntity(conversation, agent.Id) :
                await agentConversationRepository.GetAsync(x => x.Id == request.AgentConversationId.Value),
             Chat = new(GuidGenerator.Create(), agent.Id, conversation),
             MessageId = GuidGenerator.Create(),
@@ -89,7 +91,7 @@ public class LlmAgentDomainService(
 public class LlmAgentRequest
 {
     public virtual AgentEntity Agent { get; set; }
-    public virtual AgentConversation Conversation { get; set; }
+    public virtual AgentConversationEntity Conversation { get; set; }
     public virtual Entities.AgentChat Chat { get; set; }
     public virtual Guid MessageId { get; set; }
 }

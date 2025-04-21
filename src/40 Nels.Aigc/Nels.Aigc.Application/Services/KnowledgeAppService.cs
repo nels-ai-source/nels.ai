@@ -4,6 +4,7 @@ using Nels.Aigc.Dtos;
 using Nels.Aigc.Entities;
 using Nels.Aigc.Permissions;
 using System;
+using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
 
 namespace Nels.Aigc.Services;
@@ -19,6 +20,11 @@ public class KnowledgeAppService : RouteCrudGetAllAppService<Knowledge, Knowledg
         DeletePolicyName = AigcPermissions.Knowledge.Delete;
         GetPolicyName = AigcPermissions.Knowledge.GetList;
         GetListPolicyName = AigcPermissions.Knowledge.GetList;
+    }
+
+    public override Task DeleteAsync(Guid id)
+    {
+        return base.DeleteAsync(id);
     }
 
 }

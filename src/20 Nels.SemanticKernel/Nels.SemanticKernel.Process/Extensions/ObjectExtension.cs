@@ -1,5 +1,4 @@
 ﻿using Nels.SemanticKernel.Extensions;
-using System.Collections.Generic;
 
 namespace Nels.SemanticKernel.Process.Extensions;
 

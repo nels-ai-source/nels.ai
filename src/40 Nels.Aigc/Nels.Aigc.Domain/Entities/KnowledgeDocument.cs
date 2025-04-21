@@ -3,6 +3,7 @@ using Nels.Aigc.Consts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -46,7 +47,8 @@ public class KnowledgeDocument : AuditedEntity<Guid>, IAggregateRoot<Guid>
     public virtual void AddParagraph(Guid id, int index, string content, bool isEnable = true)
     {
         KnowledgeDocumentParagraphs.Add(new KnowledgeDocumentParagraph(id, KnowledgeId, Id, index, content, isEnable));
-        ParagraphCount += 1;
+        ParagraphCount = KnowledgeDocumentParagraphs.Count;
+        Length = KnowledgeDocumentParagraphs.Sum(x => x.Length);
     }
 }
 

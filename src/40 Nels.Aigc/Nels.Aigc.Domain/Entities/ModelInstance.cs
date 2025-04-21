@@ -1,7 +1,10 @@
 ﻿using Nels.Aigc.Consts;
 using Nels.SemanticKernel.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Nels.Aigc.Entities;
@@ -11,8 +14,7 @@ public class ModelInstance : AuditedEntity<Guid>
     public ModelInstance() { }
     public ModelInstance(Guid id) : base(id) { }
 
-    [Required]
-    public virtual Guid ModelId { get; set; }
+    public virtual Guid? ModelId { get; set; }
 
     [Required]
     [MaxLength(ModelInstanceConsts.MaxNameLength)]
@@ -37,8 +39,23 @@ public class ModelInstance : AuditedEntity<Guid>
     public virtual string DeploymentName { get; set; } = string.Empty;
 
     [Required]
+    public virtual ModelType Type { get; set; }
+
+    [Required]
     public virtual ModelProvider Provider { get; set; }
 
     [Required]
-    public virtual ModelType Type { get; set; }
+    public virtual ModelConnector Connector { get; set; }
+
+    [MaxLength(ModelInstanceConsts.MaxCapabilitiesLength)]
+    public virtual string? Capabilities { get; set; }
+
+    [NotMapped]
+    public virtual List<ModelCapability> ModelCapabilities
+    {
+        get => string.IsNullOrEmpty(Capabilities)
+            ? []
+            : Capabilities.Split(';').Select(x => Enum.Parse<ModelCapability>(x.Trim('[', ']'))).ToList();
+        set => Capabilities = string.Join(";", value.Select(x => $"[{(int)x}]"));
+    }
 }

@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
-using Nels.SemanticKernel.DashScope;
-using Nels.SemanticKernel.DeepSeek;
-using Nels.SemanticKernel.Kimi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,13 +59,13 @@ public static class KernelExtensions
                 kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, apiKey: modelInstance.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelProvider.DeepSeek:
-                kernelBuilder.AddDeepSeekChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelProvider.Kimi:
-                kernelBuilder.AddKimiChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelProvider.DashScope:
-                kernelBuilder.AddDashScopeChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint+ "/compatible-mode/v1"), apiKey: modelInstance.AccessKey, serviceId: serviceId);
                 break;
             default:
                 break;
@@ -102,7 +99,7 @@ public static class KernelExtensions
                 kernelBuilder.AddOpenAITextEmbeddingGeneration(modelId: modelInstance.Name, apiKey: modelInstance.SecretKey, serviceId: serviceId);
                 break;
             case Enums.ModelProvider.DashScope:
-                kernelBuilder.AddDeepSeekTextEmbeddingGeneration(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.SecretKey, serviceId: serviceId);
+                kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(deploymentName: modelInstance.Name, modelId: modelInstance.Name, endpoint: modelInstance.Endpoint, apiKey: modelInstance.SecretKey, serviceId: serviceId);
                 break;
             default:
                 break;

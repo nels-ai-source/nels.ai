@@ -14,10 +14,10 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Nels.Aigc.Entities;
 
-public class AgentConversation : FullAuditedEntity<Guid>, IAggregateRoot<Guid>, ISoftDelete
+public class AgentConversationEntity : FullAuditedEntity<Guid>, IAggregateRoot<Guid>, ISoftDelete
 {
-    public AgentConversation() { }
-    public AgentConversation(Guid id, Guid agentId) : base(id)
+    public AgentConversationEntity() { }
+    public AgentConversationEntity(Guid id, Guid agentId) : base(id)
     {
         AgentId = agentId;
     }

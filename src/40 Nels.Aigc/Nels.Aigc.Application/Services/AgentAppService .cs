@@ -35,7 +35,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
     private readonly IRepository<AgentPresetQuestions, Guid> _presetQuestionsRepository;
     private readonly IRepository<LlmAgentMetadata, Guid> _llmMetadataRepository;
     private readonly IRepository<WorkflowAgentMetadata, Guid> _wfMetadataRepository;
-    private readonly IRepository<AgentConversation, Guid> _agentConversationRepository;
+    private readonly IRepository<AgentConversationEntity, Guid> _agentConversationRepository;
     private readonly IRepository<AgentChat, Guid> _agentChatRepository;
     private readonly IRepository<AgentMessage, Guid> _agentMessageRepository;
 
@@ -48,7 +48,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
         IRepository<LlmAgentMetadata, Guid> llmMetadataRepository,
         IRepository<WorkflowAgentMetadata, Guid> wfMetadataRepository,
-        IRepository<AgentConversation, Guid> agentConversationRepository,
+        IRepository<AgentConversationEntity, Guid> agentConversationRepository,
         IRepository<AgentMessage, Guid> agentMessageRepository,
         IRepository<AgentChat, Guid> agentChatRepository,
         ILanguageProvider languageProvider,
@@ -315,7 +315,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
         var entities = await _agentConversationRepository.GetListAsync(x => x.AgentId == agentId && x.CreatorId == CurrentUser.Id);
 
         var dto = Map<AgentEntity, AgentDto>(entity);
-        dto.Conversations = MapList<AgentConversation, AgentConversationDto>([.. entities.OrderByDescending(x => x.CreationTime)]);
+        dto.Conversations = MapList<AgentConversationEntity, AgentConversationDto>([.. entities.OrderByDescending(x => x.CreationTime)]);
 
         return dto;
     }

@@ -1,0 +1,74 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+}
+
+.ant-pro-layout .ant-pro-layout-content{
+  padding-block: 15px;
+  padding-inline:15px;
+}
+.ant-pro-page-container .ant-pro-page-container-warp-page-header {
+  padding-inline:5px;
+  padding-block-start: 0px;
+}
+.ant-pro-page-container-children-container {
+  padding-block: 0;
+  padding-inline:5px;  
+}
+.ant-pro-page-container .ant-pro-page-container-warp-page-header .ant-page-header-breadcrumb {
+  padding-block-start: 5px;
+}
+
+.ant-pro-global-footer {
+  margin-block-start: 15px;
+  margin-block-end: 15px;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+
+canvas {
+  display: block;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}

@@ -7,5 +7,8 @@ public enum ModelType
     [Description("TextGeneration")]
     TextGeneration = 0,
     [Description("Embedding")]
-    Embedding = 1
+    Embedding = 1,
+    [Description("MultiModal")]
+    MultiModal =2,
 }
+

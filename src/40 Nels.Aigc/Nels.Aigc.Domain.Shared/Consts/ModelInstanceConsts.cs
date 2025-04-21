@@ -9,5 +9,6 @@ public static class ModelInstanceConsts
     public const int MaxAccessKeyLength = 128;
     public const int MaxSecretKeyLength = 128;
     public const int MaxDeploymentNameLength = 128;
+    public const int MaxCapabilitiesLength = 256;
 }
 

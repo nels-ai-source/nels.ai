@@ -7,5 +7,7 @@ public static class ModelConsts
     public const int MaxEndpointLength = 256;
 
     public const int MaxPropertiesLength = 512;
+
+    public const int MaxCapabilitiesLength = 256;
 }
 

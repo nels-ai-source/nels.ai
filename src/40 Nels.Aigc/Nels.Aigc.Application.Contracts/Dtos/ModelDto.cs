@@ -33,5 +33,18 @@ public class ModelGetListOutputDto : EntityDto<Guid>
     public virtual Guid? ParentId { get; set; }
     public virtual string Endpoint { get; set; }
     public virtual string Properties { get; set; }
+    public virtual ModelType Type { get; set; }
+
+    public virtual bool IsEnabled { get; set; }
+    public virtual List<ModelCapability> ModelCapabilities { get; set; }
     public virtual List<ModelGetListOutputDto> children { get; set; }
+}
+
+public class ModelSettingDto
+{
+    public virtual ModelProvider Provider { get; set; }
+    public virtual string? Endpoint { get; set; }
+    public virtual string AccessKey { get; set; }
+    public virtual string? SecretKey { get; set; }
+    public virtual string? DeploymentName { get; set; }
 }

@@ -1,10 +1,8 @@
 ﻿using Microsoft.SemanticKernel;
 using Nels.SemanticKernel.Process.Interfaces;
-using Nels.SemanticKernel.Process.Steps;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using System.Text.Json.Serialization;
-using Nels.SemanticKernel.Process.Variables;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Nels.SemanticKernel.Process.Services;
 

@@ -1,69 +1,53 @@
-﻿using AutoMapper.Internal.Mappers;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Nels.Abp.Ddd.Application.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using Nels.Abp.SysMng.Files;
 using Nels.Aigc.Dtos;
 using Nels.Aigc.Entities;
 using Nels.Aigc.Knowledges;
-using Nels.Aigc.Permissions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.BackgroundJobs;
-using Volo.Abp.BlobStoring;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
-using static Nels.Aigc.Permissions.AigcPermissions;
 
 namespace Nels.Aigc.Services;
 
 
 [Route(AigcRemoteServiceConsts.knowledgeDocumentRoute)]
-public class KnowledgeDocumentAppService : AigcAppService
-{
-    private readonly IRepository<Entities.KnowledgeDocument> _repository;
-    private readonly IRepository<KnowledgeDocumentParagraph> _paragraphRepository;
-    private readonly IRepository<FileEntity, Guid> _fileRepository;
-    private readonly IBackgroundJobManager _backgroundJobManager;
-
-    private readonly KnowledgeDocumentDomainService _knowledgeDocumentDomainService;
-
-    public KnowledgeDocumentAppService(IRepository<Entities.KnowledgeDocument, Guid> repository
+public class KnowledgeDocumentAppService(IRepository<KnowledgeDocument, Guid> repository
     , IRepository<FileEntity, Guid> fileRepository
     , IRepository<KnowledgeDocumentParagraph> paragraphRepository
     , IBackgroundJobManager backgroundJobManager
-    , KnowledgeDocumentDomainService knowledgeDocumentDomainService)
-    {
-        _repository = repository;
-        _paragraphRepository = paragraphRepository;
-        _fileRepository = fileRepository;
-        _backgroundJobManager = backgroundJobManager;
+    , KnowledgeDocumentDomainService knowledgeDocumentDomainService,
+      KnowledgeDomainService knowledgeDomainService) : AigcAppService
+{
+    private readonly IRepository<KnowledgeDocument> _repository = repository;
+    private readonly IRepository<KnowledgeDocumentParagraph> _paragraphRepository = paragraphRepository;
+    private readonly IRepository<FileEntity, Guid> _fileRepository = fileRepository;
+    private readonly IBackgroundJobManager _backgroundJobManager = backgroundJobManager;
 
-        _knowledgeDocumentDomainService = knowledgeDocumentDomainService;
-    }
+    private readonly KnowledgeDocumentDomainService _knowledgeDocumentDomainService = knowledgeDocumentDomainService;
+    private readonly KnowledgeDomainService _knowledgeDomainService = knowledgeDomainService;
 
     [HttpPost]
     [Route("[action]")]
-    //[Authorize(Policy = AigcPermissions.KnowledgeDocument.Create)]
-    public virtual async Task<KnowledgeDocumentDto> AddKnowledgeDocumentAsync(AddKnowledgeDocumentRequest request)
+    public virtual async Task<KnowledgeDocumentDto> CreateAsync(AddKnowledgeDocumentRequest request)
     {
         var file = await _fileRepository.GetAsync(request.FileId) ?? throw new BusinessException();
 
-        var entity = new Entities.KnowledgeDocument(GuidGenerator.Create(), request.KnowledgeId, file.Name, file.Type, file.Id);
+        var entity = new KnowledgeDocument(GuidGenerator.Create(), request.KnowledgeId, file.Name, file.Type, file.Id);
 
         await _repository.InsertAsync(entity, true);
         await _knowledgeDocumentDomainService.DocumentSplitAsync(new DocumentSplitArgs { FileId = file.Id, KnowledgeDocumentId = entity.Id, MaxTokensPerParagraph = request.MaxTokensPerParagraph });
+        await _knowledgeDomainService.UpdateKnowledgeAsync(entity.KnowledgeId);
 
-        return ObjectMapper.Map<Entities.KnowledgeDocument, KnowledgeDocumentDto>(entity);
+        return ObjectMapper.Map<KnowledgeDocument, KnowledgeDocumentDto>(entity);
     }
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task UodateKnowledgeDocumentNameAsync(Guid knowledgeDocumentId, string name)
+    public virtual async Task UpdateAsync(Guid knowledgeDocumentId, string name)
     {
         var entity = await _repository.GetAsync(x => x.Id == knowledgeDocumentId);
         entity.Name = name;
@@ -72,10 +56,19 @@ public class KnowledgeDocumentAppService : AigcAppService
 
     [HttpPost]
     [Route("[action]")]
+    public virtual async Task DeleteAsync(Guid knowledgeDocumentId)
+    {
+        var entity = await _repository.GetAsync(x => x.Id == knowledgeDocumentId);
+        await _repository.DeleteAsync(entity, true);
+        await _knowledgeDomainService.UpdateKnowledgeAsync(entity.KnowledgeId);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
     public virtual async Task<List<KnowledgeDocumentDto>> GetListAsync(Guid knowledgeId)
     {
         var entities = await _repository.GetListAsync(x => x.KnowledgeId == knowledgeId);
-        return ObjectMapper.Map<List<Entities.KnowledgeDocument>, List<KnowledgeDocumentDto>>([.. entities.OrderBy(x => x.CreationTime)]);
+        return ObjectMapper.Map<List<KnowledgeDocument>, List<KnowledgeDocumentDto>>([.. entities.OrderBy(x => x.CreationTime)]);
     }
 
     [HttpPost]
@@ -88,7 +81,7 @@ public class KnowledgeDocumentAppService : AigcAppService
 
     [HttpPost]
     [Route("[action]")]
-    public virtual async Task UpdateKnowledgeDocumentParagraphAsync(UpdateKnowledgeDocumentParagraphDto dto)
+    public virtual async Task UpdateParagraphAsync(UpdateKnowledgeDocumentParagraphDto dto)
     {
         var entity = await _paragraphRepository.GetAsync(x => x.Id == dto.Id);
         entity.Content = dto.Content;

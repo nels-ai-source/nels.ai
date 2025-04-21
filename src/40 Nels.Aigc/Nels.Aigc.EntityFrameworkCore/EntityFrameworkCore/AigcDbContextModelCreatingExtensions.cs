@@ -57,9 +57,9 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<AgentConversation>(b =>
+        builder.Entity<AgentConversationEntity>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentConversation), SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + "AgentConversation", SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });

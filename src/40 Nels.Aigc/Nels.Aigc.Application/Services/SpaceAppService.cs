@@ -52,7 +52,7 @@ public class SpaceAppService : RouteCrudGetAllAppService<Space, SpaceDto, Guid>
         var spaceUserQuery = (await _spaceUserRepository.GetQueryableAsync())
             .Where(x => x.SpaceId == request.SpaceId);
         var userQuery = (await _userRepository.GetQueryableAsync())
-            .WhereIf(!string.IsNullOrWhiteSpace(request.UserName), x => x.UserName.Contains(request.UserName));
+            .WhereIf(!string.IsNullOrWhiteSpace(request.UserName), x => x.UserName.Contains(request.UserName ?? string.Empty));
 
         var result = (from spaceUser in spaceUserQuery
                       join user in userQuery on spaceUser.UserId equals user.Id

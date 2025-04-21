@@ -5,7 +5,6 @@ using Microsoft.SemanticKernel.PromptTemplates.Liquid;
 using Microsoft.SemanticKernel.Services;
 using Nels.SemanticKernel.Extensions;
 using Nels.SemanticKernel.InternalUtilities;
-using Nels.SemanticKernel.InternalUtilities.Models;
 using Nels.SemanticKernel.Process.Extensions;
 using Nels.SemanticKernel.Process.States;
 using System.Text.Json.Serialization;
@@ -68,10 +67,10 @@ public class LlmStep() : NelsKernelProcessStep<LlmStepState>()
             if (string.IsNullOrWhiteSpace(item.Content)) continue;
 
             _result += item.Content;
-            _stepLog.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
-                && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : _stepLog.PromptTokens + 1;
-            _stepLog.CompleteTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
-                && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : _stepLog.CompleteTokens + 1;
+            //_stepLog.PromptTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsagePromptTokens), out var usagePromptTokens)
+            //    && int.TryParse(usagePromptTokens?.ToString(), out var promptTokens)) ? promptTokens : _stepLog.PromptTokens + 1;
+            //_stepLog.CompleteTokens = (item.Metadata != null && item.Metadata.TryGetValue(nameof(ChatCompletionMetadata.UsageCompletionTokens), out var usageCompletionTokens)
+            //    && int.TryParse(usageCompletionTokens?.ToString(), out var completionTokens)) ? completionTokens : _stepLog.CompleteTokens + 1;
 
             await messageEvent(new LlmChatMessageEventData(_id, item.Content));
         };

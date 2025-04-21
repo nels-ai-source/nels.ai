@@ -11,15 +11,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.96.250116.1" />
+    <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250324.1" />
     <PackageReference Include="Microsoft.ML.Tokenizers" Version="2.0.0-preview.1.25127.4" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.41.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.41.0-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Postgres" Version="1.41.0-alpha" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Nels.SemanticKernel.Connectors.AI\Nels.SemanticKernel.Connectors.AI.csproj" />
   </ItemGroup>
 
 </Project>

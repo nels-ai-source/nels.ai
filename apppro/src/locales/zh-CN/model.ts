@@ -1,0 +1,23 @@
+export default {
+  'model.setting.title': '配置模型',
+  'model.setting.label.endpoint': '服务终端',
+  'model.setting.label.apiKey': '访问密钥',
+  'model.setting.label.secretKey': '安全密钥',
+  'model.setting.label.deploymentName': '部署名称',
+  'model.list.setting': '设置',
+  'model.list.running': '运行中',
+  'model.list.stopped': '未运行',
+  'model.list.provider': '模型厂商',
+  'model.list.switch': '开关',
+  'model.list.error.get': '获取模型列表失败',
+  'model.list.error.setting': '模型设置失败',
+
+  'model.capability.textGeneration': '文本生成',
+  'model.capability.imageComprehend': '图像理解',
+  'model.capability.audioComprehend': '音频理解',
+  'model.capability.videoComprehend': '视频理解',
+  'model.capability.embedding': '向量计算',
+  'model.capability.reasoning': '推理能力',
+  'model.capability.functionCall': '函数调用',
+  'model.capability.jsonOutput': 'JSON输出',
+};

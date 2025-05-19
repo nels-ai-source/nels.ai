@@ -19,5 +19,5 @@ public enum ModelConnector
     [Description("Onnx")]
     Onnx = 6,
     [Description("Amazon")]
-    Amazon = 6,
+    Amazon = 7,
 }

@@ -114,7 +114,7 @@ public class HttpApiHostModule : AbpModule
     }
     private void ConfigureAigc(ServiceConfigurationContext context)
     {
-        context.Services.AddSingleton<IModelInstanceService, ModelInstanceAppService>();
+        context.Services.AddSingleton<IModelService, ModelAppService>();
         context.Services.AddSingleton<IPromptService, PromptAppService>();
         context.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         context.Services.AddScoped<IStreamResponse, SseStreamResponse>();
@@ -124,7 +124,7 @@ public class HttpApiHostModule : AbpModule
         });
         context.Services.AddKernelBuilder(_builder =>
         {
-            _builder.Services.AddSingleton<IModelInstanceService, ModelInstanceAppService>();
+            _builder.Services.AddSingleton<IModelService, ModelAppService>();
             _builder.Services.AddSingleton<IPromptService, PromptAppService>();
             _builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
             _builder.Services.AddScoped<IStreamResponse, SseStreamResponse>();

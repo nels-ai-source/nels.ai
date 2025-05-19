@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Nels.Aigc.Entities;
@@ -20,6 +19,9 @@ public class Model : AuditedEntity<Guid>
 
     [Required]
     public virtual ModelType Type { get; set; }
+
+    [Required]
+    public virtual ModelConnector Connector { get; set; }
 
     [Required]
     [MaxLength(ModelConsts.MaxNameLength)]
@@ -40,12 +42,6 @@ public class Model : AuditedEntity<Guid>
     [MaxLength(ModelInstanceConsts.MaxDeploymentNameLength)]
     public virtual string DeploymentName { get; set; } = string.Empty;
 
-    [MaxLength(ModelConsts.MaxPropertiesLength)]
-    public virtual string Properties { get; set; } = string.Empty;
-
-    [Required]
-    public virtual ModelConnector Connector { get; set; }
-
     [MaxLength(ModelConsts.MaxCapabilitiesLength)]
     public virtual string? Capabilities { get; set; }
 
@@ -57,6 +53,4 @@ public class Model : AuditedEntity<Guid>
             : Capabilities.Split(';').Select(x => Enum.Parse<ModelCapability>(x.Trim('[', ']'))).ToList();
         set => Capabilities = string.Join(";", value.Select(x => $"[{(int)x}]"));
     }
-
-    public virtual string Metadata { get; set; } = string.Empty;
 }

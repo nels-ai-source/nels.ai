@@ -1,75 +1,36 @@
+# AutoGen Studio frontend
 
-<div align="center">
+## 🚀 Running UI in Dev Mode
 
-![logo](https://lolicode.gitee.io/scui-doc/logo.png)
+Run the UI in dev mode (make changes and see them reflected in the browser with hot reloading):
 
-<p align="center">
-	<a href="https://v3.vuejs.org/" target="_blank">
-		<img src="https://img.shields.io/badge/VueCLI-5-green" alt="VueCLI">
-	</a>
-	<a href="https://v3.vuejs.org/" target="_blank">
-		<img src="https://img.shields.io/badge/Vue.js-3.x-green" alt="Vue">
-	</a>
-	<a href="https://element-plus.gitee.io/#/zh-CN/component/changelog" target="_blank">
-		<img src="https://img.shields.io/badge/element--plus-latest-blue" alt="element plus">
-	</a>
-</p>
-
-<h1>SCUI Admin</h1>
-
-</div>
-
-## 介绍
-SCUI 是一个中后台前端解决方案，基于VUE3和elementPlus实现。
-使用最新的前端技术栈，提供各类实用的组件方便在业务开发时的调用，并且持续性的提供丰富的业务模板帮助你快速搭建企业级中后台前端任务。
-
-SCUI的宗旨是 让一切复杂的东西傻瓜化。
-
-![logo](https://lolicode.gitee.io/scui-doc/g_1.jpg)
-
-## 演示和文档
-
-| 类型 | 链接 |
-| -------- | -------- |
-| 文档地址 | https://lolicode.gitee.io/scui-doc/ |
-| 演示地址  | https://lolicode.gitee.io/scui-doc/demo/#/login |
-
-
-
-## 特点
-
-- **组件** 多个独家组件、业务模板
-- **权限** 完整的鉴权体系和高精度权限控制
-- **布局** 提供多套布局模式，满足各种视觉需求
-- **API** 完善的API管理，使用真实网络MOCK
-- **配置** 统一的全局配置和组件配置，支持build后配置热更新
-- **性能** 在减少带宽请求和前端算力上多次优化，并且持续着
-- **其他** 多功能视图标签、动态权限菜单、控制台组态化、统一异常处理等等
-
-
-## 部分截图
-
-![logo](https://lolicode.gitee.io/scui-doc/g_2.jpg)
-
-## 安装教程
-``` sh
-# 克隆项目
-git clone https://gitee.com/lolicode/scui.git
-
-# 进入项目目录
-cd scui
-
-# 安装依赖
-npm i
-
-# 启动项目(开发模式)
-npm run serve
+```bash
+yarn install
+yarn start               # local development
+yarn start --host 0.0.0.0  # in container (enables external access)
 ```
-启动完成后浏览器访问 http://localhost:4200
 
-## 鸣谢
+This should start the server on [port 8000](http://localhost:8000).
 
-<img src="https://www.fastmock.site/resource/images/logo.png" style="height:40px"/>
+## Design Elements
 
-## 支持
-如果觉得本项目还不错或在工作中有所启发，请在Gitee(码云)帮开发者点亮星星，这是对开发者最大的支持和鼓励！
+- **Gatsby**: The app is created in Gatsby. A guide on bootstrapping a Gatsby app can be found here - <https://www.gatsbyjs.com/docs/quick-start/>.
+  This provides an overview of the project file structure include functionality of files like `gatsby-config.js`, `gatsby-node.js`, `gatsby-browser.js` and `gatsby-ssr.js`.
+- **TailwindCSS**: The app uses TailwindCSS for styling. A guide on using TailwindCSS with Gatsby can be found here - <https://tailwindcss.com/docs/guides/gatsby.https://tailwindcss.com/docs/guides/gatsby> . This will explain the functionality in tailwind.config.js and postcss.config.js.
+
+## Modifying the UI, Adding Pages
+
+The core of the app can be found in the `src` folder. To add pages, add a new folder in `src/pages` and add a `index.js` file. This will be the entry point for the page. For example to add a route in the app like `/about`, add a folder `about` in `src/pages` and add a `index.tsx` file. You can follow the content style in `src/pages/index.tsx` to add content to the page.
+
+Core logic for each component should be written in the `src/components` folder and then imported in pages as needed.
+
+## Connecting to backend
+
+The frontend makes requests to the backend api and expects it at /api on localhost port 8081.
+
+## setting env variables for the UI
+
+- please look at `.env.default`
+- make a copy of this file and name it `.env.development`
+- set the values for the variables in this file
+  - The main variable here is `GATSBY_API_URL` which should be set to `http://localhost:8081/api` for local development. This tells the UI where to make requests to the backend.

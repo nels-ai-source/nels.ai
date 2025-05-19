@@ -15,7 +15,6 @@ public class ModelDataSeedContributor(
     IOptions<ModelOptions> options,
     IServiceProvider services,
     IRepository<Model, Guid> repository,
-    IRepository<ModelInstance, Guid> modelInstanceRrepository,
     ICurrentTenant currentTenant) : IDataSeedContributor, ITransientDependency
 {
     protected ICurrentTenant CurrentTenant { get; } = currentTenant;
@@ -54,13 +53,6 @@ public class ModelDataSeedContributor(
             var modelIds = definitionContext.Models.Select(p => p.Id).ToList();
             await repository.DeleteAsync(x => modelIds.Contains(x.Id));
             await repository.InsertManyAsync(definitionContext.Models);
-        }
-
-        if (definitionContext.ModelInstances.Count != 0)
-        {
-            var modelInstanceIds = definitionContext.ModelInstances.Select(p => p.Id).ToList();
-            await modelInstanceRrepository.DeleteAsync(x => modelInstanceIds.Contains(x.Id));
-            await modelInstanceRrepository.InsertManyAsync(definitionContext.ModelInstances);
         }
     }
 }

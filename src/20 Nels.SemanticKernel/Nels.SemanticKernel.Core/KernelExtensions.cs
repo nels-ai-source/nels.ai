@@ -16,8 +16,8 @@ public static class KernelExtensions
         {
             var _kernelBuilder = Kernel.CreateBuilder();
 
-            var modelInstanceService = provider.GetService<IModelInstanceService>();
-            var modelInstances = modelInstanceService.GetAllInstances().GetAwaiter().GetResult();
+            var modelInstanceService = provider.GetService<IModelService>();
+            var modelInstances = modelInstanceService.GetAllModels().GetAwaiter().GetResult();
 
             var textModelInstances = modelInstances.Where(x => x.Type == Enums.ModelType.TextGeneration).ToList();
             var embeddingInstances = modelInstances.Where(x => x.Type == Enums.ModelType.Embedding).ToList();
@@ -33,39 +33,42 @@ public static class KernelExtensions
 
         return services;
     }
-    public static async Task AddChatCompletionServices(this IKernelBuilder kernelBuilder, List<IModelInstance> modelInstances)
+    public static async Task AddChatCompletionServices(this IKernelBuilder kernelBuilder, List<IModel> models)
     {
-        if (modelInstances?.Count == 0) return;
+        if (models?.Count == 0) return;
 
-        var defaultModelInstance = modelInstances.FirstOrDefault(x => x.IsDefault);
-        if (defaultModelInstance != null)
+        var defaultModel = models.FirstOrDefault(x => x.IsDefault);
+        if (defaultModel != null)
         {
-            await kernelBuilder.AddChatCompletionService(defaultModelInstance, null);
+            await kernelBuilder.AddChatCompletionService(defaultModel, null);
         }
-        modelInstances.ForEach(async modelInstance =>
+        models.ForEach(async model =>
         {
-            await kernelBuilder.AddChatCompletionService(modelInstance, modelInstance.Id.ToString());
+            await kernelBuilder.AddChatCompletionService(model, model.Id.ToString());
         });
 
     }
-    public static async Task AddChatCompletionService(this IKernelBuilder kernelBuilder, IModelInstance modelInstance, string serviceId)
+    public static async Task AddChatCompletionService(this IKernelBuilder kernelBuilder, IModel model, string serviceId)
     {
-        switch (modelInstance.Provider)
+        switch (model.ModelConnector)
         {
-            case Enums.ModelProvider.AzureOpenAI:
-                kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName: modelInstance.DeploymentName, modelId: modelInstance.Name, endpoint: modelInstance.Endpoint, apiKey: modelInstance.AccessKey, serviceId: serviceId);
+            case Enums.ModelConnector.AzureOpenAI:
+                kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName: model.DeploymentName, modelId: model.Name, endpoint: model.Endpoint, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.OpenAI:
-                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, apiKey: modelInstance.AccessKey, serviceId: serviceId);
+            case Enums.ModelConnector.OpenAI:
+                kernelBuilder.AddOpenAIChatCompletion(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.DeepSeek:
-                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+            case Enums.ModelConnector.Google:
+                kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.Kimi:
-                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+            case Enums.ModelConnector.HuggingFace:
+                kernelBuilder.AddHuggingFaceChatCompletion(model: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.DashScope:
-                kernelBuilder.AddOpenAIChatCompletion(modelId: modelInstance.Name, endpoint: new Uri(modelInstance.Endpoint+ "/compatible-mode/v1"), apiKey: modelInstance.AccessKey, serviceId: serviceId);
+            case Enums.ModelConnector.MistralAI:
+                kernelBuilder.AddMistralChatCompletion(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), apiKey: model.AccessKey, serviceId: serviceId);
+                break;
+            case Enums.ModelConnector.Ollama:
+                kernelBuilder.AddOllamaChatCompletion(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), serviceId: serviceId);
                 break;
             default:
                 break;
@@ -73,33 +76,42 @@ public static class KernelExtensions
         await Task.CompletedTask;
     }
 
-    public static async Task AddTextEmbeddingGenerations(this IKernelBuilder kernelBuilder, List<IModelInstance> modelInstances)
+    public static async Task AddTextEmbeddingGenerations(this IKernelBuilder kernelBuilder, List<IModel> models)
     {
-        if (modelInstances?.Count == 0) return;
+        if (models?.Count == 0) return;
 
-        var defaultModelInstance = modelInstances.FirstOrDefault(x => x.IsDefault);
+        var defaultModelInstance = models.FirstOrDefault(x => x.IsDefault);
         if (defaultModelInstance != null)
         {
             await kernelBuilder.AddTextEmbeddingGeneration(defaultModelInstance, null);
         }
-        modelInstances.ForEach(async modelInstance =>
+        models.ForEach(async modelInstance =>
         {
             await kernelBuilder.AddTextEmbeddingGeneration(modelInstance, modelInstance.Id.ToString());
         });
 
     }
-    public static async Task AddTextEmbeddingGeneration(this IKernelBuilder kernelBuilder, IModelInstance modelInstance, string serviceId)
+    public static async Task AddTextEmbeddingGeneration(this IKernelBuilder kernelBuilder, IModel model, string serviceId)
     {
-        switch (modelInstance.Provider)
+        switch (model.ModelConnector)
         {
-            case Enums.ModelProvider.AzureOpenAI:
-                kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(deploymentName: modelInstance.DeploymentName, modelId: modelInstance.Name, endpoint: modelInstance.Endpoint, apiKey: modelInstance.SecretKey, serviceId: serviceId);
+            case Enums.ModelConnector.AzureOpenAI:
+                kernelBuilder.AddAzureOpenAIEmbeddingGenerator(deploymentName: model.DeploymentName, modelId: model.Name, endpoint: model.Endpoint, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.OpenAI:
-                kernelBuilder.AddOpenAITextEmbeddingGeneration(modelId: modelInstance.Name, apiKey: modelInstance.SecretKey, serviceId: serviceId);
+            case Enums.ModelConnector.OpenAI:
+                kernelBuilder.AddOpenAIEmbeddingGenerator(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
-            case Enums.ModelProvider.DashScope:
-                kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(deploymentName: modelInstance.Name, modelId: modelInstance.Name, endpoint: modelInstance.Endpoint, apiKey: modelInstance.SecretKey, serviceId: serviceId);
+            case Enums.ModelConnector.Google:
+                kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
+                break;
+            case Enums.ModelConnector.HuggingFace:
+                kernelBuilder.AddHuggingFaceEmbeddingGenerator(model: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
+                break;
+            case Enums.ModelConnector.MistralAI:
+                kernelBuilder.AddMistralEmbeddingGenerator(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), apiKey: model.AccessKey, serviceId: serviceId);
+                break;
+            case Enums.ModelConnector.Ollama:
+                kernelBuilder.AddOllamaEmbeddingGenerator(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), serviceId: serviceId);
                 break;
             default:
                 break;

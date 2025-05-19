@@ -21,12 +21,6 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<ModelInstance>(b =>
-        {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(ModelInstance), AigcDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-        });
         builder.Entity<Prompt>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Prompt), AigcDbProperties.DbSchema);

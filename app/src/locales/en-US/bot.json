@@ -1,0 +1,16 @@
+{
+    "bot": {
+        "lastEdit": "Last edited",
+        "tag": "Bot",
+        "actions": {
+            "duplicate": "Duplicate",
+            "delete": "Delete",
+            "confirm": "Confirm",
+            "cancel": "Cancel"
+        },
+        "deleteConfirm": {
+            "title": "Are you sure you want to delete this bot?",
+            "content": "This action cannot be undone."
+        }
+    }
+}

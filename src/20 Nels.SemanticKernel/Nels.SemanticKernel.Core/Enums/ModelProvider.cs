@@ -5,16 +5,16 @@ namespace Nels.SemanticKernel.Enums;
 public enum ModelProvider
 {
     [Description("OpenAI")]
-    OpenAI = 0,
+    OpenAI = 1,
     [Description("AzureOpenAI")]
-    AzureOpenAI = 1,
-    [Description("Baidu")]
-    Baidu = 20,
+    AzureOpenAI = 2,
+    [Description("Anthropic")]
+    Anthropic = 3,
+    [Description("Google")]
+    Google = 4,
     [Description("DashScope")]
-    DashScope = 21,
+    DashScope = 100,
     [Description("DeepSeek")]
-    DeepSeek = 22,
-    [Description("Kimi")]
-    Kimi = 23,
+    DeepSeek = 101,
 }
 

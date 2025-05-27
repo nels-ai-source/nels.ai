@@ -5,20 +5,20 @@ namespace Nels.SemanticKernel.Enums;
 public enum ModelCapability
 {
     [Description("TextGeneration")]
-    TextGeneration = 0,
+    TextGeneration = 1,
     [Description("ImageComprehend")]
-    ImageComprehend = 1,
+    ImageComprehend = 2,
     [Description("AudioComprehend")]
-    AudioComprehend = 2,
+    AudioComprehend = 3,
     [Description("VideoComprehend")]
-    VideoComprehend = 3,
+    VideoComprehend = 4,
     [Description("Embedding")]
-    Embedding = 4,
+    Embedding = 5,
 
     [Description("Reasoning")]
-    Reasoning = 51,
+    Reasoning = 6,
     [Description("FunctionCall")]
-    FunctionCall = 52,
+    FunctionCall = 7,
     [Description("JsonOutput")]
-    JsonOutput = 53,
+    JsonOutput = 8,
 }

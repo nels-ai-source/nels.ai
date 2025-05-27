@@ -1,9 +1,11 @@
+import { Permissions } from '@/access';
 import {
   createKnowledge,
   deleteKnowledge,
   getKnowledgeList,
   updateKnowledge,
 } from '@/services/aigc/knowledge';
+import { Knowledge } from '@/types/knowledge';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
@@ -12,12 +14,12 @@ import { App, Button } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 
-const Knowledge: React.FC = () => {
+const KnowledgeManager: React.FC = () => {
   const access = useAccess();
   const { message, modal } = App.useApp();
   const intl = useIntl();
 
-  const handleAdd = async (fields: API.RuleListItem) => {
+  const handleAdd = async (fields: Knowledge) => {
     const hide = message.loading(intl.formatMessage({ id: 'operation.add.loading' }));
     try {
       await createKnowledge({ ...fields });
@@ -31,7 +33,7 @@ const Knowledge: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (fields: API.RuleListItem) => {
+  const handleUpdate = async (fields: Knowledge) => {
     const hide = message.loading(intl.formatMessage({ id: 'operation.edit.loading' }));
     try {
       await updateKnowledge({ ...fields });
@@ -45,7 +47,7 @@ const Knowledge: React.FC = () => {
     }
   };
 
-  const handleRemove = async (selectedRows: API.KnowledgeItem[]) => {
+  const handleRemove = async (selectedRows: Knowledge[]) => {
     const hide = message.loading(intl.formatMessage({ id: 'operation.delete.loading' }));
     if (!selectedRows) return true;
     try {
@@ -64,16 +66,16 @@ const Knowledge: React.FC = () => {
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.KnowledgeItem>();
+  const [currentRow, setCurrentRow] = useState<Knowledge>();
 
-  const columns: ProColumns<API.KnowledgeItem>[] = [
+  const columns: ProColumns<Knowledge>[] = [
     {
       dataIndex: 'index',
       valueType: 'index',
       width: 48,
     },
     {
-      title: <FormattedMessage id="knowledge.table.name" />,
+      title: <FormattedMessage id="knowledge.name" />,
       dataIndex: 'name',
       render: (dom, entity) => (
         <a
@@ -86,85 +88,87 @@ const Knowledge: React.FC = () => {
       ),
     },
     {
-      title: <FormattedMessage id="knowledge.table.description" />,
+      title: <FormattedMessage id="knowledge.description" />,
       dataIndex: 'description',
       ellipsis: true,
     },
     {
-      title: <FormattedMessage id="knowledge.table.documentCount" />,
+      title: <FormattedMessage id="knowledge.documentCount" />,
       dataIndex: 'documentCount',
       search: false,
-      renderText: (val: number) =>
-        `${val} ${intl.formatMessage({ id: 'knowledge.table.unit.count' })}`,
+      renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.count' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.table.length" />,
+      title: <FormattedMessage id="knowledge.length" />,
       dataIndex: 'length',
       search: false,
       renderText: (val: number) =>
         `${((val || 0) / 1024).toFixed(2)}k ${intl.formatMessage({
-          id: 'knowledge.table.unit.char',
+          id: 'knowledge.unit.char',
         })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.table.retrievalCount" />,
+      title: <FormattedMessage id="knowledge.retrievalCount" />,
       dataIndex: 'retrievalCount',
       search: false,
-      renderText: (val: number) =>
-        `${val} ${intl.formatMessage({ id: 'knowledge.table.unit.times' })}`,
+      renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.times' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.table.creationTime" />,
+      title: <FormattedMessage id="knowledge.creationTime" />,
       dataIndex: 'creationTime',
       valueType: 'dateTime',
       search: false,
       sorter: true,
     },
     {
-      title: <FormattedMessage id="knowledge.table.status" />,
+      title: <FormattedMessage id="knowledge.status" />,
       dataIndex: 'isEnabled',
       valueEnum: {
         true: {
-          text: <FormattedMessage id="knowledge.table.status.enabled" />,
+          text: <FormattedMessage id="status.enable" />,
           status: 'Success',
         },
         false: {
-          text: <FormattedMessage id="knowledge.table.status.disabled" />,
+          text: <FormattedMessage id="status.disabled" />,
           status: 'Error',
         },
       },
     },
     {
-      title: <FormattedMessage id="knowledge.table.operation" />,
+      title: <FormattedMessage id="actions.lable" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key="edit"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="knowledge.table.operation.edit" />
-        </a>,
-        <a
-          key="delete"
-          onClick={async () => {
-            modal.confirm({
-              title: <FormattedMessage id="operation.delete.confirm" />,
-              content: <FormattedMessage id="operation.delete.content" />,
-              okText: <FormattedMessage id="operation.delete.ok" />,
-              cancelText: <FormattedMessage id="operation.delete.cancel" />,
-              onOk: async () => {
-                await handleRemove([record]);
-                actionRef.current?.reload();
-              },
-            });
-          }}
-        >
-          <FormattedMessage id="knowledge.table.operation.delete" />
-        </a>,
+        access.checkAccess(Permissions.Knowledge.Update) && (
+          <a
+            key="edit"
+            onClick={() => {
+              handleUpdateModalOpen(true);
+              setCurrentRow(record);
+            }}
+          >
+            <FormattedMessage id="actions.edit" />
+          </a>
+        ),
+        access.checkAccess(Permissions.Knowledge.Delete) && (
+          <a
+            key="delete"
+            onClick={async () => {
+              modal.confirm({
+                title: <FormattedMessage id="modal.delete.confirm" />,
+                content: <FormattedMessage id="modal.delete.content" />,
+                okText: <FormattedMessage id="modal.delete.ok" />,
+                cancelText: <FormattedMessage id="modal.delete.cancel" />,
+                onOk: async () => {
+                  await handleRemove([record]);
+                  actionRef.current?.reload();
+                },
+              });
+            }}
+          >
+            <FormattedMessage id="actions.delete" />
+          </a>
+        ),
       ],
     },
   ];
@@ -176,15 +180,15 @@ const Knowledge: React.FC = () => {
       }}
       breadcrumb={{}}
     >
-      <ProTable<API.KnowledgeItem, API.PageParams>
+      <ProTable<Knowledge, API.PageParams>
+        bordered
         actionRef={actionRef}
         rowKey="id"
         search={false}
         options={false}
         cardProps={{
           bodyStyle: {
-            padding: 10,
-            height: 'calc(100vh - 200px)',
+            padding: 0,
           },
         }}
         toolbar={{
@@ -196,15 +200,16 @@ const Knowledge: React.FC = () => {
           },
         }}
         toolBarRender={() => [
-          access.checkAccess('Aigc.Knowledge.Create') && (
+          access.checkAccess(Permissions.Knowledge.Create) && (
             <Button
               type="primary"
               key="primary"
               onClick={() => {
                 handleModalOpen(true);
               }}
+              icon={<PlusOutlined />}
             >
-              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+              <FormattedMessage id="knowledge.operation.create" />
             </Button>
           ),
         ]}
@@ -232,7 +237,7 @@ const Knowledge: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.KnowledgeItem);
+          const success = await handleAdd(value as Knowledge);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -248,7 +253,7 @@ const Knowledge: React.FC = () => {
         open={updateModalOpen}
         onOpenChange={handleUpdateModalOpen}
         onFinish={async (value) => {
-          const success = await handleUpdate(value as API.KnowledgeItem);
+          const success = await handleUpdate(value as Knowledge);
           if (success) {
             handleUpdateModalOpen(false);
             if (actionRef.current) {
@@ -264,4 +269,4 @@ const Knowledge: React.FC = () => {
   );
 };
 
-export default Knowledge;
+export default KnowledgeManager;

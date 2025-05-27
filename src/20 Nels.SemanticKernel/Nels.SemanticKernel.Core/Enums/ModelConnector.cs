@@ -5,19 +5,19 @@ namespace Nels.SemanticKernel.Enums;
 public enum ModelConnector
 {
     [Description("OpenAI")]
-    OpenAI = 0,
+    OpenAI = 1,
     [Description("AzureOpenAI")]
-    AzureOpenAI = 1,
+    AzureOpenAI = 2,
     [Description("Google")]
-    Google = 2,
+    Google = 3,
     [Description("HuggingFace")]
-    HuggingFace = 3,
+    HuggingFace = 4,
     [Description("MistralAI")]
-    MistralAI = 4,
+    MistralAI = 5,
     [Description("Ollama")]
-    Ollama = 5,
+    Ollama = 6,
     [Description("Onnx")]
-    Onnx = 6,
+    Onnx = 7,
     [Description("Amazon")]
-    Amazon = 7,
+    Amazon = 8,
 }

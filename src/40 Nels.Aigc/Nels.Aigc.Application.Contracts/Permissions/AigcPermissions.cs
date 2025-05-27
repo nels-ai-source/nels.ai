@@ -24,14 +24,6 @@ public static class AigcPermissions
         public const string Update = Default + ".Update";
         public const string Delete = Default + ".Delete";
     }
-    public static class ModelInstance
-    {
-        public const string Default = GroupName + ".ModelInstance";
-        public const string GetList = Default + ".GetList";
-        public const string Create = Default + ".Create";
-        public const string Update = Default + ".Update";
-        public const string Delete = Default + ".Delete";
-    }
     public static class Agent
     {
         public const string Default = GroupName + ".Agent";

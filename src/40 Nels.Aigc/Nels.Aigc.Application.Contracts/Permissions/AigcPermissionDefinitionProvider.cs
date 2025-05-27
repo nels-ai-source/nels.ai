@@ -20,12 +20,6 @@ public class AigcPermissionDefinitionProvider : PermissionDefinitionProvider
         .AddChild(AigcPermissions.Model.Update, GetDisplayName(AigcPermissions.Model.Update))
         .AddChild(AigcPermissions.Model.Delete, GetDisplayName(AigcPermissions.Model.Delete));
 
-        myGroup.AddPermission(AigcPermissions.ModelInstance.Default, GetDisplayName(AigcPermissions.ModelInstance.Default))
-        .AddChild(AigcPermissions.ModelInstance.GetList, GetDisplayName(AigcPermissions.ModelInstance.GetList))
-        .AddChild(AigcPermissions.ModelInstance.Create, GetDisplayName(AigcPermissions.ModelInstance.Create))
-        .AddChild(AigcPermissions.ModelInstance.Update, GetDisplayName(AigcPermissions.ModelInstance.Update))
-        .AddChild(AigcPermissions.ModelInstance.Delete, GetDisplayName(AigcPermissions.ModelInstance.Delete));
-
         myGroup.AddPermission(AigcPermissions.Prompt.Default, GetDisplayName(AigcPermissions.Prompt.Default))
         .AddChild(AigcPermissions.Prompt.GetList, GetDisplayName(AigcPermissions.Prompt.GetList))
         .AddChild(AigcPermissions.Prompt.Create, GetDisplayName(AigcPermissions.Prompt.Create))
@@ -39,23 +33,23 @@ public class AigcPermissionDefinitionProvider : PermissionDefinitionProvider
         .AddChild(AigcPermissions.Agent.Delete, GetDisplayName(AigcPermissions.Agent.Delete));
 
         myGroup.AddPermission(AigcPermissions.Space.Default, GetDisplayName(AigcPermissions.Space.Default))
-.AddChild(AigcPermissions.Space.GetList, GetDisplayName(AigcPermissions.Space.GetList))
-.AddChild(AigcPermissions.Space.Create, GetDisplayName(AigcPermissions.Space.Create))
-.AddChild(AigcPermissions.Space.Update, GetDisplayName(AigcPermissions.Space.Update))
-.AddChild(AigcPermissions.Space.Delete, GetDisplayName(AigcPermissions.Space.Delete));
+        .AddChild(AigcPermissions.Space.GetList, GetDisplayName(AigcPermissions.Space.GetList))
+        .AddChild(AigcPermissions.Space.Create, GetDisplayName(AigcPermissions.Space.Create))
+        .AddChild(AigcPermissions.Space.Update, GetDisplayName(AigcPermissions.Space.Update))
+        .AddChild(AigcPermissions.Space.Delete, GetDisplayName(AigcPermissions.Space.Delete));
 
 
         myGroup.AddPermission(AigcPermissions.Knowledge.Default, GetDisplayName(AigcPermissions.Knowledge.Default))
-.AddChild(AigcPermissions.Knowledge.GetList, GetDisplayName(AigcPermissions.Knowledge.GetList))
-.AddChild(AigcPermissions.Knowledge.Create, GetDisplayName(AigcPermissions.Knowledge.Create))
-.AddChild(AigcPermissions.Knowledge.Update, GetDisplayName(AigcPermissions.Knowledge.Update))
-.AddChild(AigcPermissions.Knowledge.Delete, GetDisplayName(AigcPermissions.Knowledge.Delete));
+        .AddChild(AigcPermissions.Knowledge.GetList, GetDisplayName(AigcPermissions.Knowledge.GetList))
+        .AddChild(AigcPermissions.Knowledge.Create, GetDisplayName(AigcPermissions.Knowledge.Create))
+        .AddChild(AigcPermissions.Knowledge.Update, GetDisplayName(AigcPermissions.Knowledge.Update))
+        .AddChild(AigcPermissions.Knowledge.Delete, GetDisplayName(AigcPermissions.Knowledge.Delete));
 
         myGroup.AddPermission(AigcPermissions.KnowledgeDocument.Default, GetDisplayName(AigcPermissions.KnowledgeDocument.Default))
-.AddChild(AigcPermissions.KnowledgeDocument.GetList, GetDisplayName(AigcPermissions.KnowledgeDocument.GetList))
-.AddChild(AigcPermissions.KnowledgeDocument.Create, GetDisplayName(AigcPermissions.KnowledgeDocument.Create))
-.AddChild(AigcPermissions.KnowledgeDocument.Update, GetDisplayName(AigcPermissions.KnowledgeDocument.Update))
-.AddChild(AigcPermissions.KnowledgeDocument.Delete, GetDisplayName(AigcPermissions.KnowledgeDocument.Delete));
+        .AddChild(AigcPermissions.KnowledgeDocument.GetList, GetDisplayName(AigcPermissions.KnowledgeDocument.GetList))
+        .AddChild(AigcPermissions.KnowledgeDocument.Create, GetDisplayName(AigcPermissions.KnowledgeDocument.Create))
+        .AddChild(AigcPermissions.KnowledgeDocument.Update, GetDisplayName(AigcPermissions.KnowledgeDocument.Update))
+        .AddChild(AigcPermissions.KnowledgeDocument.Delete, GetDisplayName(AigcPermissions.KnowledgeDocument.Delete));
         #endregion
 
 

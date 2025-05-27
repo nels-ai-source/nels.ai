@@ -1,0 +1,24 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-font {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 50px;
+      font-weight: bold;
+    }
+  </style>
+
+  <!-- Letter N -->
+  <text x="20" y="60" class="logo-font" fill="#2A4B7C">N</text>
+
+  <!-- Letter e -->
+  <text x="65" y="60" class="logo-font" fill="#36C1C8">e</text>
+  <!-- AIGC Spark in 'e' -->
+  <circle cx="79" cy="43" r="3.5" fill="#FFD700" />
+
+  <!-- Letter l -->
+  <text x="105" y="60" class="logo-font" fill="#2A4B7C">l</text>
+
+  <!-- Letter s -->
+  <text x="130" y="60" class="logo-font" fill="#36C1C8">s</text>
+
+</svg>

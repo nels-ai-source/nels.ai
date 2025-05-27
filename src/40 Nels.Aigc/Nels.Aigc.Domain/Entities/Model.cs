@@ -45,6 +45,8 @@ public class Model : AuditedEntity<Guid>
     [MaxLength(ModelConsts.MaxCapabilitiesLength)]
     public virtual string? Capabilities { get; set; }
 
+    public virtual int? MaxTokens { get; set; }
+
     [NotMapped]
     public virtual List<ModelCapability> ModelCapabilities
     {

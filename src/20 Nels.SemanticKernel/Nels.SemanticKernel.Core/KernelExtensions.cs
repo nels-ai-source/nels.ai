@@ -22,9 +22,9 @@ public static class KernelExtensions
             var textModelInstances = modelInstances.Where(x => x.Type == Enums.ModelType.TextGeneration).ToList();
             var embeddingInstances = modelInstances.Where(x => x.Type == Enums.ModelType.Embedding).ToList();
 
-            _kernelBuilder.AddChatCompletionServices(textModelInstances).GetAwaiter().GetResult();
-            _kernelBuilder.AddTextEmbeddingGenerations(embeddingInstances).GetAwaiter().GetResult();
-            _kernelBuilder.Services.AddDefaultContentDecoders();
+            //_kernelBuilder.AddChatCompletionServices(textModelInstances).GetAwaiter().GetResult();
+            //_kernelBuilder.AddTextEmbeddingGenerations(embeddingInstances).GetAwaiter().GetResult();
+            //_kernelBuilder.Services.AddDefaultContentDecoders();
 
             action?.Invoke(_kernelBuilder);
 
@@ -37,11 +37,11 @@ public static class KernelExtensions
     {
         if (models?.Count == 0) return;
 
-        var defaultModel = models.FirstOrDefault(x => x.IsDefault);
-        if (defaultModel != null)
-        {
-            await kernelBuilder.AddChatCompletionService(defaultModel, null);
-        }
+        //var defaultModel = models.FirstOrDefault(x => x.IsDefault);
+        //if (defaultModel != null)
+        //{
+        //    await kernelBuilder.AddChatCompletionService(defaultModel, null);
+        //}
         models.ForEach(async model =>
         {
             await kernelBuilder.AddChatCompletionService(model, model.Id.ToString());
@@ -53,18 +53,23 @@ public static class KernelExtensions
         switch (model.ModelConnector)
         {
             case Enums.ModelConnector.AzureOpenAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName: model.DeploymentName, modelId: model.Name, endpoint: model.Endpoint, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.OpenAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddOpenAIChatCompletion(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.Google:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddGoogleAIGeminiChatCompletion(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.HuggingFace:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddHuggingFaceChatCompletion(model: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.MistralAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddMistralChatCompletion(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.Ollama:
@@ -80,11 +85,11 @@ public static class KernelExtensions
     {
         if (models?.Count == 0) return;
 
-        var defaultModelInstance = models.FirstOrDefault(x => x.IsDefault);
-        if (defaultModelInstance != null)
-        {
-            await kernelBuilder.AddTextEmbeddingGeneration(defaultModelInstance, null);
-        }
+        //var defaultModelInstance = models.FirstOrDefault(x => x.IsDefault);
+        //if (defaultModelInstance != null)
+        //{
+        //    await kernelBuilder.AddTextEmbeddingGeneration(defaultModelInstance, null);
+        //}
         models.ForEach(async modelInstance =>
         {
             await kernelBuilder.AddTextEmbeddingGeneration(modelInstance, modelInstance.Id.ToString());
@@ -96,18 +101,23 @@ public static class KernelExtensions
         switch (model.ModelConnector)
         {
             case Enums.ModelConnector.AzureOpenAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddAzureOpenAIEmbeddingGenerator(deploymentName: model.DeploymentName, modelId: model.Name, endpoint: model.Endpoint, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.OpenAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddOpenAIEmbeddingGenerator(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.Google:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddGoogleAIEmbeddingGenerator(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.HuggingFace:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddHuggingFaceEmbeddingGenerator(model: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.MistralAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddMistralEmbeddingGenerator(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.Ollama:

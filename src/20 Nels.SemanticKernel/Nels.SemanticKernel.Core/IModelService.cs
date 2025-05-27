@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Nels.SemanticKernel
+namespace Nels.SemanticKernel;
+
+public interface IModelService
 {
-    public interface IModelService
-    {
-        Task<List<IModel>> GetAllModels();
-    }
+    Task<List<IModel>> GetAllModels();
 }

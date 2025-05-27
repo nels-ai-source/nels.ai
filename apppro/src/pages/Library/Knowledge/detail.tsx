@@ -1,327 +1,274 @@
+import { Permissions } from '@/access';
 import {
-  addKnowledgeDocument,
   deleteKnowledgeDocument,
   getKnowledge,
-  getKnowledgeDocumentList,
   getParagraphList,
-  updateKnowledge,
   updateKnowledgeDocument,
 } from '@/services/aigc/knowledge';
-import { DeleteOutlined, EditOutlined, FileTextOutlined, LeftOutlined } from '@ant-design/icons';
-import { ModalForm, PageContainer, ProCard, ProFormText } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl, useParams, history } from '@umijs/max';
-import { App, Button, Flex, Input, List } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
-import CreateForm from './components/CreateForm';
-import UploadForm from './components/UploadForm';
+import { Knowledge, KnowledgeDocument, KnowledgeDocumentParagraph } from '@/types/knowledge';
+import { DeleteOutlined, FileTextOutlined, FormOutlined, SettingOutlined } from '@ant-design/icons';
+import { ModalForm, ProFormText } from '@ant-design/pro-components';
+import { FormattedMessage, useAccess, useIntl, useParams } from '@umijs/max';
+import { App, Button, List, message, Skeleton, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import './detail/detail.css';
+import { DocumentList } from './detail/documentList';
+import { Header } from './detail/header';
+const DocumentHeader: React.FC<{
+  intl: ReturnType<typeof useIntl>;
+  access: ReturnType<typeof useAccess>;
+  document: KnowledgeDocument;
+  onUpdate: () => void;
+  onDelete: (id: string) => void;
+}> = ({ intl, access, document, onUpdate, onDelete }) => (
+  <header className="border-b border-gray-200 z-10 flex items-center justify-between h-14 px-2 md:h-14 md:px-4 shadow-sm">
+    <Space className="flex items-center">
+      <FileTextOutlined />
+      {document?.name}
+      {access.checkAccess(Permissions.KnowledgeDocument.Update) && (
+        <Button type="text" icon={<FormOutlined />} onClick={onUpdate} />
+      )}
+    </Space>
 
-const styles = {
-  iconButton: {
-    fontSize: 12,
-    color: '#8c8c8c',
-    cursor: 'pointer',
-  },
-  secondaryText: {
-    fontSize: 10,
-    color: '#8c8c8c',
-  },
-  title: {
-    fontSize: 12,
-  },
-  fileIcon: {
-    fontSize: 24,
-  },
-  listContainer: {
-    marginTop: '16px',
-  },
-  listItem: {
-    cursor: 'pointer',
-    padding: '8px 12px',
-    borderRadius: 4,
-    transition: 'background-color 0.3s',
-  },
-  listItemText: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    width: '100%',
-  },
-} as const;
+    <Space className="flex items-center">
+      {access.checkAccess(Permissions.KnowledgeDocument.Update) && (
+        <Button
+          type="text"
+          size="small"
+          icon={<SettingOutlined />}
+          title={intl.formatMessage({ id: 'knowledge.detail.updateSettings' })}
+          onClick={() => {}}
+        />
+      )}
+      {access.checkAccess(Permissions.KnowledgeDocument.Delete) && (
+        <Button
+          type="text"
+          size="small"
+          icon={<DeleteOutlined />}
+          title={intl.formatMessage({ id: 'knowledge.detail.deleteDocument' })}
+          onClick={() => {
+            onDelete(document.id);
+          }}
+        />
+      )}
+    </Space>
+  </header>
+);
 
-const DocumentPage: React.FC = () => {
+const DocumentContent: React.FC<{
+  intl: ReturnType<typeof useIntl>;
+  access: ReturnType<typeof useAccess>;
+  paragraphs: KnowledgeDocumentParagraph[];
+}> = ({ intl, access, paragraphs }) => (
+  <main className="flex-1 overflow-y-auto p-4 md:p-4">
+    <List
+      size="small"
+      dataSource={paragraphs}
+      split={false}
+      renderItem={(item) => (
+        <List.Item
+          className={`
+                        cursor-pointer 
+                        rounded-lg 
+                        p-2 
+                        transition-colors 
+                        mb-2
+                        bg-gray-100 
+                        relative 
+                        group
+                        hover:bg-gray-200
+                    `}
+        >
+          <div className="flex items-center p-2">
+            <div className="flex-1">
+              <div className="text-sm text-gray-600 leading-relaxed">{item.content}</div>
+            </div>
+            {access.checkAccess(Permissions.KnowledgeDocument.Update) && (
+              <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-in-out bg-white rounded-md shadow-sm p-1">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<FormOutlined />}
+                  className="text-gray-500 hover:text-blue-500"
+                  title={intl.formatMessage({ id: 'knowledge.detail.updateParagraph' })}
+                  onClick={() => {
+                    message.success(intl.formatMessage({ id: 'operation.update.success' }));
+                  }}
+                />
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  className="text-gray-500 hover:text-red-500"
+                  title={intl.formatMessage({ id: 'knowledge.detail.deleteParagraph' })}
+                />
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<SettingOutlined />}
+                  className="text-gray-500 hover:text-blue-500"
+                  title={intl.formatMessage({ id: 'knowledge.detail.settingParagraph' })}
+                />
+              </div>
+            )}
+          </div>
+        </List.Item>
+      )}
+    />
+  </main>
+);
+
+export function KnowledgeDetail() {
+  const [knowledge, setKnowledge] = useState<Knowledge>();
+  const [selectedDocument, setSelectedDocument] = useState<KnowledgeDocument>();
+  const [paragraphs, setParagraphs] = useState<KnowledgeDocumentParagraph[]>();
+  const [isUploadDocumentModalOpen, setIsUploadDocumentModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { id } = useParams<{ id: string }>();
-  const [knowledgeData, setKnowledgeData] = useState<API.KnowledgeItem>();
-  const [knowledgeDocuments, setKnowledgeDocuments] = useState<API.KnowledgeDocument[]>();
-  const [selectedDocumnt, setSelectedDocument] = useState<API.KnowledgeDocument>();
-  const [KnowledgeDocumentParagraphs, setKnowledgeDocumentParagraphs] =
-    useState<API.KnowledgeDocumentParagraph[]>();
-  const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
-
-  const [editDocumentModalOpen, handleEditDocumentModalOpen] = useState<boolean>(false);
-
-  const intl = useIntl();
   const { message, modal } = App.useApp();
-
-  const handleAddKnowledgeDocument = async (fields: any) => {
-    const hide = message.loading(intl.formatMessage({ id: 'operation.add.loading' }));
-    try {
-      await addKnowledgeDocument({ ...fields });
-      hide();
-      message.success(intl.formatMessage({ id: 'operation.add.success' }));
-      return true;
-    } catch (error) {
-      hide();
-      message.error(intl.formatMessage({ id: 'operation.add.failed' }));
-      return false;
-    }
-  };
-
-  const handleGetKnowledge = async (knowledgeId?: string) => {
+  const intl = useIntl();
+  const access = useAccess();
+  const handleGetKnowledge = async (knowledgeId: string) => {
     if (!knowledgeId) return;
+    setLoading(false);
     try {
       const res = await getKnowledge(knowledgeId);
-      setKnowledgeData(res);
-      const docs = await getKnowledgeDocumentList(knowledgeId);
-      setKnowledgeDocuments(docs);
+      setKnowledge(res);
     } catch (error) {
-      message.error(intl.formatMessage({ id: 'operation.get.failed' }));
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
-
   const handleGetParagraphList = async (knowledgeDocumentId?: string) => {
     if (!knowledgeDocumentId) return;
+    setLoading(false);
     try {
       const res = await getParagraphList(knowledgeDocumentId);
-      setKnowledgeDocumentParagraphs(res);
+      setParagraphs(res);
     } catch (error) {
-      message.error(intl.formatMessage({ id: 'operation.get.failed' }));
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
-
   const handleDeleteDocument = async (documentId?: string) => {
     if (!documentId) return;
-    const hide = message.loading(intl.formatMessage({ id: 'operation.delete.loading' }));
     try {
+      setLoading(true);
       await deleteKnowledgeDocument(documentId);
-      hide();
-      message.success(intl.formatMessage({ id: 'operation.delete.success' }));
-      setSelectedDocument(undefined);
-      setKnowledgeDocumentParagraphs(undefined);
-      await handleGetKnowledge(id);
+      message.success(intl.formatMessage({ id: 'actions.success' }));
+      await handleGetKnowledge(id as string);
     } catch (error) {
-      hide();
-      message.error(intl.formatMessage({ id: 'operation.delete.failed' }));
+      message.error(intl.formatMessage({ id: 'actions.failed' }));
+    } finally {
+      setLoading(false);
     }
   };
-
-  const handleUpdate = async (fields: API.RuleListItem) => {
-    const hide = message.loading(intl.formatMessage({ id: 'operation.edit.loading' }));
-    try {
-      await updateKnowledge({ ...fields });
-      hide();
-      message.success(intl.formatMessage({ id: 'operation.edit.success' }));
-      return true;
-    } catch (error) {
-      hide();
-      message.error(intl.formatMessage({ id: 'operation.edit.failed' }));
-      return false;
-    }
-  };
-
-  const [searchText, setSearchText] = useState<string>('');
-
-  const filteredDocuments = useMemo(() => {
-    if (!searchText) return knowledgeDocuments;
-    return knowledgeDocuments?.filter((doc) =>
-      doc.name.toLowerCase().includes(searchText.toLowerCase()),
-    );
-  }, [knowledgeDocuments, searchText]);
-
   useEffect(() => {
-    handleGetKnowledge(id);
+    if (id) {
+      handleGetKnowledge(id);
+    }
   }, [id]);
+  useEffect(() => {
+    if (knowledge?.documents && knowledge.documents.length > 0) {
+      setSelectedDocument(knowledge.documents[0]);
+    }
+  }, [knowledge]);
+  useEffect(() => {
+    if (selectedDocument?.id) {
+      handleGetParagraphList(selectedDocument.id);
+    }
+  }, [selectedDocument]);
 
-  return (
-    <PageContainer
-      header={{
-        title: (
-          <App>
-            <Flex align="center">
-              <LeftOutlined onClick={() => history.push('/library/knowledge')} />
-              <Flex gap={8} style={{ marginLeft: 8 }}>
-                <FileTextOutlined style={styles.fileIcon} />
-                <Flex vertical>
-                  <Flex align="center" gap={8}>
-                    <span style={styles.title}>{knowledgeData?.name}</span>
-                    <EditOutlined
-                      style={styles.iconButton}
-                      onClick={() => handleUpdateModalOpen(true)}
-                    />
-                  </Flex>
-                  <Flex gap={8} style={styles.secondaryText}>
-                    <span>
-                      {knowledgeData?.documentCount || 0}{' '}
-                      {intl.formatMessage({ id: 'knowledge.table.unit.count' })}
-                    </span>
-                    <span>·</span>
-                    <span>
-                      {((knowledgeData?.length || 0) / 1024).toFixed(2)}
-                      {'k '}
-                      {intl.formatMessage({ id: 'knowledge.table.unit.char' })}
-                    </span>
-                    <span>·</span>
-                    <span>
-                      {knowledgeData?.retrievalCount || 0}{' '}
-                      {intl.formatMessage({ id: 'knowledge.table.unit.times' })}
-                    </span>
-                  </Flex>
-                </Flex>
-              </Flex>
-            </Flex>
-          </App>
-        ),
-      }}
-      breadcrumb={{}}
-      extra={
-        <Button type="link" onClick={() => setUploadVisible(true)}>
-          <FormattedMessage id="knowledge.detail.addDocument" />
-        </Button>
-      }
-    >
-      <ProCard split="vertical" style={{ minHeight: 'calc(100vh - 235px)' }}>
-        <ProCard title="" colSpan="300px">
-          <Input.Search
-            placeholder={intl.formatMessage({ id: 'search.placeholder' })}
-            onSearch={(value) => setSearchText(value)}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-          />
-          <List
-            style={styles.listContainer}
-            dataSource={filteredDocuments || []}
-            renderItem={(item) => (
-              <List.Item
-                onClick={() => {
-                  setSelectedDocument(item);
-                  handleGetParagraphList(item.id);
-                }}
-                style={{
-                  ...styles.listItem,
-                  backgroundColor: selectedDocumnt === item ? '#f0f0f0' : 'transparent',
-                }}
-              >
-                <div style={styles.listItemText}>{item.name}</div>
-              </List.Item>
-            )}
-          />
-        </ProCard>
-        <ProCard
-          title={
-            selectedDocumnt && (
-              <Flex align="center" gap={8}>
-                <span style={styles.title}>{selectedDocumnt?.name}</span>
-                <EditOutlined
-                  style={styles.iconButton}
-                  onClick={() => handleEditDocumentModalOpen(true)}
-                />
-              </Flex>
-            )
-          }
-          extra={
-            selectedDocumnt && (
-              <DeleteOutlined
-                style={styles.iconButton}
-                onClick={() =>
-                  modal.confirm({
-                    title: <FormattedMessage id="operation.delete.confirm" />,
-                    content: <FormattedMessage id="operation.delete.content" />,
-                    okText: <FormattedMessage id="operation.delete.ok" />,
-                    cancelText: <FormattedMessage id="operation.delete.cancel" />,
-                    onOk: async () => {
-                      handleDeleteDocument(selectedDocumnt?.id);
-                    },
-                  })
-                }
-              />
-            )
-          }
-          headerBordered
-        >
-          <List
-            dataSource={KnowledgeDocumentParagraphs || []}
-            renderItem={(item) => <List.Item>{item.content}</List.Item>}
-          />
-        </ProCard>
-      </ProCard>
-      <UploadForm
-        open={uploadVisible}
-        onOpenChange={setUploadVisible}
-        onFinish={async (value) => {
-          const dara = {
-            knowledgeId: id,
-            fileId: value.fileId,
-            maxTokensPerParagraph: 500,
-          };
-          const success = await handleAddKnowledgeDocument(dara as any);
-          if (success) {
-            setUploadVisible(false);
-            await handleGetKnowledge(id);
-          }
-          return success;
-        }}
-      />
-      <CreateForm
-        open={updateModalOpen}
-        onOpenChange={handleUpdateModalOpen}
-        onFinish={async (value) => {
-          const success = await handleUpdate(value as API.KnowledgeItem);
-          if (success) {
-            handleUpdateModalOpen(false);
-            await handleGetKnowledge(id);
-          }
-          return success;
-        }}
-        type="edit"
-        values={knowledgeData || {}}
-      />
+  return loading ? (
+    <Skeleton active />
+  ) : (
+    <>
       <ModalForm
-        title={intl.formatMessage({ id: 'knowledge.document.edit.title' })}
-        width="400px"
-        open={editDocumentModalOpen}
-        onOpenChange={handleEditDocumentModalOpen}
+        title={intl.formatMessage({ id: 'knowledge.document.title' })}
+        width="480px"
+        open={isUploadDocumentModalOpen}
+        onOpenChange={setIsUploadDocumentModalOpen}
         onFinish={async (value) => {
           try {
-            if (selectedDocumnt?.id) {
-              await updateKnowledgeDocument(selectedDocumnt.id, value.name);
-              handleEditDocumentModalOpen(false);
-              await handleGetKnowledge(id);
-              selectedDocumnt.name = value.name;
-              message.success(intl.formatMessage({ id: 'operation.edit.success' }));
+            if (selectedDocument?.id) {
+              await updateKnowledgeDocument(selectedDocument.id, value.name);
+              setIsUploadDocumentModalOpen(false);
+              await handleGetKnowledge(id as string);
+              selectedDocument.name = value.name;
+              message.success(intl.formatMessage({ id: 'actions.success' }));
               return true;
             }
             return false;
           } catch (error) {
-            message.error(intl.formatMessage({ id: 'operation.edit.failed' }));
+            message.error(intl.formatMessage({ id: 'actions.failed' }));
             return false;
           }
         }}
-        initialValues={selectedDocumnt}
+        initialValues={selectedDocument}
       >
         <ProFormText
           rules={[
             {
               required: true,
-              message: intl.formatMessage({ id: 'knowledge.document.name.required' }),
+              message: intl.formatMessage({ id: 'knowledge.document.required.name' }),
             },
           ]}
-          width="md"
           name="name"
-          label={intl.formatMessage({ id: 'knowledge.document.name.label' })}
+          label={intl.formatMessage({ id: 'knowledge.document.name' })}
+          placeholder={intl.formatMessage({ id: 'knowledge.document.placeholder.name' })}
         />
       </ModalForm>
-    </PageContainer>
-  );
-};
+      {/* Header */}
+      <div className="flex-shrink-0 mb-4">
+        <Header
+          data={knowledge as Knowledge}
+          onChange={() => {
+            handleGetKnowledge(id as string);
+          }}
+        />
+      </div>
+      {/* Main Content*/}
+      <main className="flex-1 min-h-0 flex " style={{ border: '1px solid #e5e7eb' }}>
+        {/* Left Sidebar */}
+        <aside className="flex-shrink-0 w-[300px] overflow-y-auto bg-white shadow-sm p-4">
+          <DocumentList
+            documents={knowledge?.documents}
+            selectedDocId={selectedDocument?.id}
+            onDocumentSelect={setSelectedDocument}
+          />
+        </aside>
 
-export default DocumentPage;
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-y-auto">
+          <DocumentHeader
+            document={selectedDocument as KnowledgeDocument}
+            intl={intl}
+            access={access}
+            onUpdate={() => {
+              setIsUploadDocumentModalOpen(true);
+            }}
+            onDelete={(id: string) => {
+              modal.confirm({
+                title: <FormattedMessage id="modal.delete.confirm" />,
+                content: <FormattedMessage id="modal.delete.content" />,
+                okText: <FormattedMessage id="modal.delete.ok" />,
+                cancelText: <FormattedMessage id="modal.delete.cancel" />,
+                onOk: async () => {
+                  await handleDeleteDocument(id);
+                },
+              });
+            }}
+          />
+          <DocumentContent
+            paragraphs={paragraphs as KnowledgeDocumentParagraph[]}
+            intl={intl}
+            access={access}
+          />
+        </div>
+      </main>
+    </>
+  );
+}
+export default KnowledgeDetail;

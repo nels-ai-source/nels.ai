@@ -375,6 +375,9 @@ namespace Nels.Aigc.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AgentConversationEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("AgentConversationId")
                         .HasColumnType("uuid");
 
@@ -423,12 +426,12 @@ namespace Nels.Aigc.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgentConversationId");
+                    b.HasIndex("AgentConversationEntityId");
 
                     b.ToTable("ai_AgentChat", (string)null);
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentConversation", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentConversationEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
@@ -963,19 +966,13 @@ namespace Nels.Aigc.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<string>("Metadata")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("MaxTokens")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
-
-                    b.Property<string>("Properties")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
 
                     b.Property<int>("Provider")
                         .HasColumnType("integer");
@@ -991,81 +988,6 @@ namespace Nels.Aigc.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ai_Model", (string)null);
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.ModelInstance", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("AccessKey")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("Capabilities")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<int>("Connector")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("DeploymentName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<Guid?>("ModelId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<int>("Provider")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SecretKey")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ai_ModelInstance", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.Prompt", b =>
@@ -2964,11 +2886,9 @@ namespace Nels.Aigc.Migrations
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
                 {
-                    b.HasOne("Nels.Aigc.Entities.AgentConversation", null)
+                    b.HasOne("Nels.Aigc.Entities.AgentConversationEntity", null)
                         .WithMany("Chats")
-                        .HasForeignKey("AgentConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AgentConversationEntityId");
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
@@ -3163,7 +3083,7 @@ namespace Nels.Aigc.Migrations
                     b.Navigation("StepLogs");
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentConversation", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentConversationEntity", b =>
                 {
                     b.Navigation("Chats");
                 });

@@ -13,14 +13,14 @@ export type UploadFormProps = {
 
 const PARSE_STRATEGIES = [
   {
-    title: 'knowledge.upload.parse.strategy.accurate',
-    description: 'knowledge.upload.parse.strategy.accurate.desc',
+    title: 'knowledge.upload.parse.accurate.title',
+    description: 'knowledge.upload.parse.accurate.description',
     value: '1',
     disabled: true,
   },
   {
-    title: 'knowledge.upload.parse.strategy.fast',
-    description: 'knowledge.upload.parse.strategy.fast.desc',
+    title: 'knowledge.upload.parse.fast.title',
+    description: 'knowledge.upload.parse.fast.description',
     value: '2',
     disabled: false,
   },
@@ -28,20 +28,20 @@ const PARSE_STRATEGIES = [
 
 const SEGMENT_STRATEGIES = [
   {
-    title: 'knowledge.upload.segment.strategy.auto',
-    description: 'knowledge.upload.segment.strategy.auto.desc',
+    title: 'knowledge.upload.segment.auto.title',
+    description: 'knowledge.upload.segment.auto.description',
     value: '1',
     disabled: false,
   },
   {
-    title: 'knowledge.upload.segment.strategy.custom',
-    description: 'knowledge.upload.segment.strategy.custom.desc',
+    title: 'knowledge.upload.segment.custom.title',
+    description: 'knowledge.upload.segment.custom.description',
     value: '2',
     disabled: true,
   },
   {
-    title: 'knowledge.upload.segment.strategy.hierarchy',
-    description: 'knowledge.upload.segment.strategy.hierarchy.desc',
+    title: 'knowledge.upload.segment.hierarchy.title',
+    description: 'knowledge.upload.segment.hierarchy.description',
     value: '3',
     disabled: true,
   },
@@ -150,7 +150,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish })
                 <UploadOutlined />
               </p>
               <p className="ant-upload-text">
-                <FormattedMessage id="knowledge.upload.file.drag.text" />
+                <FormattedMessage id="knowledge.upload.file.dragText" />
               </p>
               <p className="ant-upload-hint">
                 <FormattedMessage id="knowledge.upload.file.hint" />
@@ -175,15 +175,16 @@ const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish })
               items={[
                 {
                   key: 'parseStrategy',
-                  label: <FormattedMessage id="knowledge.upload.parse.strategy" />,
+                  label: <FormattedMessage id="knowledge.upload.parse.title" />,
                   children: (
                     <Form.Item
                       name="parseStrategy"
+                      className="mb-1"
                       rules={[
                         {
                           required: true,
                           message: intl.formatMessage({
-                            id: 'knowledge.upload.parse.strategy.required',
+                            id: 'knowledge.upload.parse.required',
                           }),
                         },
                       ]}
@@ -205,15 +206,16 @@ const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish })
                 },
                 {
                   key: 'segmentStrategy',
-                  label: <FormattedMessage id="knowledge.upload.segment.strategy" />,
+                  label: <FormattedMessage id="knowledge.upload.segment.title" />,
                   children: (
                     <Form.Item
                       name="segmentStrategy"
+                      className="mb-1"
                       rules={[
                         {
                           required: true,
                           message: intl.formatMessage({
-                            id: 'knowledge.upload.segment.strategy.required',
+                            id: 'knowledge.upload.segment.required',
                           }),
                         },
                       ]}

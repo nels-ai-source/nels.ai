@@ -7,8 +7,8 @@
  */
 
 // ... rest of the code ...
-import Footer from './Footer';
+import Footer from './footer';
 import { Question, SelectLang } from './RightContent';
 import { AvatarDropdown, AvatarName } from './RightContent/AvatarDropdown';
 
-export { Footer, Question, SelectLang, AvatarDropdown, AvatarName };
+export { AvatarDropdown, AvatarName, Footer, Question, SelectLang };

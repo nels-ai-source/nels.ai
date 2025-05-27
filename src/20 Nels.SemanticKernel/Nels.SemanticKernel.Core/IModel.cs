@@ -11,7 +11,8 @@ public interface IModel
     string Endpoint { get; set; }
     string AccessKey { get; set; }
     string SecretKey { get; set; }
-    bool IsDefault { get; set; }
+    bool IsEnabled { get; set; }
+    int? MaxTokens { get; set; }
     ModelProvider Provider { get; set; }
     ModelType Type { get; set; }
     ModelConnector ModelConnector { get; set; }

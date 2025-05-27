@@ -1,62 +1,133 @@
-import { getAgentList } from '@/services/aigc/agent';
-import { Card, List, Typography, message } from 'antd';
-import { useState, useEffect } from 'react';
-import { PageContainer, ProList } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
-
-const { Paragraph } = Typography;
+import type { Bot } from '@/types/bot';
+import { PlusOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { Button, Empty, Input, message, Pagination, Select, Skeleton } from 'antd';
+import { UUID } from 'crypto';
+import React, { useCallback, useEffect, useState } from 'react';
+import './bot.css';
+import { BotCard } from './components/bot-card';
+import { BotCreateModal } from './components/create-modal';
 
 const Develop: React.FC = () => {
-  const intl = useIntl();
-  const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState<API.Agent[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [bots, setBots] = useState<Bot[]>([]);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [messageApi] = message.useMessage();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
-  const handleGetList = async (params: API.PageParams) => {
-    setLoading(true);
+  const handlePageChange = (page: number, pageSize?: number) => {
+    setCurrentPage(page);
+    if (pageSize) setPageSize(pageSize);
+  };
+
+  const fetchBots = useCallback(async () => {
     try {
-      const { current = 1, pageSize = 10 } = params;
-      const data = await getAgentList({
-        skipCount: (current - 1) * pageSize,
-        maxResultCount: pageSize,
-        sorting: 'creationTime desc',
-      });
-      setDataSource(data.items);
+      setIsLoading(true);
+      //const data = await galleryAPI.listGalleries(user.id);
+      // 伪造数据
+      const data = Array.from({ length: 20 }, (_, index) => ({
+        id: '' as UUID,
+        name: `测试机器人 ${index + 1}`,
+        description: `这是一个用于测试的机器人，编号 ${index + 1}，可以执行各种智能任务。`,
+        icon: `default_bot_icon${Math.floor(Math.random() * 6) + 1}.png`,
+        creationTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+        lastModificationTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
+      })) as Bot[];
+      setBots(data);
     } catch (error) {
-      message.error(intl.formatMessage({ id: 'operation.get.failed' }));
+      messageApi.error('Failed to fetch bots');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
+    }
+  }, [messageApi]);
+
+  useEffect(() => {
+    fetchBots();
+  }, [fetchBots]);
+
+  const handleCreateGallery = async (botData: Bot) => {
+    try {
+      // await galleryAPI.createGallery(botData, user.id);
+      console.log(botData);
+      fetchBots();
+      setIsCreateModalOpen(false);
+      messageApi.success('Bot created successfully');
+    } catch (error) {
+      messageApi.error('Failed to create bot');
     }
   };
 
-  useEffect(() => {
-    handleGetList({});
-  }, []);
-
+  const handleDeleteGallery = async (botId: UUID) => {
+    try {
+      // await galleryAPI.deleteGallery(botId, user.id);
+      console.log(botId);
+      fetchBots();
+      messageApi.success('Bot deleted successfully');
+    } catch (error) {
+      messageApi.error('Failed to delete bot');
+    }
+  };
   return (
     <PageContainer header={{ title: '' }} breadcrumb={{}}>
-      <ProList<API.Agent>
-        rowKey="id"
-        loading={loading}
-        dataSource={dataSource}
-        renderItem={(item) => (
-          <List.Item>
-            <Card hoverable>
-              <Card.Meta
-                title={<a>{item.name}</a>}
-                description={
-                  <Paragraph
-                    ellipsis={{
-                      rows: 2,
-                    }}
-                  >
-                    {item.description}
-                  </Paragraph>
-                }
-              />
-            </Card>
-          </List.Item>
+      {/* Create Modal */}
+      <BotCreateModal
+        open={isCreateModalOpen}
+        onCancel={() => setIsCreateModalOpen(false)}
+        onCreateBot={() => handleCreateGallery}
+      />
+
+      {/* Main Content */}
+      <div className={`flex-1 transition-all duration-200"}`}>
+        {/* Search */}
+        <div className="flex-shrink-0 w-full h-[32px] flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Select
+              placeholder="选择类型"
+              style={{ width: 120 }}
+              value="all"
+              options={[
+                { value: 'all', label: '全部' },
+                { value: 'chat', label: '对话' },
+                { value: 'task', label: '任务' },
+              ]}
+            />
+            <Input.Search placeholder="搜索智能体" style={{ width: 200 }} allowClear />
+          </div>
+          <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsCreateModalOpen(true)}>
+            创建
+          </Button>
+        </div>
+        {/* Content Area */}
+        {isLoading ? (
+          <div className="flex items-center justify-center text-secondary">
+            <Skeleton active />
+          </div>
+        ) : !bots || bots.length === 0 ? (
+          <Empty />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {bots.map((bot) => (
+                <BotCard
+                  key={bot.id}
+                  bot={bot}
+                  onCreateGallery={handleCreateGallery}
+                  onDeleteGallery={handleDeleteGallery}
+                />
+              ))}
+            </div>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              showSizeChanger={false}
+              total={1000}
+              onChange={handlePageChange}
+              className="flex justify-end mt-4"
+            />
+          </>
         )}
-      ></ProList>
+      </div>
     </PageContainer>
   );
 };

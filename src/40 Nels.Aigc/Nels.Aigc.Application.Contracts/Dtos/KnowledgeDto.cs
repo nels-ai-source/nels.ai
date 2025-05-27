@@ -38,6 +38,6 @@ public class KnowledgeDto : AuditedEntityDto<Guid>
     [Required]
     public virtual bool IsEnabled { get; set; } = true;
 
-    public virtual List<KnowledgeDocumentDto> KnowledgeDocuments { get; set; } = [];
+    public virtual List<KnowledgeDocumentDto> Documents { get; set; } = [];
 }
 

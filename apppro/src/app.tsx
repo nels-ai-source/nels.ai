@@ -50,7 +50,9 @@ export async function getInitialState(): Promise<{
 }
 
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const intl = useIntl();
+
   const home = intl.formatMessage({ id: 'menu.home' });
   return {
     actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
@@ -125,9 +127,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <AntApp>
           <div
-            style={{
-              minHeight: 'calc(100vh - 160px)',
-            }}
+            className="relative flex flex-col h-full w-full overflow-hidden"
+            style={{ height: 'calc(100vh - 130px)' }}
           >
             {children}
             {isDev && (

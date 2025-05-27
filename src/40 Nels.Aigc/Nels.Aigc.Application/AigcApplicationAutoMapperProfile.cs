@@ -57,6 +57,7 @@ public class AigcApplicationAutoMapperProfile : Profile
 
         CreateMap<Model, ModelDto>().ReverseMap();
         CreateMap<Model, ModelGetListOutputDto>();
+        CreateMap<ModelUpdateInputDto, Model>();
 
         CreateMap<Space, SpaceDto>().ReverseMap();
         CreateMap<SpaceUser, SpaceUserDto>().ReverseMap();

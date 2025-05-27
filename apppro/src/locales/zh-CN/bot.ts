@@ -1,0 +1,25 @@
+export default {
+  bot: {
+    lastEdit: '最近编辑',
+    tag: '机器人',
+    actions: {
+      duplicate: '复制',
+      delete: '删除',
+      confirm: '确认',
+      cancel: '取消',
+      create: '创建',
+    },
+    deleteConfirm: {
+      title: '确定要删除这个机器人吗？',
+      content: '此操作无法撤销。',
+    },
+    createModal: {
+      title: '创建新机器人',
+      nameLabel: '机器人名称',
+      nameRequired: '请输入机器人名称！',
+      descriptionLabel: '描述',
+      iconLabel: '图标',
+      iconRequired: '请上传机器人图标！',
+    },
+  },
+};

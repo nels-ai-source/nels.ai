@@ -5,10 +5,10 @@ namespace Nels.SemanticKernel.Enums;
 public enum ModelType
 {
     [Description("TextGeneration")]
-    TextGeneration = 0,
+    TextGeneration = 1,
     [Description("Embedding")]
-    Embedding = 1,
+    Embedding = 2,
     [Description("MultiModal")]
-    MultiModal =2,
+    MultiModal =3,
 }
 

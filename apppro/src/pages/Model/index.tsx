@@ -1,183 +1,120 @@
-import { modelSetting, getModelList } from '@/services/aigc/model';
-import {
-  ProList,
-  PageContainer,
-  LightFilter,
-  ProFormSwitch,
-  ProFormSelect,
-} from '@ant-design/pro-components';
-import openAIIcon from '/public/modelIcons/GPT-3.5_v2.png';
-import { Button, Tag, Switch, message, Flex, Badge } from 'antd';
-import { useState, useEffect } from 'react';
-import SetingForm from './components/SetingForm';
-import { modelIcons, modelProvider, modelCapability } from './constants';
-import { useIntl } from '@umijs/max';
+import { getModelList } from '@/services/aigc/model';
+import type { Model, ModelFilter } from '@/types/model';
+import { ClearOutlined, KeyOutlined, PlusOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { FormattedMessage } from '@umijs/max';
+import { Button, Empty, Skeleton } from 'antd';
+import { useEffect, useState } from 'react';
+import { CreateModal } from './components/create-modal';
+import { FilterPanel } from './components/filter-panel';
+import { KeySettingModal } from './components/key-setting-modal';
+import { ModelCard } from './components/model-card';
 
 export default () => {
-  const intl = useIntl();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isKeySettingModalOpen, setIsKeySettingModalOpen] = useState(false);
+  const [models, setModels] = useState<Model[]>([]);
 
-  const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<API.ModelItem>();
-  const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState<API.ModelItem[]>([]);
-
-  const handleGetModelList = async (params: API.PageParams) => {
-    setLoading(true);
-    try {
-      const { current = 1, pageSize = 10 } = params;
-      const data = await getModelList({
-        skipCount: (current - 1) * pageSize,
-        maxResultCount: pageSize,
-        sorting: 'creationTime desc',
-      });
-      setDataSource(data.items);
-    } catch (error) {
-      message.error(intl.formatMessage({ id: 'operation.get.failed' }));
-    } finally {
-      setLoading(false);
-    }
+  const filter: ModelFilter = {
+    keyword: null,
+    type: null,
+    provider: null,
+    maxTokens: null,
+    modelCapabilities: null,
   };
-  const handleModelSetting = async (params: API.ModelSettingDto) => {
-    setLoading(true);
+  const [searchFilters, setSearchFilters] = useState<ModelFilter>(filter);
+
+  const handleLoadData = async () => {
+    setIsLoading(true);
     try {
-      await modelSetting(params);
-      return true;
-    } catch (error) {
-      message.error(intl.formatMessage({ id: 'operation.failed' }));
-      return false;
+      const response = await getModelList(searchFilters as ModelFilter);
+      setModels(response);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    handleGetModelList({});
-  }, []);
+    handleLoadData();
+  }, [searchFilters]);
+
+  const handleFiltersUpdate = (updates: Partial<ModelFilter>) => {
+    if (searchFilters) {
+      setSearchFilters((prevFilters) => {
+        const newFilters = { ...prevFilters, ...updates };
+        return newFilters;
+      });
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchFilters(filter);
+  };
+
+  const handleCreateModel = async (result: boolean) => {
+    if (!result) {
+      return;
+    }
+    setIsCreateModalOpen(false);
+    await handleLoadData();
+  };
 
   return (
     <PageContainer header={{ title: '' }} breadcrumb={{}}>
-      <ProList<API.ModelItem>
-        loading={loading}
-        metas={{
-          title: {
-            dataIndex: 'name',
-            render: (dom) => (
-              <div style={{ width: '220px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {dom}
-              </div>
-            ),
-          },
-          subTitle: {
-            render: (_, record) => (
-              <Flex align="center" gap="small">
-                <Button
-                  type="link"
-                  onClick={async () => {
-                    setCurrentRow(record);
-                    await handleModalOpen(true);
-                  }}
-                >
-                  设置
-                </Button>
-              </Flex>
-            ),
-          },
-          avatar: {
-            render: (_, record) => (
-              <Badge count={record.children.length}>
-                <img
-                  src={modelIcons[record.provider] || openAIIcon}
-                  alt="avatar"
-                  style={{ width: 40, height: 40 }}
-                />
-              </Badge>
-            ),
-          },
-          description: {
-            render: (_, record) => (
-              <div>
-                <div style={{ marginBottom: 8 }}>{record.description}</div>
-                {record.children && (
-                  <Flex vertical gap="small">
-                    {record.children.map((item) => (
-                      <Flex
-                        key={item.id}
-                        align="center"
-                        justify="space-between"
-                        style={{
-                          padding: '8px 12px',
-                          borderRadius: 6,
-                        }}
-                      >
-                        <Flex align="center" gap="small">
-                          <img
-                            src={modelIcons[item.provider] || openAIIcon}
-                            alt={item.name}
-                            style={{ width: 24, height: 24 }}
-                          />
-                          <span style={{ width: 200 }}>{item.name}</span>
-
-                          {item.modelCapabilities?.map((capability) => (
-                            <Tag key={capability} color={modelCapability[capability]?.color}>
-                              {intl.formatMessage({ id: modelCapability[capability]?.labelKey })}
-                            </Tag>
-                          ))}
-                        </Flex>
-                        <Switch
-                          checkedChildren={intl.formatMessage({ id: 'model.list.running' })}
-                          unCheckedChildren={intl.formatMessage({ id: 'model.list.stopped' })}
-                          checked={item.isEnabled}
-                        />
-                      </Flex>
-                    ))}
-                  </Flex>
-                )}
-              </div>
-            ),
-          },
-        }}
-        toolbar={{
-          search: {
-            onSearch: (value: string) => {
-              console.log(value);
-              handleGetModelList({});
-            },
-          },
-          filter: (
-            <LightFilter>
-              <ProFormSelect
-                name="provider"
-                label={intl.formatMessage({ id: 'model.list.provider' })}
-                showSearch
-                valueEnum={modelProvider}
-                placeholder={intl.formatMessage({ id: 'model.list.provider' })}
-              />
-              <ProFormSwitch
-                name="open"
-                label={intl.formatMessage({ id: 'model.list.switch' })}
-                checkedChildren={intl.formatMessage({ id: 'model.list.running' })}
-                unCheckedChildren={intl.formatMessage({ id: 'model.list.stopped' })}
-              />
-            </LightFilter>
-          ),
-        }}
-        rowKey="id"
-        headerTitle=""
-        dataSource={dataSource}
+      {/* Create Modal */}
+      <CreateModal
+        open={isCreateModalOpen}
+        onCancel={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateModel}
       />
-      <SetingForm
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleModelSetting(value as API.ModelSettingDto);
-          if (success) {
-            handleModalOpen(false);
-            await handleGetModelList({});
+      <KeySettingModal
+        open={isKeySettingModalOpen}
+        mode="provider"
+        onCancel={() => setIsKeySettingModalOpen(false)}
+        onChange={(result: boolean) => {
+          if (!result) {
+            return;
           }
-          return success;
+          setIsKeySettingModalOpen(false);
+          handleLoadData();
         }}
-        provider={currentRow?.provider}
       />
+      <div className="flex flex-row h-full w-full ">
+        <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 130px)' }}>
+          <div className="flex-shrink-0 w-full h-[32px] flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2"></div>
+            <div className="flex flex-1 justify-end items-center gap-2">
+              {models.length > 0 && (
+                <FormattedMessage id="model.list.result.count" values={{ count: models.length }} />
+              )}
+              <Button icon={<ClearOutlined />} onClick={() => handleClearFilters()}>
+                <FormattedMessage id={'model.operation.clearFilter'} />
+              </Button>
+              <Button icon={<KeyOutlined />} onClick={() => setIsKeySettingModalOpen(true)}>
+                <FormattedMessage id={'model.operation.setKey'} />
+              </Button>
+              <Button
+                icon={<PlusOutlined />}
+                type="primary"
+                onClick={() => setIsCreateModalOpen(true)}
+              >
+                <FormattedMessage id={'model.operation.addModel'} />
+              </Button>
+            </div>
+          </div>
+          {isLoading ? (
+            <Skeleton active />
+          ) : models === null || models.length === 0 ? (
+            <Empty />
+          ) : (
+            models.map((model) => (
+              <ModelCard key={model.id} model={model} onChange={handleLoadData} />
+            ))
+          )}
+        </div>
+        <FilterPanel onFilterChange={handleFiltersUpdate} filter={searchFilters} />
+      </div>
     </PageContainer>
   );
 };

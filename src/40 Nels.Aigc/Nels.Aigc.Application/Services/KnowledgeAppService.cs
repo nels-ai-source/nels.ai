@@ -13,18 +13,27 @@ namespace Nels.Aigc.Services;
 [Route(AigcRemoteServiceConsts.knowledgeRoute)]
 public class KnowledgeAppService : RouteCrudGetAllAppService<Knowledge, KnowledgeDto, Guid>
 {
-    public KnowledgeAppService(IRepository<Knowledge, Guid> repository) : base(repository)
+    private IRepository<KnowledgeDocument, Guid> DocumentRepository { get; set; }
+    public KnowledgeAppService(IRepository<Knowledge, Guid> repository, IRepository<KnowledgeDocument, Guid> documentRepository) : base(repository)
     {
         CreatePolicyName = AigcPermissions.Knowledge.Create;
         UpdatePolicyName = AigcPermissions.Knowledge.Update;
         DeletePolicyName = AigcPermissions.Knowledge.Delete;
         GetPolicyName = AigcPermissions.Knowledge.GetList;
         GetListPolicyName = AigcPermissions.Knowledge.GetList;
+
+        DocumentRepository = documentRepository;
     }
 
-    public override Task DeleteAsync(Guid id)
+    protected override KnowledgeDto MapToGetOutputDto(Knowledge entity)
     {
-        return base.DeleteAsync(id);
+        var dto = base.MapToGetOutputDto(entity);
+        var documents = DocumentRepository.GetListAsync(x => x.KnowledgeId == entity.Id).GetAwaiter().GetResult();
+
+        dto.Documents = MapList<KnowledgeDocument, KnowledgeDocumentDto>(documents);
+
+        return dto;
     }
+
 
 }

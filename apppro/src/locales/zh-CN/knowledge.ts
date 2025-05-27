@@ -1,65 +1,126 @@
 export default {
-  'knowledge.table.name': '知识库名称',
-  'knowledge.table.description': '描述',
-  'knowledge.table.documentCount': '文档数量',
-  'knowledge.table.length': '字符数',
-  'knowledge.table.retrievalCount': '调用次数',
-  'knowledge.table.creationTime': '创建时间',
-  'knowledge.table.status': '状态',
-  'knowledge.table.status.enabled': '启用',
-  'knowledge.table.status.disabled': '禁用',
-  'knowledge.table.operation': '操作',
-  'knowledge.table.operation.edit': '编辑',
-  'knowledge.table.operation.delete': '删除',
-  'knowledge.table.unit.count': '个文档',
-  'knowledge.table.unit.char': '字符',
-  'knowledge.table.unit.times': '命中',
-  
-  'knowledge.detail.addDocument': '添加内容',
-  'knowledge.document.edit.title': '编辑文档',
-  'knowledge.document.name.label': '文档名称',
-  'knowledge.document.name.required': '请输入文档名称',
-  'knowledge.create.title': '创建知识库',
-  'knowledge.edit.title': '编辑知识库',
-  'knowledge.create.format.label': '格式类型',
-  'knowledge.create.format.text.title': '文本格式',
-  'knowledge.create.format.text.description': '支持文本类型的知识库创建',
-  'knowledge.create.format.table.title': '表格格式',
-  'knowledge.create.format.table.description': '支持表格类型的知识库创建',
-  'knowledge.create.format.image.title': '照片类型',
-  'knowledge.create.format.image.description': '支持图片类型的知识库创建',
-  'knowledge.create.name.label': '名称',
-  'knowledge.create.name.required': '请输入知识库名称',
-  'knowledge.create.name.placeholder': '输入数据集名称',
-  'knowledge.create.description.label': '描述',
-  'knowledge.create.description.placeholder': '输入数据集内容的描述',
-  'knowledge.create.importType.label': '导入类型',
-  'knowledge.create.importType.local.title': '本地文档',
-  'knowledge.create.importType.local.description': '上传 PDF, TXT, MD, DOC...',
-  'knowledge.create.importType.online.title': '在线数据',
-  'knowledge.create.importType.online.description': '获取在线网页内容',
+  knowledge: {
+    name: '名称',
+    description: '描述',
+    documentCount: '文档数量',
+    length: '字符数',
+    retrievalCount: '调用次数',
+    creationTime: '创建时间',
+    status: '状态',
+    format: '格式类型',
+    model: '嵌入模型',
+    import: '导入方式',
+    placeholder: {
+      name: '请输入名称',
+      description: '请输入描述',
+      model: '请选择嵌入模型',
+    },
+    required: {
+      name: '名称不能为空',
+      model: '嵌入模型不能为空',
+    },
 
-  'knowledge.upload.title': '添加文档',
-  'knowledge.upload.step.file': '上传文件',
-  'knowledge.upload.step.settings': '分段设置',
-  'knowledge.upload.file.required': '请上传文件',
-  'knowledge.upload.file.drag.text': '点击上传或拖拽文档到这里',
-  'knowledge.upload.file.hint':
-    '支持 PDF、TXT、DOC、DOCX、MD，最多可上传 300 个文件，每个文件不超过 100MB， PDF 最多 500 页',
-  'knowledge.upload.parse.strategy': '文档解析策略',
-  'knowledge.upload.parse.strategy.required': '请选择文档解析策略',
-  'knowledge.upload.parse.strategy.accurate': '精准解析',
-  'knowledge.upload.parse.strategy.accurate.desc':
-    '将从文档中提取图片、表格等元素，需要耗费更长的时间',
-  'knowledge.upload.parse.strategy.fast': '快速解析',
-  'knowledge.upload.parse.strategy.fast.desc': '不会对文档提取图像、表格等元素，适用于纯文本',
-  'knowledge.upload.segment.strategy': '分段策略',
-  'knowledge.upload.segment.strategy.required': '请选择分段策略',
-  'knowledge.upload.segment.strategy.auto': '自动分段与清晰',
-  'knowledge.upload.segment.strategy.auto.desc': '自动分段与预处理规则',
-  'knowledge.upload.segment.strategy.custom': '自定义',
-  'knowledge.upload.segment.strategy.custom.desc': '自定义分段规则、分段长度及预处理规则',
-  'knowledge.upload.segment.strategy.hierarchy': '按层级分段',
-  'knowledge.upload.segment.strategy.hierarchy.desc':
-    '按照文档层级结构分段，将文档转化为有层级信息的树结构',
+    unit: {
+      count: '个文档',
+      char: '字符',
+      times: '命中',
+    },
+    create: {
+      title: '创建知识库',
+    },
+    edit: {
+      title: '编辑知识库',
+    },
+    detail: {
+      addDocument: '添加内容',
+      deleteDocument: '删除文档',
+      updateSettings: '查看或调整配置',
+      updateParagraph: '编辑段落',
+      deleteParagraph: '删除段落',
+      settingParagraph: '段落设置',
+    },
+    document: {
+      title: '编辑文档',
+      name: '文档名称',
+      placeholder: {
+        name: '请输入文档名称',
+      },
+      required: {
+        name: '文档名称不能为空',
+      },
+    },
+    operation: {
+      create: '创建知识库',
+      edit: '编辑知识库',
+      delete: '删除知识库',
+    },
+
+    formatType: {
+      text: {
+        title: '文本格式',
+        description: '支持文本类型的知识库创建',
+      },
+      table: {
+        title: '表格格式',
+        description: '支持表格类型的知识库创建',
+      },
+      image: {
+        title: '照片类型',
+        description: '支持图片类型的知识库创建',
+      },
+    },
+
+    importType: {
+      label: '导入类型',
+      local: {
+        title: '本地文档',
+        description: '支持本地文档类型的知识库创建',
+      },
+      online: {
+        title: '在线数据',
+        description: '支持在线数据类型的知识库创建',
+      },
+    },
+
+    upload: {
+      title: '添加文档',
+      step: {
+        file: '上传文件',
+        settings: '分段设置',
+      },
+      file: {
+        required: '请上传文件',
+        dragText: '点击上传或拖拽文档到这里',
+        hint: '支持 PDF、TXT、DOC、DOCX、MD，最多可上传 300 个文件，每个文件不超过 100MB， PDF 最多 500 页',
+      },
+      parse: {
+        title: '文档解析策略',
+        required: '请选择文档解析策略',
+        accurate: {
+          title: '精准解析',
+          description: '将从文档中提取图片、表格等元素，需要耗费更长的时间',
+        },
+        fast: {
+          title: '快速解析',
+          description: '不会对文档提取图像、表格等元素，适用于纯文本',
+        },
+      },
+      segment: {
+        title: '分段策略',
+        required: '请选择分段策略',
+        auto: {
+          title: '自动分段与清晰',
+          description: '自动分段与预处理规则',
+        },
+        custom: {
+          title: '自定义',
+          description: '自定义分段规则、分段长度及预处理规则',
+        },
+        hierarchy: {
+          title: '按层级分段',
+          description: '按照文档层级结构分段，将文档转化为有层级信息的树结构',
+        },
+      },
+    },
+  },
 };

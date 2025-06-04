@@ -1,3 +1,4 @@
+import { KnowledgeDocument } from '@/types/knowledge';
 import { UploadOutlined } from '@ant-design/icons';
 import { CheckCard, ProFormInstance, StepsForm } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
@@ -8,7 +9,7 @@ const { Dragger } = Upload;
 export type UploadFormProps = {
   open: boolean;
   onOpenChange: (visible: boolean) => void;
-  onFinish: (values: API.KnowledgeDocument) => Promise<boolean>;
+  onFinish: (values: KnowledgeDocument) => Promise<boolean>;
 };
 
 const PARSE_STRATEGIES = [
@@ -47,7 +48,7 @@ const SEGMENT_STRATEGIES = [
   },
 ] as const;
 
-const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish }) => {
+const EditModal: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish }) => {
   const intl = useIntl();
   const formMapRef = useRef<React.MutableRefObject<ProFormInstance<any> | undefined>[]>([]);
   const { message } = App.useApp();
@@ -207,6 +208,7 @@ const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish })
                 {
                   key: 'segmentStrategy',
                   label: <FormattedMessage id="knowledge.upload.segment.title" />,
+
                   children: (
                     <Form.Item
                       name="segmentStrategy"
@@ -244,4 +246,4 @@ const UploadForm: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish })
   );
 };
 
-export default UploadForm;
+export default EditModal;

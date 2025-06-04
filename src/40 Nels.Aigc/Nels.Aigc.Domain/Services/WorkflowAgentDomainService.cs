@@ -12,7 +12,7 @@ namespace Nels.Aigc.Services;
 
 public class WorkflowAgentDomainService : DomainService
 {
-    public async Task WorkflowAgentStartAsync(StartRequest request, AgentEntity agent)
+    public async Task WorkflowAgentStartAsync(StartRequest request, Agent agent)
     {
         await Task.CompletedTask;
     }

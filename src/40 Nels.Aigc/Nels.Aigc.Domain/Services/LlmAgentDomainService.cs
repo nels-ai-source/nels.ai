@@ -21,7 +21,7 @@ public class LlmAgentDomainService(
     AgentChatDomainService agentChatDomainService,
     Kernel kernel) : DomainService
 {
-    public async Task InvokeStreamingAsync(StartRequest request, AgentEntity agent, CancellationToken cancellation = default)
+    public async Task InvokeStreamingAsync(StartRequest request, Entities.Agent agent, CancellationToken cancellation = default)
     {
         if (agent.Metadata is LlmAgentMetadata metadata)
         {
@@ -64,7 +64,7 @@ public class LlmAgentDomainService(
         }
     }
 
-    private async Task<LlmAgentRequest> InvokeStreamingProcessAsync(StartRequest request, AgentEntity agent, AgentGroupChat chat, CancellationToken cancellation = default)
+    private async Task<LlmAgentRequest> InvokeStreamingProcessAsync(StartRequest request, Entities.Agent agent, AgentGroupChat chat, CancellationToken cancellation = default)
     {
         Guid conversation = request.AgentConversationId ?? GuidGenerator.Create();
         LlmAgentRequest llmAgentRequest = new()
@@ -90,7 +90,7 @@ public class LlmAgentDomainService(
 }
 public class LlmAgentRequest
 {
-    public virtual AgentEntity Agent { get; set; }
+    public virtual Entities.Agent Agent { get; set; }
     public virtual AgentConversationEntity Conversation { get; set; }
     public virtual Entities.AgentChat Chat { get; set; }
     public virtual Guid MessageId { get; set; }

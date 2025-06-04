@@ -23,6 +23,7 @@ export const ProviderSelect: React.FC<ProviderSelectProps> = ({ value, onChange 
                 className="w-6 h-6 object-cover"
                 alt={ModelProvider[value as ModelProvider]}
               />
+
               {intl.formatMessage(
                 getEnumLabel(ModelProvider, 'ModelProvider', value as ModelProvider),
               )}

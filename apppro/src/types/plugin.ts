@@ -1,16 +1,24 @@
-import { UUID } from 'crypto';
-import { Entity, AuditedEntity, FullAuditedEntity } from './entity';
+import { Entity, FullAuditedEntity } from './entity';
+
+export interface Plugin extends FullAuditedEntity {
+  name: string;
+  icon: string;
+  version: string;
+  description: string;
+  manifestUrl: string;
+}
 
 export interface Tool extends Entity {
-    pluginName: string;
-    pluginIcon: string;
-    name: string;
-    icon: string;
-    description: string;
-    inputParameters: PluginParameter[];
+  pluginId: string;
+  name: string;
+  description: string;
+  inputParamters: ToolParamter[];
+  outputParamters: ToolParamter[];
 }
-export interface PluginParameter {
-    name: string;
-    description: string;
-    type: string;
+
+export interface ToolParamter {
+  name: string;
+  description: string;
+  type: string;
+  required: boolean;
 }

@@ -55,15 +55,22 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
   const home = intl.formatMessage({ id: 'menu.home' });
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
+    actionsRender: () => [
+      <Question key="doc" data-oid="0qyecld" />,
+      <SelectLang key="SelectLang" data-oid="k.qktpq" />,
+    ],
+
     avatarProps: {
       src: initialState?.currentUser?.avatar,
-      title: <AvatarName />,
+      title: <AvatarName data-oid="up784r-" />,
       render: (_, avatarChildren) => {
-        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+        return <AvatarDropdown data-oid="_piawu0">{avatarChildren}</AvatarDropdown>;
       },
     },
-    headerContentRender: () => <ProBreadcrumb style={{ paddingInline: '80px' }} />,
+    headerContentRender: () => (
+      <ProBreadcrumb style={{ paddingInline: '80px' }} data-oid="8.l0b9." />
+    ),
+
     breadcrumbRender: (routers = []) => {
       if (routers.length === 0) {
         return [];
@@ -84,7 +91,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     waterMarkProps: {
       content: initialState?.currentUser?.name,
     },
-    footerRender: () => <Footer />,
+    footerRender: () => <Footer data-oid="mrre71i" />,
     onPageChange: () => {
       const { location } = history;
       const token = localStorage.getItem('access_token');
@@ -113,11 +120,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         width: '331px',
       },
     ],
+
     links: isDev
       ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-            <span>OpenAPI 文档</span>
+          <Link key="openapi" to="/umi/plugin/openapi" target="_blank" data-oid="e5rp23h">
+            <LinkOutlined data-oid=".fd867l" />
+            <span data-oid="sy0.a41">OpenAPI 文档</span>
           </Link>,
         ]
       : [],
@@ -125,10 +133,11 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
     childrenRender: (children) => {
       return (
-        <AntApp>
+        <AntApp data-oid="sw7ams:">
           <div
             className="relative flex flex-col h-full w-full overflow-hidden"
             style={{ height: 'calc(100vh - 130px)' }}
+            data-oid="nimmh63"
           >
             {children}
             {isDev && (
@@ -142,6 +151,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
                     settings,
                   }));
                 }}
+                data-oid="g12djuf"
               />
             )}
           </div>

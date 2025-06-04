@@ -10,6 +10,7 @@ export const SelectLang = () => {
       style={{
         padding: 4,
       }}
+      data-oid="4vq6nih"
     />
   );
 };
@@ -24,8 +25,9 @@ export const Question = () => {
       onClick={() => {
         window.open('https://pro.ant.design/docs/getting-started');
       }}
+      data-oid="4sz1j.w"
     >
-      <QuestionCircleOutlined />
+      <QuestionCircleOutlined data-oid="w9mip.2" />
     </div>
   );
 };

@@ -5,8 +5,8 @@ import { Select, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { getProviderIcon } from '../util';
 interface ProviderSelectProps {
-  value?: ModelProvider;
-  onChange?: (value: ModelProvider) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   filter?: Partial<ModelFilter>;
 }
 
@@ -52,6 +52,7 @@ export const ModelSelect: React.FC<ProviderSelectProps> = ({ value, filter, onCh
               className="w-6 h-6 object-cover"
               alt={ModelProvider[model.provider as ModelProvider]}
             />
+
             {model.name}
           </Space>
         </Select.Option>

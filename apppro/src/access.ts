@@ -27,4 +27,13 @@ export const Permissions = {
     Update: 'Aigc.KnowledgeDocument.Update',
     Delete: 'Aigc.KnowledgeDocument.Delete',
   },
+
+  Model: {
+    Default: 'Aigc.Model',
+    GetList: 'Aigc.Model.GetList',
+    Create: 'Aigc.Model.Create',
+    Update: 'Aigc.Model.Update',
+    Delete: 'Aigc.Model.Delete',
+    SetKey: 'Aigc.Model.SetKey',
+  },
 } as const;

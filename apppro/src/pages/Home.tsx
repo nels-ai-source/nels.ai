@@ -28,16 +28,14 @@ export default () => {
 
   return (
     <>
-
       <Card
-
         style={{
           height: 'calc(100vh - 160px)', // 60px 是顶部控制栏的高度
           overflow: 'hidden',
         }}
       >
         <XProvider direction={direction}>
-          <Flex style={{ height:'calc(100vh - 190px)' }} gap={12}>
+          <Flex style={{ height: 'calc(100vh - 190px)' }} gap={12}>
             <Conversations
               style={{ width: 200 }}
               defaultActiveKey="1"
@@ -54,6 +52,7 @@ export default () => {
                 },
               ]}
             />
+
             <Divider type="vertical" style={{ height: '100%' }} />
             <Flex vertical style={{ flex: 1 }} gap={8}>
               <Bubble.List
@@ -76,6 +75,7 @@ export default () => {
                   },
                 ]}
               />
+
               <Prompts
                 items={[
                   {
@@ -90,6 +90,7 @@ export default () => {
                   },
                 ]}
               />
+
               <Suggestion items={[{ label: 'Write a report', value: 'report' }]}>
                 {({ onTrigger, onKeyDown }) => {
                   return (

@@ -17,10 +17,10 @@ public class AigcApplicationAutoMapperProfile : Profile
         #region aigc
         CreateMap<Prompt, PromptDto>().ReverseMap();
 
-        CreateMap<AgentEntity, AgentDto>()
+        CreateMap<Agent, AgentDto>()
             .ReverseMap().Ignore(dest => dest.Metadata);
 
-        CreateMap<AgentEntity, LlmAgentDto>()
+        CreateMap<Agent, LlmAgentDto>()
             .Ignore(dest => dest.Prompt)
             .ReverseMap().Ignore(dest => dest.Metadata);
 
@@ -40,7 +40,7 @@ public class AigcApplicationAutoMapperProfile : Profile
             .Ignore(dest => dest.LastModifierId);
 
 
-        CreateMap<AgentEntity, WorkflowAgentDto>()
+        CreateMap<Agent, WorkflowAgentDto>()
             .Ignore(dest => dest.States)
             .Ignore(dest => dest.Steps)
             .ReverseMap().Ignore(dest => dest.Metadata);

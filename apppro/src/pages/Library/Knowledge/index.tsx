@@ -12,7 +12,7 @@ import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { FormattedMessage, history, useAccess, useIntl } from '@umijs/max';
 import { App, Button } from 'antd';
 import React, { useRef, useState } from 'react';
-import CreateForm from './components/CreateForm';
+import CreateModal from './components/create-modal';
 
 const KnowledgeManager: React.FC = () => {
   const access = useAccess();
@@ -75,31 +75,32 @@ const KnowledgeManager: React.FC = () => {
       width: 48,
     },
     {
-      title: <FormattedMessage id="knowledge.name" />,
+      title: <FormattedMessage id="knowledge.name" data-oid="4jh6p.5" />,
       dataIndex: 'name',
       render: (dom, entity) => (
         <a
           onClick={() => {
             history.push(`/library/knowledge/detail/${entity.id}`);
           }}
+          data-oid="skao2vg"
         >
           {dom}
         </a>
       ),
     },
     {
-      title: <FormattedMessage id="knowledge.description" />,
+      title: <FormattedMessage id="knowledge.description" data-oid="l02oa-y" />,
       dataIndex: 'description',
       ellipsis: true,
     },
     {
-      title: <FormattedMessage id="knowledge.documentCount" />,
+      title: <FormattedMessage id="knowledge.documentCount" data-oid="7ri-axm" />,
       dataIndex: 'documentCount',
       search: false,
       renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.count' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.length" />,
+      title: <FormattedMessage id="knowledge.length" data-oid="q7qjeed" />,
       dataIndex: 'length',
       search: false,
       renderText: (val: number) =>
@@ -108,34 +109,34 @@ const KnowledgeManager: React.FC = () => {
         })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.retrievalCount" />,
+      title: <FormattedMessage id="knowledge.retrievalCount" data-oid="7669y:k" />,
       dataIndex: 'retrievalCount',
       search: false,
       renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.times' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.creationTime" />,
+      title: <FormattedMessage id="knowledge.creationTime" data-oid="-:5qhj5" />,
       dataIndex: 'creationTime',
       valueType: 'dateTime',
       search: false,
       sorter: true,
     },
     {
-      title: <FormattedMessage id="knowledge.status" />,
+      title: <FormattedMessage id="knowledge.status" data-oid="x0n-t89" />,
       dataIndex: 'isEnabled',
       valueEnum: {
         true: {
-          text: <FormattedMessage id="status.enable" />,
+          text: <FormattedMessage id="status.enable" data-oid="q4.xw.w" />,
           status: 'Success',
         },
         false: {
-          text: <FormattedMessage id="status.disabled" />,
+          text: <FormattedMessage id="status.disabled" data-oid="uw5is.2" />,
           status: 'Error',
         },
       },
     },
     {
-      title: <FormattedMessage id="actions.lable" />,
+      title: <FormattedMessage id="actions.lable" data-oid="9v5b_0q" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -146,27 +147,30 @@ const KnowledgeManager: React.FC = () => {
               handleUpdateModalOpen(true);
               setCurrentRow(record);
             }}
+            data-oid="yp_5vcw"
           >
-            <FormattedMessage id="actions.edit" />
+            <FormattedMessage id="actions.edit" data-oid="1zb_wn6" />
           </a>
         ),
+
         access.checkAccess(Permissions.Knowledge.Delete) && (
           <a
             key="delete"
             onClick={async () => {
               modal.confirm({
-                title: <FormattedMessage id="modal.delete.confirm" />,
-                content: <FormattedMessage id="modal.delete.content" />,
-                okText: <FormattedMessage id="modal.delete.ok" />,
-                cancelText: <FormattedMessage id="modal.delete.cancel" />,
+                title: <FormattedMessage id="modal.delete.confirm" data-oid="arnhi9y" />,
+                content: <FormattedMessage id="modal.delete.content" data-oid="nkytydv" />,
+                okText: <FormattedMessage id="modal.delete.ok" data-oid="ptvwjxj" />,
+                cancelText: <FormattedMessage id="modal.delete.cancel" data-oid="8:jkepr" />,
                 onOk: async () => {
                   await handleRemove([record]);
                   actionRef.current?.reload();
                 },
               });
             }}
+            data-oid="l3_fnfo"
           >
-            <FormattedMessage id="actions.delete" />
+            <FormattedMessage id="actions.delete" data-oid="npd-dmr" />
           </a>
         ),
       ],
@@ -179,6 +183,7 @@ const KnowledgeManager: React.FC = () => {
         title: '',
       }}
       breadcrumb={{}}
+      data-oid="b5y0w.y"
     >
       <ProTable<Knowledge, API.PageParams>
         bordered
@@ -207,9 +212,10 @@ const KnowledgeManager: React.FC = () => {
               onClick={() => {
                 handleModalOpen(true);
               }}
-              icon={<PlusOutlined />}
+              icon={<PlusOutlined data-oid="3_:y10r" />}
+              data-oid="0z9h7.u"
             >
-              <FormattedMessage id="knowledge.operation.create" />
+              <FormattedMessage id="knowledge.operation.create" data-oid="jmcq4oj" />
             </Button>
           ),
         ]}
@@ -231,9 +237,10 @@ const KnowledgeManager: React.FC = () => {
           defaultPageSize: 20,
           showSizeChanger: true,
         }}
+        data-oid="f.y30t0"
       />
 
-      <CreateForm
+      <CreateModal
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
@@ -247,9 +254,10 @@ const KnowledgeManager: React.FC = () => {
           return success;
         }}
         type="create"
+        data-oid="lzyyp9q"
       />
 
-      <CreateForm
+      <CreateModal
         open={updateModalOpen}
         onOpenChange={handleUpdateModalOpen}
         onFinish={async (value) => {
@@ -264,6 +272,7 @@ const KnowledgeManager: React.FC = () => {
         }}
         type="edit"
         values={currentRow || {}}
+        data-oid="eph9oux"
       />
     </PageContainer>
   );

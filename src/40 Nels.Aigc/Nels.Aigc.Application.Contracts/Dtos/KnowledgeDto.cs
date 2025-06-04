@@ -31,7 +31,7 @@ public class KnowledgeDto : AuditedEntityDto<Guid>
     [Required]
     public virtual int RetrievalCount { get; set; } = default!;
 
-    public virtual Guid? ModelId { get; set; }
+    public virtual Guid? EmbeddingModelId { get; set; }
 
     public virtual SearchType SearchType { get; set; }
 

@@ -9,12 +9,14 @@ export interface Knowledge extends FullAuditedEntity {
   documents: KnowledgeDocument[];
   documentCount: number;
   length: number;
+  embeddingModelId: string;
   agentUseCount: number;
   retrievalCount: number;
 }
 export interface KnowledgeDocument extends Entity {
   name: string;
   type: string;
+  fileId?: string;
   paragraphs: KnowledgeDocumentParagraph[];
 }
 export interface KnowledgeDocumentParagraph extends Entity {

@@ -16,7 +16,7 @@ export type CreateFormProps = {
   type?: 'create' | 'edit';
 };
 
-const CreateForm: React.FC<CreateFormProps> = ({
+const CreateModal: React.FC<CreateFormProps> = ({
   open,
   onOpenChange,
   onFinish,
@@ -28,10 +28,11 @@ const CreateForm: React.FC<CreateFormProps> = ({
   const [form] = Form.useForm();
 
   const handleFinish = async (formValues: Record<string, any>) => {
-    const { name = '', description = '', format, importType } = formValues;
+    const { name = '', description = '', format, importType, embeddingModelId = null } = formValues;
     const formData = {
       ...(values || {}),
       name,
+      embeddingModelId,
       description,
       ...(isEdit
         ? {}
@@ -76,9 +77,7 @@ const CreateForm: React.FC<CreateFormProps> = ({
                   <CheckCard
                     title={<FormattedMessage id="knowledge.formatType.table.title" />}
                     avatar={<FileExcelOutlined style={{ fontSize: 24 }} />}
-                    description={
-                      <FormattedMessage id="knowledge.formatType.table.description" />
-                    }
+                    description={<FormattedMessage id="knowledge.formatType.table.description" />}
                     value="table"
                     style={{ width: '95%', marginBlockEnd: 0 }}
                     disabled
@@ -88,9 +87,7 @@ const CreateForm: React.FC<CreateFormProps> = ({
                   <CheckCard
                     title={<FormattedMessage id="knowledge.formatType.image.title" />}
                     avatar={<FileExcelOutlined style={{ fontSize: 24 }} />}
-                    description={
-                      <FormattedMessage id="knowledge.formatType.image.description" />
-                    }
+                    description={<FormattedMessage id="knowledge.formatType.image.description" />}
                     value="image"
                     style={{ width: '95%', marginBlockEnd: 0 }}
                     disabled
@@ -118,17 +115,21 @@ const CreateForm: React.FC<CreateFormProps> = ({
           style: { width: '100%' },
         }}
       />
+
       <FormItem
-        name="model"
-        label={<FormattedMessage id="knowledge.model" />}
+        name="embeddingModelId"
+        label={<FormattedMessage id="knowledge.embeddingModel" />}
         rules={[
           {
             required: true,
-            message: intl.formatMessage({ id: 'knowledge.required.model' }),
+            message: intl.formatMessage({ id: 'knowledge.required.embeddingModel' }),
           },
         ]}
       >
-        <ModelSelect filter={{ type: ModelType.Embedding }}></ModelSelect>
+        <ModelSelect
+          filter={{ type: ModelType.Embedding }}
+          value={values?.embeddingModelId}
+        ></ModelSelect>
       </FormItem>
       <ProFormTextArea
         label={<FormattedMessage id="knowledge.description" />}
@@ -141,21 +142,17 @@ const CreateForm: React.FC<CreateFormProps> = ({
           style: { width: '100%' },
         }}
       />
+
       {!isEdit && (
         <App>
-          <Form.Item
-            name="importType"
-            label={<FormattedMessage id="knowledge.import" />}
-          >
+          <Form.Item name="importType" label={<FormattedMessage id="knowledge.import" />}>
             <CheckCard.Group style={{ width: '100%' }}>
               <Row>
                 <Col span={12}>
                   <CheckCard
                     title={<FormattedMessage id="knowledge.importType.local.title" />}
                     avatar={<FileTextOutlined style={{ fontSize: 20 }} />}
-                    description={
-                      <FormattedMessage id="knowledge.importType.local.description" />
-                    }
+                    description={<FormattedMessage id="knowledge.importType.local.description" />}
                     value="local"
                     style={{ width: '95%', marginBlockEnd: 0 }}
                   />
@@ -164,9 +161,7 @@ const CreateForm: React.FC<CreateFormProps> = ({
                   <CheckCard
                     title={<FormattedMessage id="knowledge.importType.online.title" />}
                     avatar={<CloudSyncOutlined style={{ fontSize: 20 }} />}
-                    description={
-                      <FormattedMessage id="knowledge.importType.online.description" />
-                    }
+                    description={<FormattedMessage id="knowledge.importType.online.description" />}
                     value="online"
                     style={{ width: '95%', marginBlockEnd: 0 }}
                     disabled
@@ -181,4 +176,4 @@ const CreateForm: React.FC<CreateFormProps> = ({
   );
 };
 
-export default CreateForm;
+export default CreateModal;

@@ -1,4 +1,4 @@
-import bot from './zh-CN/bot';
+import agent from './zh-CN/agent';
 import commonality from './zh-CN/commonality';
 import component from './zh-CN/component';
 import globalHeader from './zh-CN/globalHeader';
@@ -23,6 +23,6 @@ export default {
   ...knowledge,
   ...commonality,
   ...model,
-  ...bot,
+  ...agent,
   ...user
 };

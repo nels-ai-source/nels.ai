@@ -1,7 +1,8 @@
+import { Permissions } from '@/access';
 import { deleteModel, setIsEnabled } from '@/services/aigc/model';
 import { Model, ModelCapability, ModelProvider, ModelType } from '@/types/model';
 import { EditOutlined, KeyOutlined, MoreOutlined } from '@ant-design/icons';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
 import { Button, Card, Dropdown, Modal, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 import { getEnumLabel, getProviderIcon } from '../util';
@@ -14,6 +15,7 @@ interface ModelCardProps {
 }
 
 export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
+  const access = useAccess();
   const { Meta } = Card;
   const intl = useIntl();
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +56,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
           onChange();
         }}
       />
+
       <KeySettingModal
         open={isKeySettingModalOpen}
         mode="model"
@@ -61,6 +64,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
         onCancel={() => setIsKeySettingModalOpen(false)}
         onChange={onChange}
       />
+
       <Card className={'group mb-4'}>
         <Meta
           avatar={
@@ -73,9 +77,9 @@ export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
             <>
               <div className="flex justify-between items-center">
                 <div>{model.name}</div>
-                <Tag color={model.isEnabled ? 'success' : 'default'}>
+                <Tag color={model.isEnabled ? 'processing' : 'default'}>
                   {model.isEnabled ? (
-                    <FormattedMessage id="status.enable" />
+                    <FormattedMessage id="status.running" />
                   ) : (
                     <FormattedMessage id="status.disable" />
                   )}
@@ -106,6 +110,7 @@ export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
             </div>
           }
         />
+
         <div className="flex items-center justify-between text-xs text-secondary">
           <Space className="flex items-center gap-x-1">
             <span>
@@ -132,46 +137,54 @@ export const ModelCard: React.FC<ModelCardProps> = ({ model, onChange }) => {
             </span>
           </Space>
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              className="hover:text-primary"
-              loading={isLoading}
-              onClick={handleEdit}
-            />
-            <Button
-              type="text"
-              icon={<KeyOutlined />}
-              className="hover:text-primary"
-              loading={isLoading}
-              onClick={() => setIsKeySettingModalOpen(true)}
-            />
+            {access.checkAccess(Permissions.Model.Update) && (
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                className="hover:text-primary"
+                loading={isLoading}
+                onClick={handleEdit}
+              />
+            )}
+            {access.checkAccess(Permissions.Model.SetKey) && (
+              <Button
+                type="text"
+                icon={<KeyOutlined />}
+                className="hover:text-primary"
+                loading={isLoading}
+                onClick={() => setIsKeySettingModalOpen(true)}
+              />
+            )}
             <Dropdown
               menu={{
                 items: [
-                  {
-                    key: 'duplicate',
-                    label: !model.isEnabled
-                      ? intl.formatMessage({ id: 'status.enable' })
-                      : intl.formatMessage({ id: 'status.disable' }),
-                    onClick: () => {
-                      handleSetEnabled(!model.isEnabled);
-                    },
-                  },
-                  {
-                    key: 'delete',
-                    label: intl.formatMessage({ id: 'actions.delete' }),
-                    danger: true,
-                    onClick: () => {
-                      Modal.confirm({
-                        title: intl.formatMessage({ id: 'deleteConfirm.title' }),
-                        content: intl.formatMessage({ id: 'deleteConfirm.content' }),
-                        okText: intl.formatMessage({ id: 'actions.confirm' }),
-                        cancelText: intl.formatMessage({ id: 'actions.cancel' }),
-                        onOk: handleDelete,
-                      });
-                    },
-                  },
+                  access.checkAccess(Permissions.Model.Update)
+                    ? {
+                        key: 'duplicate',
+                        label: !model.isEnabled
+                          ? intl.formatMessage({ id: 'status.enable' })
+                          : intl.formatMessage({ id: 'status.disable' }),
+                        onClick: () => {
+                          handleSetEnabled(!model.isEnabled);
+                        },
+                      }
+                    : null,
+                  access.checkAccess(Permissions.Model.Delete)
+                    ? {
+                        key: 'delete',
+                        label: intl.formatMessage({ id: 'actions.delete' }),
+                        danger: true,
+                        onClick: () => {
+                          Modal.confirm({
+                            title: intl.formatMessage({ id: 'deleteConfirm.title' }),
+                            content: intl.formatMessage({ id: 'deleteConfirm.content' }),
+                            okText: intl.formatMessage({ id: 'actions.confirm' }),
+                            cancelText: intl.formatMessage({ id: 'actions.cancel' }),
+                            onOk: handleDelete,
+                          });
+                        },
+                      }
+                    : null,
                 ],
               }}
             >

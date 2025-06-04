@@ -27,15 +27,48 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<AgentEntity>(b =>
+        builder.Entity<Agent>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + "Agent", SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Agent), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });
         builder.Entity<AgentPresetQuestions>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentPresetQuestions), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentKnowledge>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentKnowledge), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentTool>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentTool), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<Plugin>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Plugin), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<Tool>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Tool), SysMngDbProperties.DbSchema);
+            b.HasMany(x => x.InputParamters).WithOne().HasForeignKey(x => x.ToolId);
+
+            b.HasMany(x => x.OutputParamters).WithOne().HasForeignKey(x => x.ToolId);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<ToolParamter>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(ToolParamter), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });

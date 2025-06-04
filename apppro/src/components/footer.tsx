@@ -3,14 +3,15 @@ import * as React from 'react';
 const Footer = () => {
   React.useEffect(() => {}, []);
   return (
-    <div className=" text-primary p-3  border-t border-secondary flex ">
-      <div className="text-xs flex-1">
+    <div className=" text-primary p-3  border-t border-secondary flex " data-oid="ajj0mdn">
+      <div className="text-xs flex-1" data-oid="rlznv50">
         Maintained by the Nels.ai{' '}
         <a
           target={'_blank'}
           rel={'noopener noreferrer'}
           className="underlipne inline-block border-accent border-b hover:text-accent"
           href="https://github.com/nels-ai-source/nels.ai"
+          data-oid="r4wa1rm"
         >
           {' '}
           Team.

@@ -43,6 +43,14 @@ export default [
     component: './Develop',
   },
   {
+    path: '/develop/detail/:id',
+    hideInMenu: true,
+    name: 'developDetail',
+    icon: 'AppstoreAddOutlined',
+    component: './Develop/detail',
+    layout: false,
+  },
+  {
     path: '/library',
     name: 'library',
     icon: 'ProfileOutlined',

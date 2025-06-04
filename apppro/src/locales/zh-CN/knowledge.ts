@@ -8,7 +8,7 @@ export default {
     creationTime: '创建时间',
     status: '状态',
     format: '格式类型',
-    model: '嵌入模型',
+    embeddingModel: '嵌入模型',
     import: '导入方式',
     placeholder: {
       name: '请输入名称',

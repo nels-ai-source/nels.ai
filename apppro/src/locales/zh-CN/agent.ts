@@ -1,5 +1,5 @@
 export default {
-  bot: {
+  agent: {
     lastEdit: '最近编辑',
     tag: '机器人',
     actions: {

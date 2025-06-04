@@ -370,6 +370,62 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("sys_Page", (string)null);
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.Agent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Instructions")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Prologue")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid>("SpaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ai_Agent", (string)null);
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
                 {
                     b.Property<Guid>("Id")
@@ -483,50 +539,22 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("ai_AgentConversation", (string)null);
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentEntity", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledge", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AgentType")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("IntroductionText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<Guid>("SpaceId")
+                    b.Property<Guid>("KnowledgeId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ai_Agent", (string)null);
+                    b.HasIndex("AgentId");
+
+                    b.ToTable("ai_AgentKnowledge", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
@@ -611,38 +639,20 @@ namespace Nels.Aigc.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("AgentEntityId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("AgentId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<int>("Index")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AgentEntityId");
+                    b.HasIndex("AgentId");
 
                     b.ToTable("ai_AgentPresetQuestions", (string)null);
                 });
@@ -718,6 +728,24 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("ai_AgentStepLog", (string)null);
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentTool", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ToolId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.ToTable("ai_AgentTool", (string)null);
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.Knowledge", b =>
                 {
                     b.Property<Guid>("Id")
@@ -742,6 +770,9 @@ namespace Nels.Aigc.Migrations
                     b.Property<int>("DocumentCount")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("EmbeddingModelId")
+                        .HasColumnType("uuid");
+
                     b.Property<bool>("IsEnabled")
                         .HasColumnType("boolean");
 
@@ -755,9 +786,6 @@ namespace Nels.Aigc.Migrations
 
                     b.Property<int>("Length")
                         .HasColumnType("integer");
-
-                    b.Property<Guid?>("ModelId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -990,6 +1018,74 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("ai_Model", (string)null);
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.Plugin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("ManifestUrl")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("SpaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ai_Plugin", (string)null);
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.Prompt", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1109,6 +1205,72 @@ namespace Nels.Aigc.Migrations
                     b.HasIndex("SpaceId");
 
                     b.ToTable("ai_SpaceUser", (string)null);
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.Tool", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("PluginId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PluginId");
+
+                    b.ToTable("ai_Tool", (string)null);
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.ToolParamter", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("ParameterDirection")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ToolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ToolId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToolId");
+
+                    b.HasIndex("ToolId1");
+
+                    b.ToTable("ai_ToolParamter", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.WorkflowAgentMetadata", b =>
@@ -2891,6 +3053,15 @@ namespace Nels.Aigc.Migrations
                         .HasForeignKey("AgentConversationEntityId");
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledge", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Agent", null)
+                        .WithMany("Knowledges")
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
                 {
                     b.HasOne("Nels.Aigc.Entities.AgentChat", null)
@@ -2902,9 +3073,11 @@ namespace Nels.Aigc.Migrations
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentPresetQuestions", b =>
                 {
-                    b.HasOne("Nels.Aigc.Entities.AgentEntity", null)
-                        .WithMany("PresetQuestions")
-                        .HasForeignKey("AgentEntityId");
+                    b.HasOne("Nels.Aigc.Entities.Agent", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.AgentStepLog", b =>
@@ -2912,6 +3085,15 @@ namespace Nels.Aigc.Migrations
                     b.HasOne("Nels.Aigc.Entities.AgentChat", null)
                         .WithMany("StepLogs")
                         .HasForeignKey("AgentChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentTool", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Agent", null)
+                        .WithMany("Tools")
+                        .HasForeignKey("AgentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2932,6 +3114,28 @@ namespace Nels.Aigc.Migrations
                         .HasForeignKey("SpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.Tool", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Plugin", null)
+                        .WithMany("Tools")
+                        .HasForeignKey("PluginId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.ToolParamter", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Tool", null)
+                        .WithMany("OutputParamters")
+                        .HasForeignKey("ToolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Nels.Aigc.Entities.Tool", null)
+                        .WithMany("InputParamters")
+                        .HasForeignKey("ToolId1");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
@@ -3076,6 +3280,15 @@ namespace Nels.Aigc.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.Agent", b =>
+                {
+                    b.Navigation("Knowledges");
+
+                    b.Navigation("Questions");
+
+                    b.Navigation("Tools");
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
                 {
                     b.Navigation("Messages");
@@ -3088,19 +3301,26 @@ namespace Nels.Aigc.Migrations
                     b.Navigation("Chats");
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentEntity", b =>
-                {
-                    b.Navigation("PresetQuestions");
-                });
-
             modelBuilder.Entity("Nels.Aigc.Entities.KnowledgeDocument", b =>
                 {
                     b.Navigation("KnowledgeDocumentParagraphs");
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.Plugin", b =>
+                {
+                    b.Navigation("Tools");
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.Space", b =>
                 {
                     b.Navigation("SpaceUsers");
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.Tool", b =>
+                {
+                    b.Navigation("InputParamters");
+
+                    b.Navigation("OutputParamters");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

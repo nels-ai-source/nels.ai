@@ -1,8 +1,9 @@
+import { Permissions } from '@/access';
 import { getModelList } from '@/services/aigc/model';
 import type { Model, ModelFilter } from '@/types/model';
 import { ClearOutlined, KeyOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { FormattedMessage } from '@umijs/max';
+import { FormattedMessage, useAccess } from '@umijs/max';
 import { Button, Empty, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { CreateModal } from './components/create-modal';
@@ -15,7 +16,7 @@ export default () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isKeySettingModalOpen, setIsKeySettingModalOpen] = useState(false);
   const [models, setModels] = useState<Model[]>([]);
-
+  const access = useAccess();
   const filter: ModelFilter = {
     keyword: null,
     type: null,
@@ -68,6 +69,7 @@ export default () => {
         onCancel={() => setIsCreateModalOpen(false)}
         onCreate={handleCreateModel}
       />
+
       <KeySettingModal
         open={isKeySettingModalOpen}
         mode="provider"
@@ -80,6 +82,7 @@ export default () => {
           handleLoadData();
         }}
       />
+
       <div className="flex flex-row h-full w-full ">
         <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 130px)' }}>
           <div className="flex-shrink-0 w-full h-[32px] flex items-center justify-between mb-4">
@@ -91,16 +94,20 @@ export default () => {
               <Button icon={<ClearOutlined />} onClick={() => handleClearFilters()}>
                 <FormattedMessage id={'model.operation.clearFilter'} />
               </Button>
-              <Button icon={<KeyOutlined />} onClick={() => setIsKeySettingModalOpen(true)}>
-                <FormattedMessage id={'model.operation.setKey'} />
-              </Button>
-              <Button
-                icon={<PlusOutlined />}
-                type="primary"
-                onClick={() => setIsCreateModalOpen(true)}
-              >
-                <FormattedMessage id={'model.operation.addModel'} />
-              </Button>
+              {access.checkAccess(Permissions.Model.SetKey) && (
+                <Button icon={<KeyOutlined />} onClick={() => setIsKeySettingModalOpen(true)}>
+                  <FormattedMessage id={'model.operation.setKey'} />
+                </Button>
+              )}
+              {access.checkAccess(Permissions.Model.Create) && (
+                <Button
+                  icon={<PlusOutlined />}
+                  type="primary"
+                  onClick={() => setIsCreateModalOpen(true)}
+                >
+                  <FormattedMessage id={'model.operation.addModel'} />
+                </Button>
+              )}
             </div>
           </div>
           {isLoading ? (

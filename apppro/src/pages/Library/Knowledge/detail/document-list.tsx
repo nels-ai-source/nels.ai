@@ -55,13 +55,15 @@ export const DocumentList: React.FC<DocumentListProps> = ({
   }, [documents, searchText]);
 
   return (
-    <div className="flex flex-col h-full gap-4" style={{ width: '300px' }}>
+    <div className="flex flex-col h-full gap-4" style={{ width: '300px' }} data-oid="d_p3f3:">
       <Input.Search
         placeholder={intl.formatMessage({ id: 'placeholder.search' })}
         onSearch={(value) => setSearchText(value)}
         onChange={(e) => setSearchText(e.target.value)}
         allowClear
+        data-oid="ns2n_6w"
       />
+
       <List
         style={styles.listContainer}
         dataSource={filteredDocuments || []}
@@ -72,11 +74,20 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               ...styles.listItem,
               backgroundColor: selectedDocId === item.id ? '#f0f0f0' : 'transparent',
             }}
+            data-oid="r1o8yyz"
           >
-            <div className="w-full overflow-hidden">
-              <Space className="w-full" size={8}>
-                <FileTextOutlined className="text-lg text-gray-500 flex-shrink-0" />
-                <span className="text-sm truncate inline-block" style={{ width: '250px' }}>
+            <div className="w-full overflow-hidden" data-oid="t2bh2j5">
+              <Space className="w-full" size={8} data-oid="gwrt305">
+                <FileTextOutlined
+                  className="text-lg text-gray-500 flex-shrink-0"
+                  data-oid=":.kejgm"
+                />
+
+                <span
+                  className="text-sm truncate inline-block"
+                  style={{ width: '250px' }}
+                  data-oid="nbcfkuy"
+                >
                   {' '}
                   {item.name}
                 </span>
@@ -84,6 +95,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
             </div>
           </List.Item>
         )}
+        data-oid="ebo-71c"
       />
     </div>
   );

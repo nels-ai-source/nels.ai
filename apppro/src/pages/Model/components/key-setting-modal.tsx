@@ -90,6 +90,7 @@ export const KeySettingModal: React.FC<KeySettingModalProps> = ({
                 className="w-6 h-6 object-cover"
                 alt={model?.provider ? ModelProvider[model.provider] : ''}
               />
+
               {model?.name}
             </div>
           </Form.Item>

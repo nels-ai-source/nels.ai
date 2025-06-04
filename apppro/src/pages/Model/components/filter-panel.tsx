@@ -33,7 +33,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
       }));
   };
   return (
-    <div className="w-200px p-2 pt-0">
+    <div className="w-200px p-2 pt-0" data-oid="xo0mr8x">
       <Input.Search
         placeholder={intl.formatMessage({ id: 'model.search' })}
         style={{ width: 200 }}
@@ -43,14 +43,16 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
         }}
         value={filter.keyword || ''}
         className="mb-4"
+        data-oid="c0uz7c2"
       />
+
       <Collapse
         defaultActiveKey={['type', 'provider', 'maxTokens', 'modelCapabilities']}
         ghost
         items={[
           {
             key: 'type',
-            label: <FormattedMessage id="model.type" />,
+            label: <FormattedMessage id="model.type" data-oid="e6ht9:y" />,
             children: (
               <Radio.Group
                 style={style}
@@ -58,9 +60,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
                   onFilterChange({ type: e.target.value });
                 }}
                 value={filter.type || undefined}
+                data-oid="b9wnroz"
               >
                 {generateEnumOptions(ModelType, 'ModelType').map((option) => (
-                  <Radio key={option.value} value={option.value}>
+                  <Radio key={option.value} value={option.value} data-oid="2s.37y6">
                     {option.label}
                   </Radio>
                 ))}
@@ -69,7 +72,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
           },
           {
             key: 'provider',
-            label: <FormattedMessage id="model.provider" />,
+            label: <FormattedMessage id="model.provider" data-oid="buyh_66" />,
             children: (
               <Radio.Group
                 style={style}
@@ -77,9 +80,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
                   onFilterChange({ provider: e.target.value });
                 }}
                 value={filter.provider || undefined}
+                data-oid="y3rnfcn"
               >
                 {generateEnumOptions(ModelProvider, 'ModelProvider').map((option) => (
-                  <Radio key={option.value} value={option.value}>
+                  <Radio key={option.value} value={option.value} data-oid="bzu5fow">
                     {option.label}
                   </Radio>
                 ))}
@@ -88,7 +92,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
           },
           {
             key: 'maxTokens',
-            label: <FormattedMessage id="model.maxTokens" />,
+            label: <FormattedMessage id="model.maxTokens" data-oid="tnmkaoj" />,
             children: (
               <Slider
                 marks={marks}
@@ -99,12 +103,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
                   onFilterChange({ maxTokens: value });
                 }}
                 value={filter.maxTokens || 128000}
+                data-oid="ihlc4uv"
               />
             ),
           },
           {
             key: 'modelCapabilities',
-            label: <FormattedMessage id="model.modelCapabilities" />,
+            label: <FormattedMessage id="model.modelCapabilities" data-oid="oav-ths" />,
             children: (
               <Checkbox.Group
                 style={style}
@@ -116,10 +121,12 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filter, onFilterChange
                   label: option.label,
                   value: option.value,
                 }))}
+                data-oid="lgtett:"
               />
             ),
           },
         ]}
+        data-oid="wod.2jo"
       />
     </div>
   );

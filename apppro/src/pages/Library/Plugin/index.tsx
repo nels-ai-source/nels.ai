@@ -3,8 +3,8 @@ import App from 'antd/es/app/App';
 
 const plugin: React.FC = () => {
   return (
-    <PageContainer header={{ title: '' }} breadcrumb={{}}>
-      <App> Coming Soon</App>
+    <PageContainer header={{ title: '' }} breadcrumb={{}} data-oid="mf53z.k">
+      <App data-oid="xgfsgk."> Coming Soon</App>
     </PageContainer>
   );
 };

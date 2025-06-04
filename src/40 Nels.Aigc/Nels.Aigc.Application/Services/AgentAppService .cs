@@ -27,7 +27,7 @@ namespace Nels.Aigc.Services;
 
 
 [Route(AigcRemoteServiceConsts.agentRoute)]
-public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, Guid>
+public class AgentAppService : RouteCrudGetAllAppService<Agent, AgentDto, Guid>
 {
     private readonly IStreamResponse _streamResponse;
     private readonly IProceessSerializer _proceessSerializer;
@@ -44,7 +44,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
     private readonly WorkflowAgentDomainService _workflowAgentDomainService;
     private readonly Kernel _kernel;
 
-    public AgentAppService(IRepository<AgentEntity, Guid> repository,
+    public AgentAppService(IRepository<Agent, Guid> repository,
         IRepository<AgentPresetQuestions, Guid> presetQuestionsRepository,
         IRepository<LlmAgentMetadata, Guid> llmMetadataRepository,
         IRepository<WorkflowAgentMetadata, Guid> wfMetadataRepository,
@@ -60,11 +60,11 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
         WorkflowAgentDomainService workflowAgentDomainService,
     Kernel kernel) : base(repository)
     {
-        CreatePolicyName = AigcPermissions.Agent.Create;
-        UpdatePolicyName = AigcPermissions.Agent.Update;
-        DeletePolicyName = AigcPermissions.Agent.Delete;
-        GetPolicyName = AigcPermissions.Agent.GetList;
-        GetListPolicyName = AigcPermissions.Agent.GetList;
+        //CreatePolicyName = AigcPermissions.Agent.Create;
+        //UpdatePolicyName = AigcPermissions.Agent.Update;
+        //DeletePolicyName = AigcPermissions.Agent.Delete;
+        //GetPolicyName = AigcPermissions.Agent.GetList;
+        //GetListPolicyName = AigcPermissions.Agent.GetList;
 
         _presetQuestionsRepository = presetQuestionsRepository;
         _llmMetadataRepository = llmMetadataRepository;
@@ -189,21 +189,21 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
     {
         var agent = await GetEntityByIdAsync(request.AgentId) ?? throw new Exception();
 
-        if (agent.AgentType == AgentType.Llm)
+        if (agent.Type == AgentType.ChatCompletion)
         {
             await _llmAgentDomainService.InvokeStreamingAsync(request, agent, cancellation);
         }
-        else if (agent.AgentType == AgentType.Workflow)
+        else if (agent.Type == AgentType.Workflow)
         {
             await _workflowAgentDomainService.WorkflowAgentStartAsync(request, agent);
         }
     }
 
 
-    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, AgentEntity entity)
+    protected override Task UpdateInputMapToEntityAsync(AgentDto updateInput, Agent entity)
     {
         var index = 0;
-        foreach (var item in updateInput.PresetQuestions)
+        foreach (var item in updateInput.Questions)
         {
             item.Id = item.Id == Guid.Empty ? GuidGenerator.Create() : item.Id;
             item.AgentId = entity.Id;
@@ -212,24 +212,24 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
         return base.UpdateInputMapToEntityAsync(updateInput, entity);
     }
 
-    protected override async Task<AgentEntity> GetEntityByIdAsync(Guid id)
+    protected override async Task<Agent> GetEntityByIdAsync(Guid id)
     {
         var entity = await Repository.GetAsync(id);
-        entity.PresetQuestions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
-        if (entity.AgentType == AgentType.Llm)
+        entity.Questions = await _presetQuestionsRepository.GetListAsync(x => x.AgentId == id);
+        if (entity.Type == AgentType.ChatCompletion)
         {
             entity.Metadata = await _llmMetadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
         }
-        else if (entity.AgentType == AgentType.Workflow)
+        else if (entity.Type == AgentType.Workflow)
         {
             entity.Metadata = await _wfMetadataRepository.FirstOrDefaultAsync(x => x.AgentId == id);
         }
 
-        entity.PresetQuestions = [.. entity.PresetQuestions.OrderBy(x => x.Index)];
+        entity.Questions = [.. entity.Questions.OrderBy(x => x.Index)];
         return entity;
     }
 
-    protected override async Task ProcessUpdate(AgentDto input, AgentEntity entity)
+    protected override async Task ProcessUpdate(AgentDto input, Agent entity)
     {
         if (input is LlmAgentDto llmAgent)
         {
@@ -247,12 +247,12 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
 
     }
     [UnitOfWork]
-    protected override async Task<AgentEntity> UpdateAsync(AgentEntity entity)
+    protected override async Task<Agent> UpdateAsync(Agent entity)
     {
         await _presetQuestionsRepository.DeleteAsync(x => x.AgentId == entity.Id);
-        if (entity.PresetQuestions.Count != 0)
+        if (entity.Questions.Count != 0)
         {
-            await _presetQuestionsRepository.InsertManyAsync(entity.PresetQuestions);
+            await _presetQuestionsRepository.InsertManyAsync(entity.Questions);
         }
         if (entity.Metadata != null)
         {
@@ -296,7 +296,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
     public virtual async Task<LlmAgentDto> GetLlmAgentAsync(Guid id)
     {
         var entity = await GetEntityByIdAsync(id);
-        var dto = ObjectMapper.Map<AgentEntity, LlmAgentDto>(entity);
+        var dto = ObjectMapper.Map<Agent, LlmAgentDto>(entity);
         if (entity.Metadata != null && entity.Metadata is LlmAgentMetadata metadata)
         {
             ObjectMapper.Map(metadata, dto);
@@ -314,7 +314,7 @@ public class AgentAppService : RouteCrudGetAllAppService<AgentEntity, AgentDto, 
         var entity = await Repository.GetAsync(agentId) ?? throw new BusinessException("not found");
         var entities = await _agentConversationRepository.GetListAsync(x => x.AgentId == agentId && x.CreatorId == CurrentUser.Id);
 
-        var dto = Map<AgentEntity, AgentDto>(entity);
+        var dto = Map<Agent, AgentDto>(entity);
         dto.Conversations = MapList<AgentConversationEntity, AgentConversationDto>([.. entities.OrderByDescending(x => x.CreationTime)]);
 
         return dto;

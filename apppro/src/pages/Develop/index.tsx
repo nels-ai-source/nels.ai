@@ -1,16 +1,16 @@
-import type { Bot } from '@/types/bot';
+import type { Agent } from '@/types/agent';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Empty, Input, message, Pagination, Select, Skeleton } from 'antd';
 import { UUID } from 'crypto';
 import React, { useCallback, useEffect, useState } from 'react';
-import './bot.css';
-import { BotCard } from './components/bot-card';
-import { BotCreateModal } from './components/create-modal';
+import './agent.css';
+import { AgentCard } from './components/agent-card';
+import { CreateModal } from './components/create-modal';
 
 const Develop: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [bots, setBots] = useState<Bot[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [messageApi] = message.useMessage();
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,7 +21,7 @@ const Develop: React.FC = () => {
     if (pageSize) setPageSize(pageSize);
   };
 
-  const fetchBots = useCallback(async () => {
+  const fetchAgents = useCallback(async () => {
     try {
       setIsLoading(true);
       //const data = await galleryAPI.listGalleries(user.id);
@@ -30,58 +30,62 @@ const Develop: React.FC = () => {
         id: '' as UUID,
         name: `测试机器人 ${index + 1}`,
         description: `这是一个用于测试的机器人，编号 ${index + 1}，可以执行各种智能任务。`,
-        icon: `default_bot_icon${Math.floor(Math.random() * 6) + 1}.png`,
+        icon: `default_icon${Math.floor(Math.random() * 6) + 1}.png`,
         creationTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
         lastModificationTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-      })) as Bot[];
-      setBots(data);
+      })) as Agent[];
+      setAgents(data);
     } catch (error) {
-      messageApi.error('Failed to fetch bots');
+      messageApi.error('Failed to fetch agents');
     } finally {
       setIsLoading(false);
     }
   }, [messageApi]);
 
   useEffect(() => {
-    fetchBots();
-  }, [fetchBots]);
+    fetchAgents();
+  }, [fetchAgents]);
 
-  const handleCreateGallery = async (botData: Bot) => {
+  const handleCreateGallery = async (agentData: Agent) => {
     try {
-      // await galleryAPI.createGallery(botData, user.id);
-      console.log(botData);
-      fetchBots();
+      // await galleryAPI.createGallery(agentData, user.id);
+      console.log(agentData);
+      fetchAgents();
       setIsCreateModalOpen(false);
-      messageApi.success('Bot created successfully');
+      messageApi.success('Agent created successfully');
     } catch (error) {
-      messageApi.error('Failed to create bot');
+      messageApi.error('Failed to create agent');
     }
   };
 
-  const handleDeleteGallery = async (botId: UUID) => {
+  const handleDeleteGallery = async (agentId: UUID) => {
     try {
-      // await galleryAPI.deleteGallery(botId, user.id);
-      console.log(botId);
-      fetchBots();
-      messageApi.success('Bot deleted successfully');
+      // await galleryAPI.deleteGallery(agentId, user.id);
+      console.log(agentId);
+      fetchAgents();
+      messageApi.success('Agent deleted successfully');
     } catch (error) {
-      messageApi.error('Failed to delete bot');
+      messageApi.error('Failed to delete agent');
     }
   };
   return (
-    <PageContainer header={{ title: '' }} breadcrumb={{}}>
+    <PageContainer header={{ title: '' }} breadcrumb={{}} data-oid="gieahod">
       {/* Create Modal */}
-      <BotCreateModal
+      <CreateModal
         open={isCreateModalOpen}
         onCancel={() => setIsCreateModalOpen(false)}
-        onCreateBot={() => handleCreateGallery}
+        onCreateAgent={() => handleCreateGallery}
+        data-oid="-_vpfw9"
       />
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-200"}`}>
+      <div className={`flex-1 transition-all duration-200"}`} data-oid="su9dbuf">
         {/* Search */}
-        <div className="flex-shrink-0 w-full h-[32px] flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
+        <div
+          className="flex-shrink-0 w-full h-[32px] flex items-center justify-between mb-4"
+          data-oid="bppn4da"
+        >
+          <div className="flex items-center gap-2" data-oid="ye4eu8g">
             <Select
               placeholder="选择类型"
               style={{ width: 120 }}
@@ -91,29 +95,45 @@ const Develop: React.FC = () => {
                 { value: 'chat', label: '对话' },
                 { value: 'task', label: '任务' },
               ]}
+              data-oid="bunsvk0"
             />
-            <Input.Search placeholder="搜索智能体" style={{ width: 200 }} allowClear />
+
+            <Input.Search
+              placeholder="搜索智能体"
+              style={{ width: 200 }}
+              allowClear
+              data-oid="4z824yj"
+            />
           </div>
-          <Button icon={<PlusOutlined />} type="primary" onClick={() => setIsCreateModalOpen(true)}>
+          <Button
+            icon={<PlusOutlined data-oid="180r16:" />}
+            type="primary"
+            onClick={() => setIsCreateModalOpen(true)}
+            data-oid="vg26lia"
+          >
             创建
           </Button>
         </div>
         {/* Content Area */}
         {isLoading ? (
-          <div className="flex items-center justify-center text-secondary">
-            <Skeleton active />
+          <div className="flex items-center justify-center text-secondary" data-oid=".zc82.x">
+            <Skeleton active data-oid="yibhi0c" />
           </div>
-        ) : !bots || bots.length === 0 ? (
-          <Empty />
+        ) : !agents || agents.length === 0 ? (
+          <Empty data-oid="k4ucs-d" />
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {bots.map((bot) => (
-                <BotCard
-                  key={bot.id}
-                  bot={bot}
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+              data-oid="_m1v7.0"
+            >
+              {agents.map((agent) => (
+                <AgentCard
+                  key={agent.id}
+                  agent={agent}
                   onCreateGallery={handleCreateGallery}
                   onDeleteGallery={handleDeleteGallery}
+                  data-oid="mrwc1lm"
                 />
               ))}
             </div>
@@ -124,6 +144,7 @@ const Develop: React.FC = () => {
               total={1000}
               onChange={handlePageChange}
               className="flex justify-end mt-4"
+              data-oid="0m.sxpl"
             />
           </>
         )}

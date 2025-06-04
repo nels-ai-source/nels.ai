@@ -26,6 +26,7 @@ export default {
     disable: '禁用',
     success: '成功',
     failed: '失败',
+    running: '运行中',
   },
   modal: {
     delete: {

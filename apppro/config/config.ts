@@ -89,7 +89,7 @@ export default defineConfig({
    * @name Layout plugin
    * @doc https://umijs.org/docs/max/layout-menu
    */
-  title: 'Ant Design Pro',
+  title: 'Nels.AI',
   layout: {
     locale: true,
     ...defaultSettings,

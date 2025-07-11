@@ -17,7 +17,7 @@ export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
   return (
-    <span className="anticon" data-oid="06x6qdg">
+    <span className="anticon">
       {currentUser?.name}
     </span>
   );
@@ -83,14 +83,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   );
 
   const loading = (
-    <span className={styles.action} data-oid="qmspu6j">
+    <span className={styles.action}>
       <Spin
         size="small"
         style={{
           marginLeft: 8,
           marginRight: 8,
         }}
-        data-oid="zmo9r4."
+
       />
     </span>
   );
@@ -110,12 +110,12 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       ? [
           {
             key: 'center',
-            icon: <UserOutlined data-oid="90x9si0" />,
+            icon: <UserOutlined />,
             label: intl.formatMessage({ id: 'menu.account.center' }),
           },
           {
             key: 'settings',
-            icon: <SettingOutlined data-oid="vq5f.m8" />,
+            icon: <SettingOutlined />,
             label: intl.formatMessage({ id: 'menu.account.settings' }),
           },
           {
@@ -125,7 +125,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       : []),
     {
       key: 'logout',
-      icon: <LogoutOutlined data-oid="0fb98rb" />,
+      icon: <LogoutOutlined />,
       label: intl.formatMessage({ id: 'menu.account.logout' }),
     },
   ];
@@ -137,7 +137,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         onClick: onMenuClick,
         items: menuItems,
       }}
-      data-oid="sn9lvtp"
+
     >
       {children}
     </HeaderDropdown>

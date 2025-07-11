@@ -26,7 +26,7 @@ export const KnowledgeComponent: React.FC<{
           label: '文本',
           children:
             agent === null || agent?.knowledges === null || agent?.knowledges?.length === 0 ? (
-              <p style={{ paddingInlineStart: 24 }}>
+              <p className="pl-6 text-gray-500">
                 将文档、URL、三方数据源上传为文本知识库后，用户发送消息时，智能体能够引用文本知识中的内容回答用户问题。
               </p>
             ) : (

@@ -75,32 +75,32 @@ const KnowledgeManager: React.FC = () => {
       width: 48,
     },
     {
-      title: <FormattedMessage id="knowledge.name" data-oid="4jh6p.5" />,
+      title: <FormattedMessage id="knowledge.name" />,
       dataIndex: 'name',
       render: (dom, entity) => (
         <a
           onClick={() => {
             history.push(`/library/knowledge/detail/${entity.id}`);
           }}
-          data-oid="skao2vg"
+
         >
           {dom}
         </a>
       ),
     },
     {
-      title: <FormattedMessage id="knowledge.description" data-oid="l02oa-y" />,
+      title: <FormattedMessage id="knowledge.description" />,
       dataIndex: 'description',
       ellipsis: true,
     },
     {
-      title: <FormattedMessage id="knowledge.documentCount" data-oid="7ri-axm" />,
+      title: <FormattedMessage id="knowledge.documentCount" />,
       dataIndex: 'documentCount',
       search: false,
       renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.count' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.length" data-oid="q7qjeed" />,
+      title: <FormattedMessage id="knowledge.length" />,
       dataIndex: 'length',
       search: false,
       renderText: (val: number) =>
@@ -109,34 +109,34 @@ const KnowledgeManager: React.FC = () => {
         })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.retrievalCount" data-oid="7669y:k" />,
+      title: <FormattedMessage id="knowledge.retrievalCount" />,
       dataIndex: 'retrievalCount',
       search: false,
       renderText: (val: number) => `${val} ${intl.formatMessage({ id: 'knowledge.unit.times' })}`,
     },
     {
-      title: <FormattedMessage id="knowledge.creationTime" data-oid="-:5qhj5" />,
+      title: <FormattedMessage id="knowledge.creationTime" />,
       dataIndex: 'creationTime',
       valueType: 'dateTime',
       search: false,
       sorter: true,
     },
     {
-      title: <FormattedMessage id="knowledge.status" data-oid="x0n-t89" />,
+      title: <FormattedMessage id="knowledge.status" />,
       dataIndex: 'isEnabled',
       valueEnum: {
         true: {
-          text: <FormattedMessage id="status.enable" data-oid="q4.xw.w" />,
+          text: <FormattedMessage id="status.enable" />,
           status: 'Success',
         },
         false: {
-          text: <FormattedMessage id="status.disabled" data-oid="uw5is.2" />,
+          text: <FormattedMessage id="status.disabled" />,
           status: 'Error',
         },
       },
     },
     {
-      title: <FormattedMessage id="actions.lable" data-oid="9v5b_0q" />,
+      title: <FormattedMessage id="actions.lable" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -147,9 +147,9 @@ const KnowledgeManager: React.FC = () => {
               handleUpdateModalOpen(true);
               setCurrentRow(record);
             }}
-            data-oid="yp_5vcw"
+
           >
-            <FormattedMessage id="actions.edit" data-oid="1zb_wn6" />
+            <FormattedMessage id="actions.edit" />
           </a>
         ),
 
@@ -158,19 +158,19 @@ const KnowledgeManager: React.FC = () => {
             key="delete"
             onClick={async () => {
               modal.confirm({
-                title: <FormattedMessage id="modal.delete.confirm" data-oid="arnhi9y" />,
-                content: <FormattedMessage id="modal.delete.content" data-oid="nkytydv" />,
-                okText: <FormattedMessage id="modal.delete.ok" data-oid="ptvwjxj" />,
-                cancelText: <FormattedMessage id="modal.delete.cancel" data-oid="8:jkepr" />,
+                title: <FormattedMessage id="modal.delete.confirm" />,
+                content: <FormattedMessage id="modal.delete.content" />,
+                okText: <FormattedMessage id="modal.delete.ok" />,
+                cancelText: <FormattedMessage id="modal.delete.cancel" />,
                 onOk: async () => {
                   await handleRemove([record]);
                   actionRef.current?.reload();
                 },
               });
             }}
-            data-oid="l3_fnfo"
+
           >
-            <FormattedMessage id="actions.delete" data-oid="npd-dmr" />
+            <FormattedMessage id="actions.delete" />
           </a>
         ),
       ],
@@ -183,7 +183,7 @@ const KnowledgeManager: React.FC = () => {
         title: '',
       }}
       breadcrumb={{}}
-      data-oid="b5y0w.y"
+
     >
       <ProTable<Knowledge, API.PageParams>
         bordered
@@ -212,10 +212,10 @@ const KnowledgeManager: React.FC = () => {
               onClick={() => {
                 handleModalOpen(true);
               }}
-              icon={<PlusOutlined data-oid="3_:y10r" />}
-              data-oid="0z9h7.u"
+              icon={<PlusOutlined />}
+
             >
-              <FormattedMessage id="knowledge.operation.create" data-oid="jmcq4oj" />
+              <FormattedMessage id="knowledge.operation.create" />
             </Button>
           ),
         ]}
@@ -237,7 +237,7 @@ const KnowledgeManager: React.FC = () => {
           defaultPageSize: 20,
           showSizeChanger: true,
         }}
-        data-oid="f.y30t0"
+
       />
 
       <CreateModal
@@ -254,7 +254,7 @@ const KnowledgeManager: React.FC = () => {
           return success;
         }}
         type="create"
-        data-oid="lzyyp9q"
+
       />
 
       <CreateModal
@@ -272,7 +272,7 @@ const KnowledgeManager: React.FC = () => {
         }}
         type="edit"
         values={currentRow || {}}
-        data-oid="eph9oux"
+
       />
     </PageContainer>
   );

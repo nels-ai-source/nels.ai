@@ -25,7 +25,7 @@ const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, 
     <Dropdown
       overlayClassName={classNames(styles.dropdown, cls)}
       {...restProps}
-      data-oid="41obuoq"
+
     />
   );
 };

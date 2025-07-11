@@ -13,8 +13,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
     <PackageReference Include="Microsoft.ML.Tokenizers" Version="2.0.0-preview.1.25127.4" />
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.51.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.51.0" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.60.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" Version="1.60.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Amazon" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Google" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.HuggingFace" Version="1.51.0-preview" />

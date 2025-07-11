@@ -18,8 +18,8 @@ export default {
     import: '导入',
     generate: '生成',
     generateAndSave: '生成并保存',
-    success: '成功',
-    failed: '失败',
+    success: '操作成功',
+    failed: '操作失败',
   },
   status: {
     enable: '启用',
@@ -36,7 +36,16 @@ export default {
       cancel: '取消',
     },
   },
-  placeholder:{
+  placeholder: {
     search: '请输入搜索内容',
+  },
+  deleteConfirm: {
+    title: '提示',
+    content: '确认删除该条数据吗？',
+    ok: '确认',
+    cancel: '取消',
+  },
+  form: {
+    required: '此项为必填项',
   }
 };

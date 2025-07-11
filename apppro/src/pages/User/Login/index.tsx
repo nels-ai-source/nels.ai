@@ -2,7 +2,7 @@ import { login } from '@/services/aigc/api';
 import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, Helmet, SelectLang, useIntl, useModel } from '@umijs/max';
-import { App, Button, Card, Divider, message, Space, Tabs, Typography } from 'antd';
+import { App, Card, Divider, message, Space, Tabs, Typography } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import Settings from '../../../../config/defaultSettings';
@@ -248,6 +248,7 @@ const Login: React.FC = () => {
 
             <div className={styles.formContainer}>
               <LoginForm
+                loading={loading}
                 contentStyle={{
                   minWidth: 'auto',
                   maxWidth: 'none',

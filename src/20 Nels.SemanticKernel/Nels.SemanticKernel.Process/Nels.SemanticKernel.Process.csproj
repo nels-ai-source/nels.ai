@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.SemanticKernel.Process.Core" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Process.LocalRuntime" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Process.Runtime.Dapr" Version="1.51.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.51.0" />
-    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Liquid" Version="1.51.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Handlebars" Version="1.60.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.PromptTemplates.Liquid" Version="1.60.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Prompty" Version="1.51.0-beta" />
   </ItemGroup>
 

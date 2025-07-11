@@ -13,9 +13,11 @@ import type { BubbleDataType } from '@ant-design/x/es/bubble/BubbleList';
 import { message } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useRef, useState } from 'react';
+import { Agent } from "@/types/agent";
 
 import { ChatList } from './ChatList';
 import { ChatSender } from './ChatSender';
+
 
 const HOT_TOPICS = {
   key: '1',
@@ -25,7 +27,7 @@ const HOT_TOPICS = {
       key: '1-1',
       description: 'What has Ant Design X upgraded?',
       icon: (
-        <span style={{ color: '#f93a4a', fontWeight: 700 }} data-oid="q1uix_z">
+        <span style={{ color: '#f93a4a', fontWeight: 700 }}>
           1
         </span>
       ),
@@ -34,7 +36,7 @@ const HOT_TOPICS = {
       key: '1-2',
       description: 'New AGI Hybrid Interface',
       icon: (
-        <span style={{ color: '#ff6565', fontWeight: 700 }} data-oid="gyzfaz9">
+        <span style={{ color: '#ff6565', fontWeight: 700 }}>
           2
         </span>
       ),
@@ -43,7 +45,7 @@ const HOT_TOPICS = {
       key: '1-3',
       description: 'What components are in Ant Design X?',
       icon: (
-        <span style={{ color: '#ff8f1f', fontWeight: 700 }} data-oid="u9ilxa9">
+        <span style={{ color: '#ff8f1f', fontWeight: 700 }}>
           3
         </span>
       ),
@@ -52,7 +54,7 @@ const HOT_TOPICS = {
       key: '1-4',
       description: 'Come and discover the new design paradigm of the AI era.',
       icon: (
-        <span style={{ color: '#00000040', fontWeight: 700 }} data-oid="n3-8c3s">
+        <span style={{ color: '#00000040', fontWeight: 700 }}>
           4
         </span>
       ),
@@ -61,7 +63,7 @@ const HOT_TOPICS = {
       key: '1-5',
       description: 'How to quickly install and import components?',
       icon: (
-        <span style={{ color: '#00000040', fontWeight: 700 }} data-oid="z0x97nm">
+        <span style={{ color: '#00000040', fontWeight: 700 }}>
           5
         </span>
       ),
@@ -75,25 +77,25 @@ const DESIGN_GUIDE = {
   children: [
     {
       key: '2-1',
-      icon: <HeartOutlined data-oid="mjmpol8" />,
+      icon: <HeartOutlined />,
       label: 'Intention',
       description: 'AI understands user needs and provides solutions.',
     },
     {
       key: '2-2',
-      icon: <SmileOutlined data-oid="mjotg89" />,
+      icon: <SmileOutlined />,
       label: 'Role',
       description: "AI's public persona and image",
     },
     {
       key: '2-3',
-      icon: <CommentOutlined data-oid="sctjfz_" />,
+      icon: <CommentOutlined />,
       label: 'Chat',
       description: 'How AI Can Express Itself in a Way Users Understand',
     },
     {
       key: '2-4',
-      icon: <PaperClipOutlined data-oid="j1o:jah" />,
+      icon: <PaperClipOutlined />,
       label: 'Interface',
       description: 'AI balances "chat" & "do" behaviors.',
     },
@@ -104,22 +106,22 @@ const SENDER_PROMPTS = [
   {
     key: '1',
     description: 'Upgrades',
-    icon: <ScheduleOutlined data-oid="51mt62k" />,
+    icon: <ScheduleOutlined />,
   },
   {
     key: '2',
     description: 'Components',
-    icon: <ProductOutlined data-oid="di_enkn" />,
+    icon: <ProductOutlined />,
   },
   {
     key: '3',
     description: 'RICH Guide',
-    icon: <FileSearchOutlined data-oid="gi5h9gn" />,
+    icon: <FileSearchOutlined />,
   },
   {
     key: '4',
     description: 'Installation Introduction',
-    icon: <AppstoreAddOutlined data-oid=".h83xy_" />,
+    icon: <AppstoreAddOutlined />,
   },
 ];
 
@@ -142,7 +144,7 @@ const useStyle = createStyles(({ token }) => ({
   },
 }));
 
-const Independent: React.FC = () => {
+const Independent: React.FC<{ agentData: Agent }> = ({ agentData }) => {
   const { styles } = useStyle();
   const abortController = useRef<AbortController | null>(null);
 
@@ -206,14 +208,13 @@ const Independent: React.FC = () => {
   };
 
   return (
-    <div className={styles.layout} data-oid="8oon4f2">
-      <div className={styles.chat} data-oid="at16qu_">
+    <div className={styles.layout}>
+      <div className={styles.chat}>
         <ChatList
+          agent={agentData}
           messages={messages}
-          hotTopics={HOT_TOPICS}
-          designGuide={DESIGN_GUIDE}
           onPromptClick={handleSubmit}
-          data-oid="bevzwg6"
+
         />
 
         <ChatSender
@@ -231,7 +232,7 @@ const Independent: React.FC = () => {
           senderPrompts={SENDER_PROMPTS}
           onPromptClick={handleSubmit}
           loading={loading}
-          data-oid=":q_0olr"
+
         />
       </div>
     </div>

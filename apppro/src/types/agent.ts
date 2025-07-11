@@ -37,3 +37,6 @@ export interface AgentKnowledge extends Entity {
   name: string;
   description: string;
 }
+export interface AgentFilter {
+  keyword?: string | null;
+}

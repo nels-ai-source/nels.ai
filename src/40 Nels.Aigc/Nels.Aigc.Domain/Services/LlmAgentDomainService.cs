@@ -23,45 +23,44 @@ public class LlmAgentDomainService(
 {
     public async Task InvokeStreamingAsync(StartRequest request, Entities.Agent agent, CancellationToken cancellation = default)
     {
-        if (agent.Metadata is LlmAgentMetadata metadata)
+
+        AgentGroupChat chat = new();
+        LlmAgentRequest llmAgentRequest = await InvokeStreamingProcessAsync(request, agent, chat, cancellation);
+
+        ChatCompletionAgent chatAgent = new()
         {
-            AgentGroupChat chat = new();
-            LlmAgentRequest llmAgentRequest = await InvokeStreamingProcessAsync(request, agent, chat, cancellation);
-
-            ChatCompletionAgent chatAgent = new()
+            Instructions = agent.Instructions,
+            Kernel = kernel,
+            Arguments = new KernelArguments(new OpenAIPromptExecutionSettings()
             {
-                Instructions = metadata.Prompt,
-                Kernel = kernel,
-                Arguments = new KernelArguments(new OpenAIPromptExecutionSettings()
-                {
-                    FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: metadata.ToolAutoInvoke)
-                }),
-                HistoryReducer = metadata.ChatReducerCount > 0 ? new ChatHistoryTruncationReducer(metadata.ChatReducerCount * 2) : null,
-            };
+                FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(autoInvoke: true)
+            }),
+            HistoryReducer = new ChatHistoryTruncationReducer(3 * 2),
+        };
 
-            var service = kernel.GetRequiredService<IChatCompletionService>();
+        var service = kernel.GetRequiredService<IChatCompletionService>();
 
-            await foreach (StreamingChatMessageContent response in chat.InvokeStreamingAsync(chatAgent))
-            {
-                await streamResponse.WriteMessagAsync(llmAgentRequest.MessageId, response.Content);
-            }
-
-            await foreach (var content in chat.GetChatMessagesAsync(cancellation))
-            {
-                if (content.Role != AuthorRole.User)
-                {
-                    llmAgentRequest.Chat.AddMessage(id: llmAgentRequest.MessageId, content: content, insertFirst: true);
-                    continue;
-                }
-                llmAgentRequest.Chat.AddMessage(id: GuidGenerator.Create(), content: content, insertFirst: true);
-            }
-            llmAgentRequest.Conversation.SetTitle(string.IsNullOrWhiteSpace(llmAgentRequest.Conversation.Title) ? request.UserInput : llmAgentRequest.Conversation.Title);
-
-            llmAgentRequest.Conversation = request.AgentConversationId == null ?
-                await agentConversationRepository.InsertAsync(llmAgentRequest.Conversation, cancellationToken: cancellation) :
-                await agentConversationRepository.UpdateAsync(llmAgentRequest.Conversation, cancellationToken: cancellation);
-            await agentChatDomainService.InsertAgentChatAsync(llmAgentRequest.Chat, cancellation);
+        await foreach (StreamingChatMessageContent response in chat.InvokeStreamingAsync(chatAgent))
+        {
+            await streamResponse.WriteMessagAsync(llmAgentRequest.MessageId, response.Content);
         }
+
+        await foreach (var content in chat.GetChatMessagesAsync(cancellation))
+        {
+            if (content.Role != AuthorRole.User)
+            {
+                llmAgentRequest.Chat.AddMessage(id: llmAgentRequest.MessageId, content: content, insertFirst: true);
+                continue;
+            }
+            llmAgentRequest.Chat.AddMessage(id: GuidGenerator.Create(), content: content, insertFirst: true);
+        }
+        llmAgentRequest.Conversation.SetTitle(string.IsNullOrWhiteSpace(llmAgentRequest.Conversation.Title) ? request.UserInput : llmAgentRequest.Conversation.Title);
+
+        llmAgentRequest.Conversation = request.AgentConversationId == null ?
+            await agentConversationRepository.InsertAsync(llmAgentRequest.Conversation, cancellationToken: cancellation) :
+            await agentConversationRepository.UpdateAsync(llmAgentRequest.Conversation, cancellationToken: cancellation);
+        await agentChatDomainService.InsertAgentChatAsync(llmAgentRequest.Chat, cancellation);
+
     }
 
     private async Task<LlmAgentRequest> InvokeStreamingProcessAsync(StartRequest request, Entities.Agent agent, AgentGroupChat chat, CancellationToken cancellation = default)
@@ -72,7 +71,7 @@ public class LlmAgentDomainService(
             Agent = agent,
             Conversation = request.AgentConversationId == null ?
                new AgentConversationEntity(conversation, agent.Id) :
-               await agentConversationRepository.GetAsync(x => x.Id == request.AgentConversationId.Value),
+               await agentConversationRepository.FirstOrDefaultAsync(x => x.Id == request.AgentConversationId.Value, cancellationToken: cancellation) ?? new AgentConversationEntity(conversation, agent.Id),
             Chat = new(GuidGenerator.Create(), agent.Id, conversation),
             MessageId = GuidGenerator.Create(),
         };

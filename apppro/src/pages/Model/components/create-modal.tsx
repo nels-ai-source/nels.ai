@@ -21,7 +21,7 @@ interface ModelFormItemProps {
 }
 
 const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl }) => (
-  <Space key={field.key} style={{ width: '100%' }} data-oid="5b_ek7t">
+  <Space key={field.key} style={{ width: '100%' }}>
     <Form.Item
       noStyle
       name={[field.name, 'type']}
@@ -31,17 +31,17 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
           message: intl.formatMessage({ id: 'model.required.type' }),
         },
       ]}
-      data-oid="wv1m:qh"
+
     >
       <Select
         placeholder={intl.formatMessage({ id: 'model.placeholder.type' })}
         style={{ width: 120 }}
-        data-oid="ztgxm9s"
+
       >
         {Object.entries(ModelType)
           .filter(([key]) => isNaN(Number(key)))
           .map(([key, value]) => (
-            <Select.Option key={value} value={value} data-oid="j5py8-u">
+            <Select.Option key={value} value={value}>
               {intl.formatMessage({ id: `ModelType.${key}` })}
             </Select.Option>
           ))}
@@ -56,12 +56,12 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
           message: intl.formatMessage({ id: 'model.required.name' }),
         },
       ]}
-      data-oid="m70:bv0"
+
     >
       <Input
         placeholder={intl.formatMessage({ id: 'model.placeholder.name' })}
         maxLength={ModelInstanceConsts.maxNameLength}
-        data-oid="yw6:6:x"
+
       />
     </Form.Item>
     {ProviderConfig[data.provider]?.attributes.includes('deploymentName') && (
@@ -74,13 +74,13 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
             message: intl.formatMessage({ id: 'model.required.deploymentName' }),
           },
         ]}
-        data-oid="6yq7_mq"
+
       >
         <Input
           style={{ width: 100 }}
           placeholder={intl.formatMessage({ id: 'model.placeholder.deploymentName' })}
           maxLength={ModelInstanceConsts.maxDeploymentNameLength}
-          data-oid="4-xetqp"
+
         />
       </Form.Item>
     )}
@@ -94,7 +94,7 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
           message: intl.formatMessage({ id: 'model.required.maxTokens' }),
         },
       ]}
-      data-oid="ks7k4fo"
+
     >
       <Input
         style={{ width: 100 }}
@@ -102,7 +102,7 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
         placeholder={intl.formatMessage({ id: 'model.maxTokens' })}
         min={0}
         suffix="k"
-        data-oid="o5jlfy-"
+
       />
     </Form.Item>
     <Form.Item
@@ -114,25 +114,25 @@ const ModelFormItem: React.FC<ModelFormItemProps> = ({ data, field, remove, intl
           message: intl.formatMessage({ id: 'model.required.capabilities' }),
         },
       ]}
-      data-oid="-33z_lh"
+
     >
       <Select
         mode="multiple"
         placeholder={intl.formatMessage({ id: 'model.placeholder.capabilities' })}
         maxTagCount={1}
         style={{ width: 180 }}
-        data-oid="ytc2ayi"
+
       >
         {Object.entries(ModelCapability)
           .filter(([key]) => isNaN(Number(key)))
           .map(([key, value]) => (
-            <Select.Option key={value} value={value} data-oid="2bycv.4">
+            <Select.Option key={value} value={value}>
               {intl.formatMessage({ id: `ModelCapability.${key}` })}
             </Select.Option>
           ))}
       </Select>
     </Form.Item>
-    <CloseOutlined onClick={() => remove(field.name)} data-oid="q:o1sy-" />
+    <CloseOutlined onClick={() => remove(field.name)} />
   </Space>
 );
 
@@ -192,7 +192,7 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
       open={open}
       onCancel={onCancel}
       footer={[
-        <Button key="cancel" onClick={onCancel} loading={isLoading} data-oid="cytdxbr">
+        <Button key="cancel" onClick={onCancel} loading={isLoading}>
           {intl.formatMessage({ id: 'actions.cancel' })}
         </Button>,
         <Button
@@ -200,15 +200,15 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
           type="primary"
           onClick={handleCreate}
           loading={isLoading}
-          data-oid="vumn2dt"
+
         >
           {intl.formatMessage({ id: 'actions.create' })}
         </Button>,
       ]}
       width={800}
-      data-oid="soj61up"
+
     >
-      <Form form={form} layout="vertical" initialValues={data} data-oid="qaon:pj">
+      <Form form={form} layout="vertical" initialValues={data}>
         <Form.Item
           name="provider"
           label={intl.formatMessage({ id: 'model.provider' })}
@@ -218,12 +218,12 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
               message: intl.formatMessage({ id: 'model.required.provider' }),
             },
           ]}
-          data-oid="ex_jzz3"
+
         >
           <ProviderSelect
             value={data.values.provider}
             onChange={(value) => handleProviderChange(value)}
-            data-oid="kfo300e"
+
           />
         </Form.Item>
         {ProviderConfig[data.values.provider]?.attributes.includes('endpoint') && (
@@ -236,9 +236,9 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
                 message: intl.formatMessage({ id: 'model.required.endpoint' }),
               },
             ]}
-            data-oid="jm_.1o2"
+
           >
-            <Input maxLength={ModelInstanceConsts.maxEndpointLength} showCount data-oid="2uqyk9c" />
+            <Input maxLength={ModelInstanceConsts.maxEndpointLength} showCount />
           </Form.Item>
         )}
         {ProviderConfig[data.values.provider]?.attributes.includes('accessKey') && (
@@ -251,12 +251,12 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
                 message: intl.formatMessage({ id: 'model.required.accessKey' }),
               },
             ]}
-            data-oid="sg_.vtt"
+
           >
             <Input
               maxLength={ModelInstanceConsts.maxAccessKeyLength}
               showCount
-              data-oid="w_ye97f"
+
             />
           </Form.Item>
         )}
@@ -270,19 +270,19 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
                 message: intl.formatMessage({ id: 'model.required.secretKey' }),
               },
             ]}
-            data-oid="e8-v.fe"
+
           >
             <Input
               maxLength={ModelInstanceConsts.maxSecretKeyLength}
               showCount
-              data-oid="yw1e7vj"
+
             />
           </Form.Item>
         )}
-        <Form.Item label={intl.formatMessage({ id: 'model.models' })} data-oid="i6twfht">
-          <Form.List name="models" data-oid="0voty6m">
+        <Form.Item label={intl.formatMessage({ id: 'model.models' })}>
+          <Form.List name="models">
             {(fields, { add, remove }) => (
-              <div className="flex flex-col gap-4" data-oid="zz9h4kq">
+              <div className="flex flex-col gap-4">
                 {fields.map((field) => (
                   <ModelFormItem
                     data={data.values}
@@ -290,10 +290,10 @@ export const CreateModal: React.FC<CreateModalProps> = ({ open, onCancel, onCrea
                     field={field}
                     remove={(i: number) => fields.length > 1 && remove(i)}
                     intl={intl}
-                    data-oid="k.i5w_t"
+
                   />
                 ))}
-                <Button type="dashed" onClick={() => add()} block data-oid="vrb-9ou">
+                <Button type="dashed" onClick={() => add()} block>
                   + {intl.formatMessage({ id: 'model.operation.addModel' })}
                 </Button>
               </div>

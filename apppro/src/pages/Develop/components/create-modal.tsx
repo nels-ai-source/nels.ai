@@ -1,44 +1,51 @@
+import { createAgent, updateAgent } from '@/services/aigc/agent';
 import { Agent } from '@/types/agent';
 import { useIntl } from '@umijs/max';
 import type { UploadFile } from 'antd';
-import { Button, Form, Input, Modal, Upload } from 'antd';
+import { message, Form, Input, Modal, Upload } from 'antd';
 import type { UploadChangeParam } from 'antd/lib/upload/interface';
 import React, { useEffect, useState } from 'react';
+import { CheckCard, ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 
 interface AgentCreateModalProps {
   open: boolean;
-  onCancel: () => void;
-  onCreateAgent: (gallery: Agent) => void;
+  values?: Partial<Agent>;
+  type?: 'create' | 'edit';
+  onChange: (updates: Partial<Agent>) => void;
+  onOpenChange: (visible: boolean) => void;
 }
 
-export const CreateModal: React.FC<AgentCreateModalProps> = ({
-  open,
-  onCancel,
-  onCreateAgent,
-}) => {
+export const CreateModal: React.FC<AgentCreateModalProps> = ({ open, type = 'create', values, onChange, onOpenChange }) => {
   const intl = useIntl();
   const [form] = Form.useForm();
-  const [iconPath, setIconPath] = useState(
-    `/images/agent/default_icon${Math.floor(Math.random() * 6) + 1}.png`,
-  );
-  const [agent] = useState<Agent>();
-
+  const [iconPath, setIconPath] = useState(`/images/agent/default_icon${Math.floor(Math.random() * 6) + 1}.png`);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (open) {
       form.resetFields();
+      if (type === 'edit' && values?.icon) {
+        setIconPath(values.icon);
+      }
+      form.setFieldsValue({
+        icon: iconPath,
+      });
     }
   }, [open, iconPath]);
-  const handleCreate = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onCreateAgent({ ...values, icon: iconPath });
-        form.resetFields();
-      })
-      .catch((info) => {
-        console.log('Validate Failed:', info);
-      });
+
+  const handleCreateOrUpdate = async () => {
+    const values = await form.validateFields();
+    try {
+      setIsLoading(true);
+      type === 'create' ? await createAgent(values) : await updateAgent(values);
+      message.success(intl.formatMessage({ id: 'actions.success' }));
+      onChange(values);
+    } catch {
+      message.error(intl.formatMessage({ id: 'actions.failed' }));
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   const handleIconChange = (info: UploadChangeParam<UploadFile<any>>) => {
     if (info.file.status === 'done' && info.file.response) {
       setIconPath(info.file.response.url);
@@ -46,71 +53,61 @@ export const CreateModal: React.FC<AgentCreateModalProps> = ({
   };
 
   return (
-    <Modal
-      title={intl.formatMessage({ id: 'agent.createModal.title' })}
+    <ModalForm
+      form={form}
+      loading={isLoading}
+      title={intl.formatMessage({ id: type === 'create' ? 'agent.createModal.title' : 'agent.editModal.title' })}
       open={open}
-      onCancel={onCancel}
-      footer={[
-        <Button key="cancel" onClick={onCancel} data-oid="ez-55.e">
-          {intl.formatMessage({ id: 'agent.actions.cancel' })}
-        </Button>,
-        <Button key="submit" type="primary" onClick={handleCreate} data-oid="q95em4g">
-          {intl.formatMessage({ id: 'agent.actions.create' })}
-        </Button>,
-      ]}
+      onOpenChange={(visible) => {
+        if (!visible) {
+          form.resetFields();
+        }
+        onOpenChange(visible);
+      }}
+      onFinish={handleCreateOrUpdate}
+      initialValues={values}
       width={480}
-      data-oid="xh8s38u"
     >
-      <Form form={form} layout="vertical" initialValues={agent} data-oid="jjm5qwz">
-        <Form.Item
-          name="name"
-          label={intl.formatMessage({ id: 'agent.createModal.nameLabel' })}
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({ id: 'agent.createModal.nameRequired' }),
-            },
-          ]}
-          data-oid="xaeawek"
+      <Form.Item name="id" hidden={true}></Form.Item>
+      <Form.Item
+        name="name"
+        label={intl.formatMessage({ id: 'agent.createModal.nameLabel' })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({ id: 'agent.createModal.nameRequired' }),
+          },
+        ]}
+      >
+        <Input maxLength={20} showCount />
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label={intl.formatMessage({ id: 'agent.createModal.descriptionLabel' })}
+      >
+        <Input.TextArea rows={4} maxLength={500} showCount />
+      </Form.Item>
+      <Form.Item
+        name="icon"
+        label={intl.formatMessage({ id: 'agent.createModal.iconLabel' })}
+        rules={[
+          {
+            required: true,
+            message: intl.formatMessage({ id: 'agent.createModal.iconRequired' }),
+          },
+        ]}
+      >
+        <Upload
+          name="avatar"
+          listType="picture-card"
+          className="avatar-uploader"
+          showUploadList={false}
+          onChange={handleIconChange}
         >
-          <Input maxLength={20} showCount data-oid="h9ygztc" />
-        </Form.Item>
-        <Form.Item
-          name="description"
-          label={intl.formatMessage({ id: 'agent.createModal.descriptionLabel' })}
-          data-oid="3xf5ht."
-        >
-          <Input.TextArea rows={4} maxLength={500} showCount data-oid="0oedfc7" />
-        </Form.Item>
-        <Form.Item
-          name="icon"
-          label={intl.formatMessage({ id: 'agent.createModal.iconLabel' })}
-          rules={[
-            {
-              required: true,
-              message: intl.formatMessage({ id: 'agent.createModal.iconRequired' }),
-            },
-          ]}
-          data-oid="o0_x13p"
-        >
-          <Upload
-            name="avatar"
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false}
-            onChange={handleIconChange}
-            data-oid="wkwllx4"
-          >
-            <img
-              src={agent?.icon || '/images/agent/default_icon3.png'}
-              alt="avatar"
-              style={{ width: '100%' }}
-              data-oid="c_b-v8c"
-            />
-          </Upload>
-        </Form.Item>
-      </Form>
-    </Modal>
+          <img src={iconPath} alt="avatar" style={{ width: '100%' }} />
+        </Upload>
+      </Form.Item>
+    </ModalForm>
   );
 };
 

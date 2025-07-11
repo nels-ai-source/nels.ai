@@ -13,20 +13,39 @@ import { Button, Input } from 'antd';
 import { MdEditor } from 'md-editor-rt';
 import React from 'react';
 import { SidebarSection } from './sidebar-section';
+import { useIntl } from '@umijs/max';
+import { v4 as uuidv4 } from 'uuid';
+import { UUID } from 'crypto';
 
-const SortableItem = ({ id, question }: { id: string; question: string }) => {
-  const { attributes, listeners, setNodeRef } = useSortable({ id });
+const SortableItem = ({ id, question, onChange }: { id: string; question: string, onChange: (question: string) => void }) => {
+  const { attributes, listeners, setNodeRef, transform } = useSortable({ id });
+  const [localQuestion, setLocalQuestion] = React.useState(question);
+
+  React.useEffect(() => {
+    setLocalQuestion(question);
+  }, [question]);
 
   return (
     <div
       ref={setNodeRef}
       className={`transform transition flex items-center mb-2`}
-      {...attributes}
-      {...listeners}
-      data-oid="jko4d6a"
+      style={{
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+      }}
     >
-      <HolderOutlined className="mr-2" data-oid="y9wzftg" />
-      <Input value={question} data-oid="oc0joti" />
+      <HolderOutlined
+        className="mr-2 cursor-pointer"
+        {...attributes}
+        {...listeners}
+      />
+      <Input
+        value={localQuestion}
+        onChange={(e) => {
+          const newQuestion = e.target.value;
+          setLocalQuestion(newQuestion);
+          onChange(newQuestion);
+        }}
+      />
     </div>
   );
 };
@@ -35,9 +54,9 @@ export const ConversationComponent: React.FC<{
   agent: Agent;
   onChange: (updates: Partial<Agent>) => void;
 }> = ({ agent, onChange }) => {
-  const [dataSource, setDataSource] = React.useState<AgentPresetQuestions[]>(
-    agent.questions || [{}],
-  );
+  const intl = useIntl();
+  const [dataSource, setDataSource] = React.useState<AgentPresetQuestions[]>(agent.questions || []);
+
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
       setDataSource((prevState) => {
@@ -49,16 +68,26 @@ export const ConversationComponent: React.FC<{
       });
     }
   };
+
+  const handleQuestionChange = (id: string, newContent: string) => {
+    setDataSource((prevDataSource) => {
+      const updatedDataSource = prevDataSource.map((item) =>
+        item.id === id ? { ...item, content: newContent } : item
+      );
+      onChange({ questions: updatedDataSource } as Agent);
+      return updatedDataSource;
+    });
+  };
+
   return (
     <SidebarSection
-      title="对话体验"
+      title={intl.formatMessage({ id: 'agent.detail.conversationTitle' })}
       defaultActiveKey={['prologue', 'chat']}
       items={[
         {
           key: 'prologue',
-          label: '开场白文案',
+          label: intl.formatMessage({ id: 'agent.detail.prologue' }),
           children: (
-            /*  https://imzbf.github.io/md-editor-rt/en-US/ */
             <MdEditor
               value={agent.prologue || ''}
               onChange={(value) => {
@@ -85,53 +114,52 @@ export const ConversationComponent: React.FC<{
               style={{
                 height: '120px',
               }}
-              data-oid="u1:7j7g"
             />
           ),
         },
         {
           key: 'chat',
-          label: '预设问题',
+          label: intl.formatMessage({ id: 'agent.detail.presetQuestions' }),
           children: (
-            <DndContext
-              modifiers={[restrictToVerticalAxis]}
-              onDragEnd={onDragEnd}
-              data-oid="b.eg7ij"
-            >
-              <SortableContext
-                items={dataSource.map((i) => i.id)}
-                strategy={verticalListSortingStrategy}
-                data-oid="j50mnhk"
-              >
+            <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+              <SortableContext items={dataSource.map((i) => i.id)} strategy={verticalListSortingStrategy}>
                 {dataSource.map((item) => (
                   <SortableItem
                     key={item.id}
                     id={item.id}
                     question={item.content}
-                    data-oid="25:8n-v"
+                    onChange={(question) => handleQuestionChange(item.id, question)}
                   />
                 ))}
               </SortableContext>
             </DndContext>
           ),
-
           extra: (
             <>
               <Button
                 type="text"
                 size="small"
-                icon={<PlusOutlined data-oid="pzglvjz" />}
+                icon={<PlusOutlined />}
                 onClick={(event) => {
                   event.stopPropagation();
+                  setDataSource((prevDataSource) => {
+                    const newQuestion: AgentPresetQuestions = {
+                      id: uuidv4() as UUID,
+                      content: '',
+                      index: prevDataSource.length,
+                    };
+                    const newDataSource = [...prevDataSource, newQuestion];
+                    onChange({ questions: newDataSource } as Agent);
+                    return newDataSource;
+                  });
                 }}
-                data-oid="31767wu"
               ></Button>
             </>
           ),
         },
       ]}
-      data-oid="lzgy71h"
     />
   );
 };
+
 export default ConversationComponent;

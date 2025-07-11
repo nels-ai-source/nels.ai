@@ -1,17 +1,16 @@
 import {
   CopyOutlined,
   DislikeOutlined,
-  EllipsisOutlined,
   LikeOutlined,
   ReloadOutlined,
-  ShareAltOutlined,
 } from '@ant-design/icons';
 import { Bubble, Prompts, Welcome } from '@ant-design/x';
 import { Button, Flex, Space, Spin } from 'antd';
 import { createStyles } from 'antd-style';
+import { Agent } from '@/types/agent';
 import React from 'react';
 
-const useStyle = createStyles(({}) => ({
+const useStyle = createStyles(({ }) => ({
   chatList: {
     flex: 1,
     overflow: 'auto',
@@ -41,22 +40,20 @@ const useStyle = createStyles(({}) => ({
 }));
 
 interface ChatListProps {
+  agent: Agent | null;
   messages: any[];
-  hotTopics: any;
-  designGuide: any;
   onPromptClick: (text: string) => void;
 }
 
 export const ChatList: React.FC<ChatListProps> = ({
+  agent,
   messages,
-  hotTopics,
-  designGuide,
   onPromptClick,
 }) => {
   const { styles } = useStyle();
 
   return (
-    <div className={styles.chatList} data-oid="vulb6nf">
+    <div className={styles.chatList}>
       {messages?.length ? (
         <Bubble.List
           items={messages?.map((i) => ({
@@ -71,100 +68,54 @@ export const ChatList: React.FC<ChatListProps> = ({
             assistant: {
               placement: 'start',
               footer: (
-                <div style={{ display: 'flex' }} data-oid="1ln-2rc">
+                <div style={{ display: 'flex' }}>
                   <Button
                     type="text"
                     size="small"
-                    icon={<ReloadOutlined data-oid="p6pqden" />}
-                    data-oid="s6b-:ky"
+                    icon={<ReloadOutlined />}
                   />
 
                   <Button
                     type="text"
                     size="small"
-                    icon={<CopyOutlined data-oid="ar_dzx5" />}
-                    data-oid="9k4fn83"
+                    icon={<CopyOutlined />}
                   />
 
                   <Button
                     type="text"
                     size="small"
-                    icon={<LikeOutlined data-oid="rfzniku" />}
-                    data-oid="oxaz1v:"
+                    icon={<LikeOutlined />}
                   />
 
                   <Button
                     type="text"
                     size="small"
-                    icon={<DislikeOutlined data-oid=":37jsw4" />}
-                    data-oid="530:dau"
+                    icon={<DislikeOutlined />}
                   />
                 </div>
               ),
 
-              loadingRender: () => <Spin size="small" data-oid="_um:0t_" />,
+              loadingRender: () => <Spin size="small" />,
             },
             user: { placement: 'end' },
           }}
-          data-oid="7_b__vh"
+
         />
       ) : (
-        <Space direction="vertical" size={16} className={styles.placeholder} data-oid="sd.aml3">
+        agent && <Space direction="vertical" size={16} className={styles.placeholder}>
           <Welcome
             variant="borderless"
-            icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-            title="Hello, I'm Ant Design X"
-            description="Base on Ant Design, AGI product interface solution, create a better intelligent vision~"
-            extra={
-              <Space data-oid="4eygvso">
-                <Button icon={<ShareAltOutlined data-oid="h6y44kt" />} data-oid="a9.e-jr" />
-                <Button icon={<EllipsisOutlined data-oid="j1wpfvt" />} data-oid="3afw:0y" />
-              </Space>
-            }
-            data-oid="v-cn8e8"
+            icon={<img src={agent.icon} className="rounded-lg object-cover" />}
+            title={agent.name}
+            description={agent.prologue}
           />
-
-          <Flex gap={16} data-oid="dg_w6gd">
-            <Prompts
-              items={[hotTopics]}
-              styles={{
-                list: { height: '100%' },
-                item: {
-                  flex: 1,
-                  backgroundImage: 'linear-gradient(123deg, #e5f4ff 0%, #efe7ff 100%)',
-                  borderRadius: 12,
-                  border: 'none',
-                },
-                subItem: {
-                  padding: 0,
-                  background: 'transparent',
-                },
-              }}
-              onItemClick={(info) => {
-                onPromptClick(info.data.description as string);
-              }}
-              className={styles.chatPrompt}
-              data-oid="q:fmqq5"
-            />
-
-            <Prompts
-              items={[designGuide]}
-              styles={{
-                item: {
-                  flex: 1,
-                  backgroundImage: 'linear-gradient(123deg, #e5f4ff 0%, #efe7ff 100%)',
-                  borderRadius: 12,
-                  border: 'none',
-                },
-                subItem: { background: '#ffffffa6' },
-              }}
-              onItemClick={(info) => {
-                onPromptClick(info.data.description as string);
-              }}
-              className={styles.chatPrompt}
-              data-oid="pzj:ed3"
-            />
-          </Flex>
+          <Prompts vertical
+            items={agent.questions.map((question) => ({
+              label: question.content,
+              value: question.content,
+              key: question.id
+            }))}
+          />
         </Space>
       )}
     </div>

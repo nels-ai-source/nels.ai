@@ -4,70 +4,96 @@ import {
   LeftOutlined,
   OneToOneOutlined,
   PartitionOutlined,
+  ClusterOutlined
 } from '@ant-design/icons';
+import { useIntl } from '@umijs/max';
 import type { MenuProps } from 'antd';
-import { Button, Dropdown, Space } from 'antd';
-import React from 'react';
-
-import { Agent } from '@/types/agent';
+import { Button, Dropdown, Space, Select } from 'antd';
+import React, { useState } from 'react';
+import { CreateModal } from '../components/create-modal';
+import { Agent, AgentType } from '@/types/agent';
+import { Icon } from 'lucide-react';
 
 interface HeaderProps {
   agent: Agent | null;
-  onMenuClick: MenuProps['onClick'];
-  onPublish: () => void;
+  onChange: (updates: Partial<Agent>) => void;
+  onSave: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onPublish, onMenuClick, agent }) => {
-  const items: MenuProps['items'] = [
+export const Header: React.FC<HeaderProps> = ({ onChange, onSave, agent }) => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const intl = useIntl();
+  const items = [
     {
       label: '单 Agent（自主规划模式）',
-      key: '1',
-      icon: <OneToOneOutlined data-oid=".-tn4i7" />,
+      key: 1,
+      icon: <OneToOneOutlined className="w-6 h-6 object-cover" />,
     },
     {
       label: '单 Agent（对话流模式）',
-      key: '2',
-      icon: <PartitionOutlined data-oid="ciz1kl8" />,
-    },
+      key: 2,
+      icon: <PartitionOutlined className="w-6 h-6 object-cover" />,
+    }, {
+      label: '多 Agents',
+      key: 3,
+      icon: <ClusterOutlined className="w-6 h-6 object-cover" />,
+    }
   ];
 
-  const menuProps = {
-    items,
-    onClick: onMenuClick,
-  };
-
   return (
-    <header
-      className="bg-gray-50 border-b border-gray-200 z-10 flex items-center justify-between h-14 px-2 md:h-16 md:px-4 shadow-sm"
-      data-oid="hmq-_vb"
-    >
-      <div className="flex items-center space-x-2" data-oid="gkczvol">
-        <Button type="text" icon={<LeftOutlined data-oid="dcopoo1" />} data-oid="hbvn0fb" />
-        {agent?.name}
-        <Button
-          type="text"
-          icon={<FormOutlined data-oid="e8.73sh" />}
-          title={agent?.description || ''}
-          onClick={() => {}}
-          data-oid=":x6n.kg"
-        />
+    <>
+      <CreateModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onChange={(values) => {
+          onChange(values);
+          setIsCreateModalOpen(false);
+        }}
 
-        <Dropdown menu={menuProps} data-oid="86f18kv">
-          <Button icon={<OneToOneOutlined data-oid="_p_ox03" />} data-oid="y3_qy43">
-            <Space data-oid="w4t42ir">
-              单 Agent（自主规划模式）
-              <DownOutlined data-oid="471uh9j" />
-            </Space>
+        type="edit"
+        values={agent || {}}
+      />
+      <header
+        className="bg-gray-50 border-b border-gray-200 z-10 flex items-center justify-between h-14 px-2 md:h-16 md:px-4 shadow-sm"
+
+      >
+        <Space className="flex items-center">
+          <Button type="text" icon={<LeftOutlined />} onClick={() => {
+            window.history.back();
+          }} />
+          <img src={agent?.icon} alt="avatar" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
+          <div className="flex items-center">{agent?.name}</div>
+          <Button
+            type="text"
+            icon={<FormOutlined />}
+            title={agent?.description || ''}
+            onClick={() => {
+              setIsCreateModalOpen(true);
+            }}
+
+          />
+
+          <Select onChange={(value) => onChange({ type: value })} value={agent?.type || AgentType.chatCompletion} style={{ width: '250px' }}>
+            {Object.entries(AgentType)
+              .filter(([key]) => isNaN(Number(key)))
+              .map(([, value]) => (
+                <Select.Option key={value} value={value}>
+                  <div className="flex items-center">
+                    {items.find((item) => item?.key === value)?.icon}
+                    {items.find((item) => item?.key === value)?.label}
+                  </div>
+                </Select.Option>
+              ))}
+          </Select>
+        </Space>
+
+        <div className="flex items-center space-x-3">
+          <Button type="primary" onClick={onSave}>
+            保存
           </Button>
-        </Dropdown>
-      </div>
-
-      <div className="flex items-center space-x-3" data-oid=":i-:4y4">
-        <Button type="primary" onClick={onPublish} data-oid="rccph_d">
-          发布
-        </Button>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 };
 

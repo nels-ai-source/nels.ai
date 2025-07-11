@@ -4,7 +4,7 @@ import { CheckCard, ProFormInstance, StepsForm } from '@ant-design/pro-component
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { App, Collapse, Form, Modal, Upload, UploadProps } from 'antd';
 import React, { useRef } from 'react';
-import './UploadForm.less';
+import './edit-modal.less';
 const { Dragger } = Upload;
 export type UploadFormProps = {
   open: boolean;
@@ -121,7 +121,7 @@ const EditModal: React.FC<UploadFormProps> = ({ open, onOpenChange, onFinish }) 
                 onOpenChange(false);
               }}
               footer={submitter}
-              destroyOnClose
+              destroyOnHidden
             >
               {dom}
             </Modal>

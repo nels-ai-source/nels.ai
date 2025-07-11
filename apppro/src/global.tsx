@@ -61,7 +61,7 @@ if (pwa) {
           notification.destroy(key);
           reloadSW();
         }}
-        data-oid="on31pud"
+
       >
         {useIntl().formatMessage({ id: 'app.pwa.serviceworker.updated.ok' })}
       </Button>

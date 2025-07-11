@@ -53,7 +53,7 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
       open={attachmentsOpen}
       onOpenChange={onAttachmentsOpenChange}
       styles={{ content: { padding: 0 } }}
-      data-oid="7clbtp2"
+
     >
       <Attachments
         beforeUpload={() => false}
@@ -63,27 +63,27 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
           type === 'drop'
             ? { title: 'Drop file here' }
             : {
-                icon: <CloudUploadOutlined data-oid="xah0x8v" />,
+                icon: <CloudUploadOutlined />,
                 title: 'Upload files',
                 description: 'Click or drag files to this area to upload',
               }
         }
-        data-oid="dwz1gnu"
+
       />
     </Sender.Header>
   );
 
   return (
     <>
-      <Prompts
+      {/* <Prompts
         items={senderPrompts}
         onItemClick={(info) => {
           onPromptClick(info.data.description as string);
         }}
         styles={{ item: { padding: '6px 12px' } }}
         className={styles.senderPrompt}
-        data-oid="0ki0cgw"
-      />
+
+      /> */}
 
       <Sender
         value={value}
@@ -95,18 +95,18 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
           <>
             <Button
               type="text"
-              icon={<ClearOutlined style={{ fontSize: 18 }} data-oid="4euvxx9" />}
+              icon={<ClearOutlined style={{ fontSize: 18 }} />}
               onClick={() => onClear()}
               disabled={loading}
-              data-oid="uv0q37l"
+
             />
 
             <Button
               type="text"
-              icon={<PaperClipOutlined style={{ fontSize: 18 }} data-oid="gscucus" />}
+              icon={<PaperClipOutlined style={{ fontSize: 18 }} />}
               onClick={() => setAttachmentsOpen(!attachmentsOpen)}
               disabled={loading}
-              data-oid="2:2kq-s"
+
             />
           </>
         }
@@ -116,17 +116,17 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
         actions={(_, info) => {
           const { SendButton, LoadingButton, SpeechButton } = info.components;
           return (
-            <Flex gap={4} data-oid="-vcc1qi">
-              <SpeechButton className={styles.speechButton} data-oid="c2mmlaa" />
+            <Flex gap={4}>
+              <SpeechButton className={styles.speechButton} />
               {loading ? (
-                <LoadingButton type="default" data-oid="1xsk9-x" />
+                <LoadingButton type="default" />
               ) : (
-                <SendButton type="primary" data-oid=".z:f6j:" />
+                <SendButton type="primary" />
               )}
             </Flex>
           );
         }}
-        data-oid="61fz00m"
+
       />
     </>
   );

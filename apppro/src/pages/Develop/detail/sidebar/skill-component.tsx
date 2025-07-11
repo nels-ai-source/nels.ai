@@ -54,7 +54,7 @@ export const SkillComponent: React.FC<{
           label: '插件',
           children:
             agent === null || agent?.tools === null || agent?.tools?.length === 0 ? (
-              <p style={{ paddingInlineStart: 24 }}>
+              <p className="pl-6 text-gray-500">
                 插件能够让智能体调用外部
                 API，例如搜索信息、浏览网页、生成图片等，扩展智能体的能力和使用场景。
               </p>

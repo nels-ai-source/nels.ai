@@ -18,6 +18,7 @@ export default {
     required: {
       name: '名称不能为空',
       model: '嵌入模型不能为空',
+      embeddingModel: '嵌入模型不能为空'
     },
 
     unit: {

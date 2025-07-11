@@ -22,7 +22,7 @@ public static class KernelExtensions
             var textModelInstances = modelInstances.Where(x => x.Type == Enums.ModelType.TextGeneration).ToList();
             var embeddingInstances = modelInstances.Where(x => x.Type == Enums.ModelType.Embedding).ToList();
 
-            //_kernelBuilder.AddChatCompletionServices(textModelInstances).GetAwaiter().GetResult();
+            _kernelBuilder.AddChatCompletionServices(textModelInstances).GetAwaiter().GetResult();
             //_kernelBuilder.AddTextEmbeddingGenerations(embeddingInstances).GetAwaiter().GetResult();
             //_kernelBuilder.Services.AddDefaultContentDecoders();
 
@@ -37,11 +37,11 @@ public static class KernelExtensions
     {
         if (models?.Count == 0) return;
 
-        //var defaultModel = models.FirstOrDefault(x => x.IsDefault);
-        //if (defaultModel != null)
-        //{
-        //    await kernelBuilder.AddChatCompletionService(defaultModel, null);
-        //}
+        var defaultModel = models.FirstOrDefault();
+        if (defaultModel != null)
+        {
+            await kernelBuilder.AddChatCompletionService(defaultModel, null);
+        }
         models.ForEach(async model =>
         {
             await kernelBuilder.AddChatCompletionService(model, model.Id.ToString());

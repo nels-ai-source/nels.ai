@@ -1,0 +1,42 @@
+<svg width="220" height="80" viewBox="0 0 220 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueTealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A7BD5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3A90E2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="greenCyanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6DD5FA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#29ABE2;stop-opacity:1" />
+    </linearGradient>
+    <style>
+      .nels-font {
+        font-family: 'Arial', sans-serif; /* A common, clean font */
+        font-weight: bold;
+        font-size: 50px;
+      }
+    </style>
+  </defs>
+
+  <!-- Background AIGC elements - subtle neural network/data flow lines -->
+  <path d="M5 75 Q 50 60, 100 70 T 215 65" stroke="#E0E0E0" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M5 15 Q 60 25, 110 10 T 215 20" stroke="#CFD8DC" stroke-width="1.5" fill="none" opacity="0.6"/>
+
+  <!-- N -->
+  <text x="10" y="60" class="nels-font" fill="url(#blueTealGrad)">N</text>
+  
+  <!-- e -->
+  <text x="55" y="60" class="nels-font" fill="url(#greenCyanGrad)">e</text>
+
+  <!-- l -->
+  <text x="95" y="60" class="nels-font" fill="url(#blueTealGrad)">l</text>
+
+  <!-- s - with a slight generative tail -->
+  <text x="125" y="60" class="nels-font" fill="url(#greenCyanGrad)">s</text>
+  <path d="M160 58 Q 170 55, 180 60 Q 190 65, 200 55" stroke="url(#greenCyanGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Connecting dot - AIGC element -->
+  <circle cx="50" cy="30" r="3" fill="#FFC107"/>
+  <circle cx="90" cy="25" r="2.5" fill="#FF9800"/>
+  <circle cx="120" cy="35" r="3" fill="#FFC107"/>
+
+</svg>

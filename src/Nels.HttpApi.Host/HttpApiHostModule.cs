@@ -73,7 +73,7 @@ public class HttpApiHostModule : AbpModule
 
         context.Services.AddSpaStaticFiles(configuration =>
         {
-            configuration.RootPath = "wwwroot"; 
+            configuration.RootPath = "wwwroot";
         });
 
         ConfigureAuthentication(context);
@@ -203,7 +203,7 @@ public class HttpApiHostModule : AbpModule
             });
     }
 
-    private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
+    private static void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
     {
         context.Services.AddCors(options =>
         {
@@ -250,6 +250,7 @@ public class HttpApiHostModule : AbpModule
 
         app.UseCorrelationId();
         app.UseStaticFiles();
+        app.UseSpaStaticFiles();
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
@@ -276,5 +277,9 @@ public class HttpApiHostModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+        app.UseEndpoints(endpoints =>
+        {
+           endpoints.MapFallbackToFile("index.html");
+        });
     }
 }

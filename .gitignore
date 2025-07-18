@@ -268,3 +268,6 @@ src/Nels.DevPlatform.Blazor.Server.Tiered/Logs/*
 
 # ABP Studio
 **/.abpstudio/
+
+# Nels.HttpApi.Host
+/src/Nels.HttpApi.Host/wwwroot

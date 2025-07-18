@@ -12,6 +12,7 @@ public class AigcRemoteServiceConsts : RemoteServiceConsts
     public const string modelRoute = "api/model";
 
     public const string agentRoute = "api/agent";
+    public const string agentActuatorRoute = "api/agentActuator";
 
     public const string spaceRoute = "api/space";
     public const string knowledgeRoute = "api/knowledge";

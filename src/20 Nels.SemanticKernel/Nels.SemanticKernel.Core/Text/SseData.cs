@@ -38,20 +38,20 @@ namespace Nels.SemanticKernel.Text
             // 添加 id 字段
             if (!string.IsNullOrEmpty(Id?.Trim()))
             {
-                stringData.AppendLine($"id:{Id?.Trim()}");
+                stringData.Append($"id:{Id?.Trim()}\n");
             }
 
             // 添加 event 字段
-            stringData.AppendLine($"event:{Event}");
+            stringData.Append($"event:{Event}\n");
 
             // 添加 data 字段
             foreach (var item in Data)
             {
-                stringData.AppendLine($"data:{item}");
+                stringData.Append($"data:{item}\n");
             }
 
             // 每条消息以两个换行符结尾
-            stringData.AppendLine();
+            stringData.Append("\n");
 
             var bytes = Encoding.UTF8.GetBytes(stringData.ToString());
             return bytes;

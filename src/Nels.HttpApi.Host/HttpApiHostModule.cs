@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Nels.Abp.SysMng;
 using Nels.Aigc;
+using Nels.Aigc.Dtos;
 using Nels.Aigc.EntityFrameworkCore;
 using Nels.Aigc.MultiTenancy;
 using Nels.Aigc.Services;
@@ -18,7 +18,6 @@ using Nels.SemanticKernel.Interfaces;
 using Nels.SemanticKernel.Process;
 using Nels.SemanticKernel.Services;
 using OpenIddict.Validation.AspNetCore;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,7 +28,7 @@ using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.AntiForgery;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
+using Volo.Abp.AspNetCore.Mvc.Libs;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
@@ -45,7 +44,6 @@ namespace Nels;
 [DependsOn(
     typeof(AbpAutofacModule),
     typeof(AbpAspNetCoreMultiTenancyModule),
-    typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
@@ -73,8 +71,10 @@ public class HttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
-        // 配置日志级别
-        // ConfigureLogging(context, configuration);
+        context.Services.AddSpaStaticFiles(configuration =>
+        {
+            configuration.RootPath = "wwwroot"; 
+        });
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
@@ -89,34 +89,37 @@ public class HttpApiHostModule : AbpModule
         });
         Configure<MvcNewtonsoftJsonOptions>(options =>
         {
-            options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";//对类型为DateTime的生效
+            options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
         });
         Configure<AbpJsonOptions>(options =>
         {
-            options.OutputDateTimeFormat = "yyyy-MM-dd HH:mm:ss"; //对类型为DateTimeOffset生效
+            options.OutputDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
         });
-
-    }
-
-    private void ConfigureLogging(ServiceConfigurationContext context, IConfiguration configuration)
-    {
-        context.Services.AddLogging(loggingBuilder =>
+        Configure<AbpMvcLibsOptions>(options =>
         {
-            loggingBuilder.AddSerilog(dispose: true);
+            options.CheckLibs = false;
         });
 
-        // 设置默认日志级别
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(configuration)
-            .Enrich.FromLogContext()
-            .WriteTo.Console()
-            .CreateLogger();
     }
-    private void ConfigureAigc(ServiceConfigurationContext context)
+
+    private static void ConfigureAigc(ServiceConfigurationContext context)
     {
         context.Services.AddSingleton<IModelService, ModelAppService>();
         context.Services.AddSingleton<IPromptService, PromptAppService>();
-        context.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
+        context.Services.AddSingleton<IAgent, AgentDto>();
+        context.Services.AddSingleton<IAgentPresetQuestions, AgentPresetQuestionsDto>();
+        context.Services.AddSingleton<IAgentTool, AgentToolDto>();
+        context.Services.AddSingleton<IAgentKnowledge, AgentKnowledgeDto>();
+
+        context.Services.AddSingleton<IConversation, ConversationDto>();
+        context.Services.AddSingleton<IChat, ChatDto>();
+        context.Services.AddSingleton<IChatMessage, ChatMessageDto>();
+
+        context.Services.AddSingleton<IAgentService, AgentAppService>();
+        context.Services.AddSingleton<IChatService, ChatAppService>();
+
         context.Services.AddScoped<IStreamResponse, SseStreamResponse>();
 
         context.Services.AddKernelProcess(option =>
@@ -126,12 +129,12 @@ public class HttpApiHostModule : AbpModule
         {
             _builder.Services.AddSingleton<IModelService, ModelAppService>();
             _builder.Services.AddSingleton<IPromptService, PromptAppService>();
-            _builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+
             _builder.Services.AddScoped<IStreamResponse, SseStreamResponse>();
         });
     }
 
-    private void ConfigureAuthentication(ServiceConfigurationContext context)
+    private static void ConfigureAuthentication(ServiceConfigurationContext context)
     {
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
         context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
@@ -145,10 +148,9 @@ public class HttpApiHostModule : AbpModule
         Configure<AppUrlOptions>(options =>
         {
             options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-            options.RedirectAllowedUrls.AddRange(configuration["App:RedirectAllowedUrls"]?.Split(',') ?? Array.Empty<string>());
-
             options.Applications["Angular"].RootUrl = configuration["App:ClientUrl"];
             options.Applications["Angular"].Urls[AccountUrlNames.PasswordReset] = "account/reset-password";
+            options.RedirectAllowedUrls.AddRange(configuration["App:RedirectAllowedUrls"]?.Split(',') ?? []);
         });
     }
 
@@ -234,11 +236,11 @@ public class HttpApiHostModule : AbpModule
         app.UseAbpRequestLocalization(options =>
         {
             options.DefaultRequestCulture = new RequestCulture("en");
-            options.RequestCultureProviders = new List<IRequestCultureProvider>
-                {
+            options.RequestCultureProviders =
+                [
                     new QueryStringRequestCultureProvider(),
                     new CookieRequestCultureProvider()
-                };
+                ];
         });
 
         if (!env.IsDevelopment())

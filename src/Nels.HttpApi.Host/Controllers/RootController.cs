@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using Volo.Abp.AspNetCore.Mvc;
 
 namespace Nels.Controllers;
 
-[Route("[controller]")]
-public class HomeController : AbpController
+[Route("")]
+public class RootController : AbpController
 {
     public ActionResult Index()
     {

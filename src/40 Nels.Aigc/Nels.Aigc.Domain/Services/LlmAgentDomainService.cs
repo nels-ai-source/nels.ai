@@ -16,9 +16,9 @@ namespace Nels.Aigc.Services;
 
 public class LlmAgentDomainService(
     IStreamResponse streamResponse,
-    IRepository<AgentConversationEntity, Guid> agentConversationRepository,
-    IRepository<AgentMessage, Guid> agentMessageRepository,
-    AgentChatDomainService agentChatDomainService,
+    IRepository<Conversation, Guid> agentConversationRepository,
+    IRepository<ChatMessage, Guid> agentMessageRepository,
+    ChatAggregateService agentChatDomainService,
     Kernel kernel) : DomainService
 {
     public async Task InvokeStreamingAsync(StartRequest request, Entities.Agent agent, CancellationToken cancellation = default)
@@ -42,24 +42,24 @@ public class LlmAgentDomainService(
 
         await foreach (StreamingChatMessageContent response in chat.InvokeStreamingAsync(chatAgent))
         {
-            await streamResponse.WriteMessagAsync(llmAgentRequest.MessageId, response.Content);
+            await streamResponse.MessageDelta(response.Content);
         }
 
         await foreach (var content in chat.GetChatMessagesAsync(cancellation))
         {
-            if (content.Role != AuthorRole.User)
-            {
-                llmAgentRequest.Chat.AddMessage(id: llmAgentRequest.MessageId, content: content, insertFirst: true);
-                continue;
-            }
-            llmAgentRequest.Chat.AddMessage(id: GuidGenerator.Create(), content: content, insertFirst: true);
+            //if (content.Role != AuthorRole.User)
+            //{
+            //    llmAgentRequest.Chat.AddMessage(id: llmAgentRequest.MessageId, content: content, insertFirst: true);
+            //    continue;
+            //}
+            //llmAgentRequest.Chat.AddMessage(id: GuidGenerator.Create(), content: content, insertFirst: true);
         }
         llmAgentRequest.Conversation.SetTitle(string.IsNullOrWhiteSpace(llmAgentRequest.Conversation.Title) ? request.UserInput : llmAgentRequest.Conversation.Title);
 
         llmAgentRequest.Conversation = request.AgentConversationId == null ?
             await agentConversationRepository.InsertAsync(llmAgentRequest.Conversation, cancellationToken: cancellation) :
             await agentConversationRepository.UpdateAsync(llmAgentRequest.Conversation, cancellationToken: cancellation);
-        await agentChatDomainService.InsertAgentChatAsync(llmAgentRequest.Chat, cancellation);
+        await agentChatDomainService.InsertChatAsync(llmAgentRequest.Chat, cancellation);
 
     }
 
@@ -70,18 +70,18 @@ public class LlmAgentDomainService(
         {
             Agent = agent,
             Conversation = request.AgentConversationId == null ?
-               new AgentConversationEntity(conversation, agent.Id) :
-               await agentConversationRepository.FirstOrDefaultAsync(x => x.Id == request.AgentConversationId.Value, cancellationToken: cancellation) ?? new AgentConversationEntity(conversation, agent.Id),
-            Chat = new(GuidGenerator.Create(), agent.Id, conversation),
+               new Conversation(conversation, agent.SpaceId) :
+               await agentConversationRepository.FirstOrDefaultAsync(x => x.Id == request.AgentConversationId.Value, cancellationToken: cancellation) ?? new Conversation(conversation, agent.SpaceId),
+            Chat = new(GuidGenerator.Create(), agent.SpaceId, conversation),
             MessageId = GuidGenerator.Create(),
         };
 
-        List<AgentMessage> messages = await agentMessageRepository.GetListAsync(x => x.AgentChatId == agent.Id, cancellationToken: cancellation);
+        List<ChatMessage> messages = await agentMessageRepository.GetListAsync(x => x.ChatId == agent.Id, cancellationToken: cancellation);
         foreach (var item in messages)
         {
-            chat.AddChatMessage(new ChatMessageContent(new AuthorRole(item.Role), item.Content));
+            chat.AddChatMessage(new Microsoft.SemanticKernel.ChatMessageContent(new AuthorRole(item.Role), item.Content));
         }
-        ChatMessageContent message = new(AuthorRole.User, request.UserInput);
+        Microsoft.SemanticKernel.ChatMessageContent message = new(AuthorRole.User, request.UserInput);
         chat.AddChatMessage(message);
 
         return llmAgentRequest;
@@ -90,7 +90,7 @@ public class LlmAgentDomainService(
 public class LlmAgentRequest
 {
     public virtual Entities.Agent Agent { get; set; }
-    public virtual AgentConversationEntity Conversation { get; set; }
-    public virtual Entities.AgentChat Chat { get; set; }
+    public virtual Conversation Conversation { get; set; }
+    public virtual Entities.Chat Chat { get; set; }
     public virtual Guid MessageId { get; set; }
 }

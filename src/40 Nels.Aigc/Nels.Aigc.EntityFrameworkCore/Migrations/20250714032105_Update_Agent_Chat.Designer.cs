@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nels.Aigc.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Nels.Aigc.Migrations
 {
     [DbContext(typeof(AigcDbContext))]
-    partial class AigcDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250714032105_Update_Agent_Chat")]
+    partial class Update_Agent_Chat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -426,68 +429,12 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("ai_Agent", (string)null);
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledge", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("AgentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("KnowledgeId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgentId");
-
-                    b.ToTable("ai_AgentKnowledge", (string)null);
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentPresetQuestions", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AgentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<int>("Index")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgentId");
-
-                    b.ToTable("ai_AgentPresetQuestions", (string)null);
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.AgentTool", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AgentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ToolId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgentId");
-
-                    b.ToTable("ai_AgentTool", (string)null);
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.Chat", b =>
-                {
-                    b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Answer")
@@ -555,23 +502,44 @@ namespace Nels.Aigc.Migrations
 
                     b.HasIndex("ConversationId");
 
-                    b.ToTable("ai_Chat", (string)null);
+                    b.ToTable("ai_AgentChat", (string)null);
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.ChatMessage", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledge", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ChatId")
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("KnowledgeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.ToTable("ai_AgentKnowledge", (string)null);
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentChatId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentConversationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("ConversationId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone")
@@ -620,14 +588,58 @@ namespace Nels.Aigc.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("AgentChatId");
 
-                    b.ToTable("ai_ChatMessage", (string)null);
+                    b.ToTable("ai_AgentMessage", (string)null);
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentPresetQuestions", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.ToTable("ai_AgentPresetQuestions", (string)null);
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentTool", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ToolId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId");
+
+                    b.ToTable("ai_AgentTool", (string)null);
                 });
 
             modelBuilder.Entity("Nels.Aigc.Entities.Conversation", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreationTime")
@@ -2901,11 +2913,29 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("sys_TenantConnectionStrings", (string)null);
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Conversation", null)
+                        .WithMany("Chats")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledge", b =>
                 {
                     b.HasOne("Nels.Aigc.Entities.Agent", null)
                         .WithMany("Knowledges")
                         .HasForeignKey("AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentMessage", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.AgentChat", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("AgentChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2924,24 +2954,6 @@ namespace Nels.Aigc.Migrations
                     b.HasOne("Nels.Aigc.Entities.Agent", null)
                         .WithMany("Tools")
                         .HasForeignKey("AgentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.Chat", b =>
-                {
-                    b.HasOne("Nels.Aigc.Entities.Conversation", null)
-                        .WithMany("Chats")
-                        .HasForeignKey("ConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Nels.Aigc.Entities.ChatMessage", b =>
-                {
-                    b.HasOne("Nels.Aigc.Entities.Chat", null)
-                        .WithMany("Messages")
-                        .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -3137,7 +3149,7 @@ namespace Nels.Aigc.Migrations
                     b.Navigation("Tools");
                 });
 
-            modelBuilder.Entity("Nels.Aigc.Entities.Chat", b =>
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentChat", b =>
                 {
                     b.Navigation("Messages");
                 });

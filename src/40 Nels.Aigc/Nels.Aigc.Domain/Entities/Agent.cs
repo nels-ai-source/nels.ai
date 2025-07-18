@@ -1,15 +1,15 @@
 ﻿using Nels.Aigc.Consts;
 using Nels.Aigc.Enums;
+using Nels.SemanticKernel.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Nels.Aigc.Entities;
 
-public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>
+public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>, ISpaceIdentifier
 {
     public Agent() { }
     public Agent(Guid id) : base(id) { }
@@ -27,6 +27,7 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>
     [MaxLength(AgentConsts.MaxDescriptionLength)]
     public virtual string Description { get; set; } = default!;
 
+    [Required]
     public virtual AgentType Type { get; set; } = AgentType.ChatCompletion;
 
     public virtual string Instructions { get; set; } = default!;
@@ -41,6 +42,22 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>
 
     public virtual List<AgentTool> Tools { get; set; } = [];
 
+    public void AddPresetQuestion(Guid id, string content)
+    {
+        if (Questions.Exists(x => x.Content == content))
+        {
+            return;
+        }
+        Questions.Add(new AgentPresetQuestions(id, this.Id, content));
+    }
+    public void RemovePresetQuestion(Guid questionId)
+    {
+        var question = Questions.Find(x => x.Id == questionId);
+        if (question is not null)
+        {
+            Questions.Remove(question);
+        }
+    }
 
     public void AddKnowledge(Guid id, Guid knowledgeId)
     {
@@ -73,35 +90,6 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>
         if (tool is not null)
         {
             Tools.Remove(tool);
-        }
-    }
-
-    [NotMapped]
-    public virtual IAgentMetadata? Metadata { get; set; }
-
-    public void AddOrUpdateWorkflowMetadata(Guid id, string steps, string states)
-    {
-        if (Metadata is WorkflowAgentMetadata metadata)
-        {
-            metadata ??= new WorkflowAgentMetadata(id, this.Id, steps, states);
-            metadata.Steps = steps;
-            metadata.States = states;
-        }
-    }
-
-    public void AddOrUpdateLlmWorkflowMetadata(Guid id, string prompt, int chatReducerCount = 0, bool toolAutoInvoke = false)
-    {
-        if (Metadata is null)
-        {
-            Metadata = new LlmAgentMetadata(id, this.Id, prompt, chatReducerCount, toolAutoInvoke);
-            return;
-        }
-
-        if (Metadata is LlmAgentMetadata metadata)
-        {
-            metadata.Prompt = prompt;
-            metadata.ChatReducerCount = chatReducerCount;
-            metadata.ToolAutoInvoke = toolAutoInvoke;
         }
     }
 }
@@ -143,41 +131,4 @@ public class AgentKnowledge : Entity<Guid>
     }
     public virtual Guid AgentId { get; set; }
     public virtual Guid KnowledgeId { get; set; }
-}
-
-
-public class LlmAgentMetadata : AuditedEntity<Guid>, IAgentMetadata
-{
-    protected LlmAgentMetadata() { }
-
-    internal LlmAgentMetadata(Guid id, Guid agentId, string prompt, int chatReducerCount = 0, bool toolAutoInvoke = false) : base(id)
-    {
-        AgentId = agentId;
-        Prompt = prompt;
-        ChatReducerCount = chatReducerCount;
-        ToolAutoInvoke = toolAutoInvoke;
-    }
-    public virtual Guid AgentId { get; set; }
-    public virtual string Prompt { get; set; } = string.Empty;
-    public virtual int ChatReducerCount { get; set; } = 0;
-    public virtual bool ToolAutoInvoke { get; set; } = false;
-
-}
-public class WorkflowAgentMetadata : AuditedEntity<Guid>, IAgentMetadata
-{
-    protected WorkflowAgentMetadata() { }
-    internal WorkflowAgentMetadata(Guid id, Guid agentId, string steps, string states) : base(id)
-    {
-        AgentId = agentId;
-        Steps = steps;
-        States = states;
-    }
-    public virtual Guid AgentId { get; set; }
-    public virtual string Steps { get; set; } = string.Empty;
-    public virtual string States { get; set; } = string.Empty;
-}
-
-public interface IAgentMetadata
-{
-
 }

@@ -31,7 +31,7 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
         _messageId = SequentialGuidGenerator.Create();
 
         var template = TemplateReplace(_state.Template, _state.Arguments);
-        await _streamResponse.WriteDataAsync(ProcessEventType.Message_Template, new ProcessEventData(_messageId, template).Properties);
+        //await _streamResponse.MessageDelta(new ProcessEventData(_messageId, template).Properties);
         return result;
     }
     public override ValueTask PostExecuteAsync(CancellationToken cancellationToken)
@@ -47,7 +47,6 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
         }
 
         _processState.Context.AddDefaultOutput(_id, _result);
-        _processState.AgentChat.AddMessage(_messageId, MessageRoleConsts.Assistant, _result);
         return base.PostExecuteAsync(cancellationToken);
     }
 
@@ -55,7 +54,7 @@ public class MessageStep(IStreamResponse streamResponse) : NelsKernelProcessStep
     {
         var input = _state.Inputs.FirstOrDefault(x => x.IdEqual(data.Id));
         if (input == null) return;
-        await _streamResponse.WriteDataAsync(ProcessEventType.Data, new ProcessEventData(_messageId, input.Name, data.Content).Properties);
+        //await _streamResponse.MessageDelta(new ProcessEventData(_messageId, input.Name, data.Content).Properties);
     }
     private static string TemplateReplace(string promptTemplateText, KernelArguments arguments)
     {

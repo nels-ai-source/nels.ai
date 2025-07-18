@@ -72,39 +72,22 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-        builder.Entity<WorkflowAgentMetadata>(b =>
-        {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(WorkflowAgentMetadata), SysMngDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-        });
-        builder.Entity<LlmAgentMetadata>(b =>
-        {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(LlmAgentMetadata), SysMngDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-        });
-        builder.Entity<AgentConversationEntity>(b =>
+       
+        builder.Entity<Conversation>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + "AgentConversation", SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });
-        builder.Entity<AgentChat>(b =>
+        builder.Entity<Chat>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentChat), SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Chat), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });
-        builder.Entity<AgentMessage>(b =>
+        builder.Entity<ChatMessage>(b =>
         {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentMessage), SysMngDbProperties.DbSchema);
-
-            b.ConfigureByConvention();
-        });
-        builder.Entity<AgentStepLog>(b =>
-        {
-            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentStepLog), SysMngDbProperties.DbSchema);
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(ChatMessage), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });

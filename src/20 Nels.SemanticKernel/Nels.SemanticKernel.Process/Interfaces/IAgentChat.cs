@@ -7,7 +7,7 @@ public interface IAgentChat
 {
     Guid Id { get; }
     Guid AgentId { get; set; }
-    Guid AgentConversationId { get; set; }
+    Guid ConversationId { get; set; }
     string Question { get; set; }
     string Answer { get; set; }
     IStepLog AddStepLog(Guid id, Guid stepId);

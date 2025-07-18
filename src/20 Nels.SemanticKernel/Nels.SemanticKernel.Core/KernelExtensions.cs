@@ -1,10 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory;
 using Microsoft.SemanticKernel;
+using Nels.SemanticKernel.Services;
+using OpenAI;
 using System;
+using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UglyToad.PdfPig.Tokens;
 
 namespace Nels.SemanticKernel;
 
@@ -31,6 +35,8 @@ public static class KernelExtensions
             return _kernelBuilder.Build();
         });
 
+        services.AddSingleton<AgentActuator>();
+
         return services;
     }
     public static async Task AddChatCompletionServices(this IKernelBuilder kernelBuilder, List<IModel> models)
@@ -50,15 +56,20 @@ public static class KernelExtensions
     }
     public static async Task AddChatCompletionService(this IKernelBuilder kernelBuilder, IModel model, string serviceId)
     {
-        switch (model.ModelConnector)
+        switch (model.Connector)
         {
+            case Enums.ModelConnector.OpenAI:
+                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
+
+                OpenAIClient client = new(new ApiKeyCredential(model.AccessKey), new OpenAIClientOptions
+                {
+                    Endpoint = new Uri(model.Endpoint)
+                });
+                kernelBuilder.AddOpenAIChatCompletion(modelId: model.Name, openAIClient: client);
+                break;
             case Enums.ModelConnector.AzureOpenAI:
                 if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
                 kernelBuilder.AddAzureOpenAIChatCompletion(deploymentName: model.DeploymentName, modelId: model.Name, endpoint: model.Endpoint, apiKey: model.AccessKey, serviceId: serviceId);
-                break;
-            case Enums.ModelConnector.OpenAI:
-                if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
-                kernelBuilder.AddOpenAIChatCompletion(modelId: model.Name, apiKey: model.AccessKey, serviceId: serviceId);
                 break;
             case Enums.ModelConnector.Google:
                 if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
@@ -76,7 +87,7 @@ public static class KernelExtensions
                 kernelBuilder.AddOllamaChatCompletion(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), serviceId: serviceId);
                 break;
             default:
-                break;
+                throw new NotImplementedException();
         }
         await Task.CompletedTask;
     }
@@ -98,7 +109,7 @@ public static class KernelExtensions
     }
     public static async Task AddTextEmbeddingGeneration(this IKernelBuilder kernelBuilder, IModel model, string serviceId)
     {
-        switch (model.ModelConnector)
+        switch (model.Connector)
         {
             case Enums.ModelConnector.AzureOpenAI:
                 if (string.IsNullOrWhiteSpace(model.AccessKey)) return;
@@ -124,7 +135,7 @@ public static class KernelExtensions
                 kernelBuilder.AddOllamaEmbeddingGenerator(modelId: model.Name, endpoint: string.IsNullOrWhiteSpace(model.Endpoint) ? null : new Uri(model.Endpoint), serviceId: serviceId);
                 break;
             default:
-                break;
+                throw new NotImplementedException();
         }
         await Task.CompletedTask;
     }

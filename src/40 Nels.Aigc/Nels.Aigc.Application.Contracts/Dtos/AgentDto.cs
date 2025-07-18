@@ -1,6 +1,8 @@
 ﻿using Nels.Aigc.Consts;
 using Nels.Aigc.Entities;
 using Nels.Aigc.Enums;
+using Nels.SemanticKernel.Core.Enums;
+using Nels.SemanticKernel.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,7 +22,7 @@ public class WorkflowAgentDto : AgentDto
     public virtual string States { get; set; } = string.Empty;
 }
 
-public class AgentDto : AuditedEntityDto<Guid>
+public class AgentDto : AuditedEntityDto<Guid>, IAgent
 {
     [Required]
     public virtual Guid SpaceId { get; set; } = Guid.Empty;
@@ -39,16 +41,16 @@ public class AgentDto : AuditedEntityDto<Guid>
     [StringLength(AgentConsts.MaxPrologueLength)]
     public virtual string Prologue { get; set; } = string.Empty;
 
-    public virtual List<AgentPresetQuestionsDto> Questions { get; set; } = [];
+    public virtual List<IAgentPresetQuestions> Questions { get; set; } = [];
 
-    public virtual List<AgentKnowledgeDto> Knowledges { get; set; } = [];
+    public virtual List<IAgentKnowledge> Knowledges { get; set; } = [];
 
-    public virtual List<AgentToolDto> Tools { get; set; } = [];
+    public virtual List<IAgentTool> Tools { get; set; } = [];
 
-    public virtual List<AgentConversationDto> Conversations { get; set; } = [];
+    public virtual List<ConversationDto> Conversations { get; set; } = [];
 }
 
-public class AgentPresetQuestionsDto : EntityDto<Guid>
+public class AgentPresetQuestionsDto : EntityDto<Guid>, IAgentPresetQuestions
 {
     public virtual Guid AgentId { get; set; }
 
@@ -59,7 +61,7 @@ public class AgentPresetQuestionsDto : EntityDto<Guid>
     public virtual int Index { get; set; }
 }
 
-public class AgentToolDto : EntityDto<Guid>
+public class AgentToolDto : EntityDto<Guid>, IAgentTool
 {
     public virtual Guid AgentId { get; set; } = default!;
     public virtual Guid ToolId { get; set; } = default!;
@@ -72,7 +74,7 @@ public class AgentToolDto : EntityDto<Guid>
     public virtual List<ToolParamter> OutputParamters { get; set; } = [];
 
 }
-public class AgentKnowledgeDto : EntityDto<Guid>
+public class AgentKnowledgeDto : EntityDto<Guid>, IAgentKnowledge
 {
     public virtual Guid AgentId { get; set; }
     public virtual Guid KnowledgeId { get; set; }

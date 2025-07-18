@@ -22,12 +22,9 @@ public interface IAigcDbContext : ISysMngDbContext, IEfCoreDbContext
     public DbSet<Plugin> Plugins { get; set; }
     public DbSet<Tool> Tools { get; set; }
     public DbSet<ToolParamter> ToolParamters { get; set; }
-    public DbSet<WorkflowAgentMetadata> WorkflowAgentMetadatas { get; set; }    
-    public DbSet<LlmAgentMetadata> LlmAgentMetadatas { get; set; }
-    public DbSet<AgentConversationEntity> AgentConversations { get; set; }
-    public DbSet<AgentChat> AgentChats { get; set; }
-    public DbSet<AgentMessage> AgentMessages { get; set; }
-    public DbSet<AgentStepLog> AgentStepLogs { get; set; }
+    public DbSet<Conversation> AgentConversations { get; set; }
+    public DbSet<Chat> AgentChats { get; set; }
+    public DbSet<ChatMessage> AgentMessages { get; set; }
     public DbSet<Space> Spaces { get; set; }
     public DbSet<SpaceUser> SpaceUsers { get; set; }
 

@@ -18,42 +18,23 @@ public class AigcApplicationAutoMapperProfile : Profile
         CreateMap<Prompt, PromptDto>().ReverseMap();
 
         CreateMap<Agent, AgentDto>()
-            .ReverseMap().Ignore(dest => dest.Metadata);
+            .ReverseMap();
 
         CreateMap<Agent, LlmAgentDto>()
             .Ignore(dest => dest.Prompt)
-            .ReverseMap().Ignore(dest => dest.Metadata);
-
-        CreateMap<LlmAgentMetadata, LlmAgentDto>()
-            .ForMember(dest => dest.Prompt, opt => opt.MapFrom(src => src.Prompt))
-            .ForMember(dest => dest.ChatReducerCount, opt => opt.MapFrom(src => src.ChatReducerCount))
-            .ForMember(dest => dest.ToolAutoInvoke, opt => opt.MapFrom(src => src.ToolAutoInvoke))
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreatorId)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.LastModifierId)
-            .Ignore(dest => dest.LastModificationTime)
-            .ReverseMap()
-            .Ignore(dest => dest.Id)
-            .Ignore(dest => dest.CreatorId)
-            .Ignore(dest => dest.CreationTime)
-            .Ignore(dest => dest.LastModifierId);
-
+            .ReverseMap();
 
         CreateMap<Agent, WorkflowAgentDto>()
             .Ignore(dest => dest.States)
             .Ignore(dest => dest.Steps)
-            .ReverseMap().Ignore(dest => dest.Metadata);
-
-        CreateMap<WorkflowAgentMetadata, WorkflowAgentDto>()
             .ReverseMap();
 
         CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>()
             .ReverseMap();
 
-        CreateMap<AgentConversationEntity, AgentConversationDto>().ReverseMap();
-        CreateMap<AgentChat, AgentChatDto>().ReverseMap();
-        CreateMap<AgentMessage, AgentMessageDto>().ReverseMap();
+        CreateMap<Conversation, ConversationDto>().ReverseMap();
+        CreateMap<Chat, ChatDto>().ReverseMap();
+        CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
 
         CreateMap<Model, ModelDto>().ReverseMap();
         CreateMap<Model, ModelGetListOutputDto>();

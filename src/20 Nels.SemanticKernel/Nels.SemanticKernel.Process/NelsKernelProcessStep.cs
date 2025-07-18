@@ -53,7 +53,6 @@ public class NelsKernelProcessStep<IStepState> : KernelProcessStep<IStepState> w
         if (_httpContextAccessor.HttpContext.Items.TryGetValue(nameof(ProcessState), out object? processState))
         {
             _processState = (ProcessState)processState;
-            _stepLog = _processState.AgentChat.AddStepLog(SequentialGuidGenerator.Create(), Guid.Parse(_id));
         }
 
         if (await PreExecuteAsync(_cancellationToken) == false)

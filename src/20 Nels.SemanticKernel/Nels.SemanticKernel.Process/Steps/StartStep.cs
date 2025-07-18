@@ -27,7 +27,6 @@ public class StartStep() : NelsKernelProcessStep<StartStepState>()
         var messageId = SequentialGuidGenerator.Create();
 
         _processState.Context.AddDefaultOutput(_id, _request.UserInput);
-        _processState.AgentChat.AddMessage(messageId, MessageRoleConsts.User, _request.UserInput, MessageTypeConsts.Question);
 
         return base.PostExecuteAsync(cancellationToken);
     }

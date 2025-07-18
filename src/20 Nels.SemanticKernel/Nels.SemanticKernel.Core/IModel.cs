@@ -15,5 +15,5 @@ public interface IModel
     int? MaxTokens { get; set; }
     ModelProvider Provider { get; set; }
     ModelType Type { get; set; }
-    ModelConnector ModelConnector { get; set; }
+    ModelConnector Connector { get; set; }
 }

@@ -4,7 +4,10 @@ import { XStream } from '@ant-design/x';
 import { UUID } from 'crypto';
 
 export async function getAgentList(input: AgentFilter) {
-  return request<Agent[]>(`/api/agent/getAllList`, {
+  return request<{
+    items: Agent[];
+    totalCount: number;
+  }>(`/api/agent/getList`, {
     method: 'POST',
     data: {
       ...input,

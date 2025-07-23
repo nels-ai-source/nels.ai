@@ -4,12 +4,13 @@ import {
   LikeOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Bubble, Prompts, Welcome } from '@ant-design/x';
-import { Button, Space, Spin } from 'antd';
+import { Bubble } from '@ant-design/x';
+import { Button, Spin } from 'antd';
 import { createStyles } from 'antd-style';
 import { Agent } from '@/types/agent';
 import React from 'react';
 import Markdown from '../Markdown';
+import { AgentWelcome } from './AgentWelcome';
 
 const useStyle = createStyles(({ }) => ({
   chatList: {
@@ -25,6 +26,11 @@ const useStyle = createStyles(({ }) => ({
   },
   placeholder: {
     paddingTop: 32,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    height: '100%',
   },
 }));
 
@@ -37,6 +43,7 @@ interface ChatListProps {
 export const ChatList: React.FC<ChatListProps> = ({
   agent,
   messages,
+  onPromptClick,
 }) => {
   const { styles } = useStyle();
   const renderMessageContent = (content: string, role: string, messageId: string) => {
@@ -103,21 +110,9 @@ export const ChatList: React.FC<ChatListProps> = ({
 
         />
       ) : (
-        agent && <Space direction="vertical" size={16} className={styles.placeholder}>
-          <Welcome
-            variant="borderless"
-            icon={<img src={agent.icon} className="rounded-lg object-cover" />}
-            title={agent.name}
-            description={agent.prologue}
-          />
-          <Prompts vertical
-            items={agent.questions.map((question) => ({
-              label: question.content,
-              value: question.content,
-              key: question.id
-            }))}
-          />
-        </Space>
+        agent && <div className={styles.placeholder}>
+          <AgentWelcome agent={agent} onPromptClick={onPromptClick} />
+        </div>
       )}
     </div>
   );

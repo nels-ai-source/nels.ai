@@ -1,5 +1,6 @@
 import { Knowledge, KnowledgeDocument, KnowledgeDocumentParagraph } from '@/types/knowledge';
 import { request } from '@umijs/max';
+import { AgentType } from '@/types/agent';
 
 export async function getKnowledge(id: string) {
   return request<Knowledge>(`/api/knowledge/get?id=${id}`, {
@@ -12,6 +13,7 @@ export async function getKnowledgeList(
     maxResultCount?: number;
     skipCount?: number;
     sorting?: string;
+    agentType?: AgentType;
   },
   options?: { [key: string]: any },
 ) {
@@ -72,7 +74,7 @@ export async function getParagraphList(knowledgeDocumentId: string) {
   );
 }
 export async function addKnowledgeDocument(options?: { [id: string]: any }) {
-  return request<API.KnowledgeItem>(`/api/knowledgeDocument/create`, {
+  return request<KnowledgeDocument>(`/api/knowledgeDocument/create`, {
     method: 'POST',
     data: {
       ...(options || {}),

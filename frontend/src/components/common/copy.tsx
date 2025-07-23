@@ -2,8 +2,10 @@ import { Button, Tooltip, message } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import copy from "copy-to-clipboard";
 import { TooltipPlacement } from "antd/es/tooltip";
+import { useIntl } from 'umi';
 
 const Copy = ({ content = "", btnStyle = {}, placement = "bottom", onCopy = () => { } }) => {
+  const intl = useIntl();
   const [messageApi, contextHolder] = message.useMessage();
   const handleCopy = () => {
     copy(content, {
@@ -12,7 +14,7 @@ const Copy = ({ content = "", btnStyle = {}, placement = "bottom", onCopy = () =
       onCopy: () => {
         messageApi.open({
           type: "success",
-          content: "复制成功",
+          content: intl.formatMessage({ id: 'component.copy.success' }),
         });
         onCopy?.();
       },
@@ -21,7 +23,7 @@ const Copy = ({ content = "", btnStyle = {}, placement = "bottom", onCopy = () =
   return (
     <>
       {contextHolder}
-      <Tooltip title="复制" placement={placement as TooltipPlacement}>
+      <Tooltip title={intl.formatMessage({ id: 'component.copy.tooltip' })} placement={placement as TooltipPlacement}>
         <Button
           type="text"
           style={btnStyle}

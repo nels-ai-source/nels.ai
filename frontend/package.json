@@ -49,6 +49,8 @@
     "@ant-design/icons": "^6.0.0",
     "@ant-design/pro-components": "^2.8.9",
     "@ant-design/x": "^1.4.0",
+    "@flowgram.ai/form-materials": "^0.2.27",
+    "@flowgram.ai/variable-core": "^0.2.27",
     "@tailwindcss/postcss7-compat": "^2.2.17",
     "@umijs/route-utils": "^2.2.2",
     "antd": "^5.26.4",

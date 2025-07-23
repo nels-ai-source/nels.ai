@@ -3,6 +3,7 @@ import { Attachments, Sender } from '@ant-design/x';
 import { Button, Flex } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
+import { useIntl } from 'umi';
 
 const useStyle = createStyles(({ token }) => ({
   sender: {
@@ -43,10 +44,11 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
   loading,
 }) => {
   const { styles } = useStyle();
+  const intl = useIntl();
   const [attachmentsOpen, setAttachmentsOpen] = useState(false);
   const senderHeader = (
     <Sender.Header
-      title="Upload File"
+      title={intl.formatMessage({ id: 'component.chatSender.uploadFile' })}
       open={attachmentsOpen}
       onOpenChange={onAttachmentsOpenChange}
       styles={{ content: { padding: 0 } }}
@@ -58,11 +60,11 @@ export const ChatSender: React.FC<ChatSenderProps> = ({
         onChange={(info) => onAttachedFilesChange(info.fileList)}
         placeholder={(type) =>
           type === 'drop'
-            ? { title: 'Drop file here' }
+            ? { title: intl.formatMessage({ id: 'component.chatSender.dropFileHere' }) }
             : {
               icon: <CloudUploadOutlined />,
-              title: 'Upload files',
-              description: 'Click or drag files to this area to upload',
+              title: intl.formatMessage({ id: 'component.chatSender.uploadFiles' }),
+              description: intl.formatMessage({ id: 'component.chatSender.uploadDescription' }),
             }
         }
 

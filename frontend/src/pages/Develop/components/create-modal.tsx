@@ -2,10 +2,10 @@ import { createAgent, updateAgent } from '@/services/aigc/agent';
 import { Agent } from '@/types/agent';
 import { useIntl } from '@umijs/max';
 import type { UploadFile } from 'antd';
-import { message, Form, Input, Modal, Upload } from 'antd';
+import { message, Form, Input, Upload } from 'antd';
 import type { UploadChangeParam } from 'antd/lib/upload/interface';
 import React, { useEffect, useState } from 'react';
-import { CheckCard, ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { ModalForm } from '@ant-design/pro-components';
 
 interface AgentCreateModalProps {
   open: boolean;
@@ -36,7 +36,11 @@ export const CreateModal: React.FC<AgentCreateModalProps> = ({ open, type = 'cre
     const values = await form.validateFields();
     try {
       setIsLoading(true);
-      type === 'create' ? await createAgent(values) : await updateAgent(values);
+      if (type === 'create') {
+        await createAgent(values);
+      } else {
+        await updateAgent(values);
+      }
       message.success(intl.formatMessage({ id: 'actions.success' }));
       onChange(values);
     } catch {

@@ -1,4 +1,5 @@
 import component from './zh-TW/component';
+import commonality from './zh-TW/commonality';
 import globalHeader from './zh-TW/globalHeader';
 import menu from './zh-TW/menu';
 import pages from './zh-TW/pages';
@@ -19,4 +20,5 @@ export default {
   ...settings,
   ...pwa,
   ...component,
+  ...commonality,
 };

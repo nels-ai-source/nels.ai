@@ -1,3 +1,24 @@
-.ant-card .ant-card-body{
+.ant-card .ant-card-body {
     padding: 12px;
+}
+
+/* 从detail.tsx提取的样式 */
+.agent-aside {
+    width: 33%;
+    padding: 0 10px;
+}
+
+.agent-main {
+    width: 34%;
+    padding: 0 10px;
+}
+
+.agent-header {
+    height: 32px;
+    padding: 12px 0 0 0;
+}
+
+.agent-title {
+    font-size: 16px;
+    font-weight: 600;
 }

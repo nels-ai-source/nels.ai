@@ -1,9 +1,10 @@
-﻿using Nels.Aigc.Consts;
+using Nels.Aigc.Consts;
 using Nels.Aigc.Enums;
 using Nels.SemanticKernel.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -41,6 +42,8 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>, ISpaceIdentifier
     public virtual List<AgentKnowledge> Knowledges { get; set; } = [];
 
     public virtual List<AgentTool> Tools { get; set; } = [];
+
+    public virtual AgentKnowledgeOption KnowledgeOption { get; set; }
 
     public void AddPresetQuestion(Guid id, string content)
     {
@@ -92,6 +95,54 @@ public class Agent : AuditedEntity<Guid>, IAggregateRoot<Guid>, ISpaceIdentifier
             Tools.Remove(tool);
         }
     }
+
+    public void SyncPresetQuestions(ICollection<AgentPresetQuestions> newQuestions)
+    {
+        var questionsToAdd = newQuestions.Where(nq => !Questions.Any(q => q.Content == nq.Content)).ToList();
+        var questionsToRemove = Questions.Where(q => !newQuestions.Any(nq => nq.Content == q.Content)).ToList();
+
+        foreach (var q in questionsToAdd)
+        {
+            AddPresetQuestion(Guid.NewGuid(), q.Content);
+        }
+
+        foreach (var q in questionsToRemove)
+        {
+            RemovePresetQuestion(q.Id);
+        }
+    }
+
+    public void SyncKnowledges(ICollection<AgentKnowledge> newKnowledges)
+    {
+        var knowledgesToAdd = newKnowledges.Where(nk => !Knowledges.Any(k => k.Id == nk.Id)).ToList();
+        var knowledgesToRemove = Knowledges.Where(k => !newKnowledges.Any(nk => nk.Id == k.Id)).ToList();
+
+        foreach (var k in knowledgesToAdd)
+        {
+            AddKnowledge(k.Id, k.KnowledgeId);
+        }
+
+        foreach (var k in knowledgesToRemove)
+        {
+            RemoveKnowledge(k.KnowledgeId);
+        }
+    }
+
+    public void SyncTools(ICollection<AgentTool> newTools)
+    {
+        var toolsToAdd = newTools.Where(nt => !Tools.Any(t => t.ToolId == nt.ToolId)).ToList();
+        var toolsToRemove = Tools.Where(t => !newTools.Any(nt => nt.ToolId == t.ToolId)).ToList();
+
+        foreach (var t in toolsToAdd)
+        {
+            AddTool(Guid.NewGuid(), t.ToolId);
+        }
+
+        foreach (var t in toolsToRemove)
+        {
+            RemoveTool(t.ToolId);
+        }
+    }
 }
 public class AgentPresetQuestions : Entity<Guid>
 {
@@ -121,6 +172,7 @@ public class AgentTool : Entity<Guid>
     public virtual Guid AgentId { get; set; } = default!;
     public virtual Guid ToolId { get; set; } = default!;
 }
+
 public class AgentKnowledge : Entity<Guid>
 {
     protected AgentKnowledge() { }
@@ -131,4 +183,22 @@ public class AgentKnowledge : Entity<Guid>
     }
     public virtual Guid AgentId { get; set; }
     public virtual Guid KnowledgeId { get; set; }
+}
+public class AgentKnowledgeOption : Entity<Guid>
+{
+    protected AgentKnowledgeOption() { }
+    internal AgentKnowledgeOption(Guid id, Guid agentId) : base(id)
+    {
+        AgentId = agentId;
+    }
+    public virtual Guid AgentId { get; set; }
+    public virtual bool AutoInvoke { get; set; } = true;
+    public virtual SearchStrategy SearchStrategy { get; set; } = SearchStrategy.Hybrid;
+    public virtual int MaxRecallCount { get; set; } = 3;
+    public virtual double MinMatchScore { get; set; } = 0.5;
+    public virtual ReplyMode ReplyMode { get; set; } = ReplyMode.Default;
+    [MaxLength(AgentKnowledgeOptionConsts.MaxCustomReplyLength)]
+    public virtual string CustomReply { get; set; } = string.Empty;
+    public virtual bool ShowSource { get; set; } = true;
+    public virtual SourceDisplayMode SourceDisplayMode { get; set; } = SourceDisplayMode.Card;
 }

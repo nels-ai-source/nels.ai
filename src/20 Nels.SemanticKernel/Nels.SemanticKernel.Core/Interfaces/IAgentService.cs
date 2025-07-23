@@ -20,9 +20,9 @@ public interface IAgent
     AgentType Type { get; set; }
     string Instructions { get; set; }
     string Prologue { get; set; }
-    List<IAgentPresetQuestions> Questions { get; set; }
-    List<IAgentKnowledge> Knowledges { get; set; }
-    List<IAgentTool> Tools { get; set; }
+    List<IAgentPresetQuestions> Questions { get; }
+    List<IAgentKnowledge> Knowledges { get;  }
+    List<IAgentTool> Tools { get; }
 }
 
 public interface IAgentPresetQuestions

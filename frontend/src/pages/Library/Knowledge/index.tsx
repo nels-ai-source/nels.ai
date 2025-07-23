@@ -14,7 +14,21 @@ import { App, Button } from 'antd';
 import React, { useRef, useState } from 'react';
 import CreateModal from './components/create-modal';
 
-const KnowledgeManager: React.FC = () => {
+interface KnowledgeManagerProps {
+  selectMode?: boolean;
+  onSelect?: (knowledge: Knowledge) => void;
+  onRemove?: (knowledge: Knowledge) => void;
+  hidePageContainer?: boolean;
+  addedKnowledgeIds?: string[];
+}
+
+const KnowledgeManager: React.FC<KnowledgeManagerProps> = ({
+  selectMode = false,
+  onSelect,
+  onRemove,
+  hidePageContainer = false,
+  addedKnowledgeIds = [],
+}) => {
   const access = useAccess();
   const { message, modal } = App.useApp();
   const intl = useIntl();
@@ -80,9 +94,11 @@ const KnowledgeManager: React.FC = () => {
       render: (dom, entity) => (
         <a
           onClick={() => {
+            if (selectMode) {
+              return;
+            }
             history.push(`/library/knowledge/detail/${entity.id}`);
           }}
-
         >
           {dom}
         </a>
@@ -139,43 +155,171 @@ const KnowledgeManager: React.FC = () => {
       title: <FormattedMessage id="actions.lable" />,
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [
-        access.checkAccess(Permissions.Knowledge.Update) && (
-          <a
-            key="edit"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow(record);
-            }}
+      render: (_, record) => {
+        if (selectMode) {
+          const isAdded = addedKnowledgeIds.includes(record.id!);
 
-          >
-            <FormattedMessage id="actions.edit" />
-          </a>
-        ),
+          if (isAdded) {
+            return [
+              <a
+                key="remove"
+                onClick={() => {
+                  onRemove?.(record);
+                }}
+                style={{ color: '#ff4d4f' }}
+              >
+                <FormattedMessage id="knowledge.selector.remove" />
+              </a>
+            ];
+          }
 
-        access.checkAccess(Permissions.Knowledge.Delete) && (
-          <a
-            key="delete"
-            onClick={async () => {
-              modal.confirm({
-                title: <FormattedMessage id="modal.delete.confirm" />,
-                content: <FormattedMessage id="modal.delete.content" />,
-                okText: <FormattedMessage id="modal.delete.ok" />,
-                cancelText: <FormattedMessage id="modal.delete.cancel" />,
-                onOk: async () => {
-                  await handleRemove([record]);
-                  actionRef.current?.reload();
-                },
-              });
-            }}
+          return [
+            <a
+              key="select"
+              onClick={() => {
+                onSelect?.(record);
+              }}
+            >
+              <FormattedMessage id="knowledge.selector.add" />
+            </a>
+          ];
+        }
 
-          >
-            <FormattedMessage id="actions.delete" />
-          </a>
-        ),
-      ],
+        return [
+          access.checkAccess(Permissions.Knowledge.Update) && (
+            <a
+              key="edit"
+              onClick={() => {
+                handleUpdateModalOpen(true);
+                setCurrentRow(record);
+              }}
+            >
+              <FormattedMessage id="actions.edit" />
+            </a>
+          ),
+          access.checkAccess(Permissions.Knowledge.Delete) && (
+            <a
+              key="delete"
+              onClick={async () => {
+                modal.confirm({
+                  title: <FormattedMessage id="modal.delete.confirm" />,
+                  content: <FormattedMessage id="modal.delete.content" />,
+                  okText: <FormattedMessage id="modal.delete.ok" />,
+                  cancelText: <FormattedMessage id="modal.delete.cancel" />,
+                  onOk: async () => {
+                    await handleRemove([record]);
+                    actionRef.current?.reload();
+                  },
+                });
+              }}
+            >
+              <FormattedMessage id="actions.delete" />
+            </a>
+          ),
+        ];
+      },
     },
   ];
+
+  const tableComponent = (
+    <ProTable<Knowledge, API.PageParams>
+      bordered
+      actionRef={actionRef}
+      rowKey="id"
+      search={false}
+      options={false}
+      cardProps={{
+        bodyStyle: {
+          padding: 0,
+        },
+      }}
+      toolbar={{
+        search: {
+          onSearch: (value: string) => {
+            console.log(value);
+            actionRef.current?.reload();
+          },
+        },
+      }}
+      toolBarRender={() => [
+        !selectMode && access.checkAccess(Permissions.Knowledge.Create) && (
+          <Button
+            type="primary"
+            key="primary"
+            onClick={() => {
+              handleModalOpen(true);
+            }}
+            icon={<PlusOutlined />}
+          >
+            <FormattedMessage id="knowledge.operation.create" />
+          </Button>
+        ),
+      ]}
+      request={async (params) => {
+        const { current = 1, pageSize = 10 } = params;
+        const response = await getKnowledgeList({
+          skipCount: (current - 1) * pageSize,
+          maxResultCount: pageSize,
+          sorting: 'creationTime desc',
+        });
+        return {
+          data: response.items || [],
+          success: true,
+          total: response.totalCount,
+        };
+      }}
+      columns={columns}
+      pagination={{
+        defaultPageSize: 20,
+        showSizeChanger: false,
+        size: 'default',
+      }}
+    />
+  );
+
+  if (hidePageContainer) {
+    return (
+      <>
+        {tableComponent}
+        {!selectMode && (
+          <>
+            <CreateModal
+              open={createModalOpen}
+              onOpenChange={handleModalOpen}
+              onFinish={async (value) => {
+                const success = await handleAdd(value as Knowledge);
+                if (success) {
+                  handleModalOpen(false);
+                  if (actionRef.current) {
+                    actionRef.current.reload();
+                  }
+                }
+                return success;
+              }}
+              type="create"
+            />
+
+            <CreateModal
+              open={updateModalOpen}
+              onOpenChange={handleUpdateModalOpen}
+              onFinish={async (value) => {
+                const success = await handleUpdate(value as Knowledge);
+                if (success) {
+                  handleUpdateModalOpen(false);
+                  if (actionRef.current) {
+                    actionRef.current.reload();
+                  }
+                }
+                return success;
+              }}
+              type="edit"
+              values={currentRow || {}}
+            />
+          </>
+        )}
+      </>
+    );
+  }
 
   return (
     <PageContainer
@@ -183,97 +327,44 @@ const KnowledgeManager: React.FC = () => {
         title: '',
       }}
       breadcrumb={{}}
-
     >
-      <ProTable<Knowledge, API.PageParams>
-        bordered
-        actionRef={actionRef}
-        rowKey="id"
-        search={false}
-        options={false}
-        cardProps={{
-          bodyStyle: {
-            padding: 0,
-          },
-        }}
-        toolbar={{
-          search: {
-            onSearch: (value: string) => {
-              console.log(value);
-              actionRef.current?.reload();
-            },
-          },
-        }}
-        toolBarRender={() => [
-          access.checkAccess(Permissions.Knowledge.Create) && (
-            <Button
-              type="primary"
-              key="primary"
-              onClick={() => {
-                handleModalOpen(true);
-              }}
-              icon={<PlusOutlined />}
+      {tableComponent}
+      {!selectMode && (
+        <>
+          <CreateModal
+            open={createModalOpen}
+            onOpenChange={handleModalOpen}
+            onFinish={async (value) => {
+              const success = await handleAdd(value as Knowledge);
+              if (success) {
+                handleModalOpen(false);
+                if (actionRef.current) {
+                  actionRef.current.reload();
+                }
+              }
+              return success;
+            }}
+            type="create"
+          />
 
-            >
-              <FormattedMessage id="knowledge.operation.create" />
-            </Button>
-          ),
-        ]}
-        request={async (params) => {
-          const { current = 1, pageSize = 10 } = params;
-          const response = await getKnowledgeList({
-            skipCount: (current - 1) * pageSize,
-            maxResultCount: pageSize,
-            sorting: 'creationTime desc',
-          });
-          return {
-            data: response.items || [],
-            success: true,
-            total: response.totalCount,
-          };
-        }}
-        columns={columns}
-        pagination={{
-          defaultPageSize: 20,
-          showSizeChanger: true,
-        }}
-
-      />
-
-      <CreateModal
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as Knowledge);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-          return success;
-        }}
-        type="create"
-
-      />
-
-      <CreateModal
-        open={updateModalOpen}
-        onOpenChange={handleUpdateModalOpen}
-        onFinish={async (value) => {
-          const success = await handleUpdate(value as Knowledge);
-          if (success) {
-            handleUpdateModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-          return success;
-        }}
-        type="edit"
-        values={currentRow || {}}
-
-      />
+          <CreateModal
+            open={updateModalOpen}
+            onOpenChange={handleUpdateModalOpen}
+            onFinish={async (value) => {
+              const success = await handleUpdate(value as Knowledge);
+              if (success) {
+                handleUpdateModalOpen(false);
+                if (actionRef.current) {
+                  actionRef.current.reload();
+                }
+              }
+              return success;
+            }}
+            type="edit"
+            values={currentRow || {}}
+          />
+        </>
+      )}
     </PageContainer>
   );
 };

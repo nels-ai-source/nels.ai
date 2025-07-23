@@ -15,10 +15,10 @@ const Icon = ({ index, name, styles = {}, size }: { index: number; name: string;
         ...styles,
         background: botIconColors[index % len],
         width: size,
-        height: size, 
-        minWidth: size, 
-        minHeight: size, 
-        maxWidth: size, 
+        height: size,
+        minWidth: size,
+        minHeight: size,
+        maxWidth: size,
         maxHeight: size,
       }}
       className="agent-icon text-[16px] bg-[#fff] items-center justify-center flex rounded-[15px] text-[#fff] font-semibold"

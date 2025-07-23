@@ -54,6 +54,10 @@
 // Font Variables
 @font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
+.ant-prompts .ant-prompts-item {
+  padding-block: 0.5em;
+}
+
 // ===== Style Definitions =====
 .markdown-body {
   color: inherit;
@@ -368,12 +372,12 @@
     font-size: @font-size-medium !important;
     margin-left: @spacing-sm !important;
     transition: transform 0.2s ease !important;
-    
+
     // Rotation based on expanded state - handled by CSS class
     &.expanded {
       transform: rotate(0deg) !important;
     }
-    
+
     &.collapsed {
       transform: rotate(180deg) !important;
     }

@@ -1,4 +1,9 @@
-import { Agent, AgentPresetQuestions } from '@/types/agent';
+import React, { useState, useEffect } from 'react';
+import { useIntl } from '@umijs/max';
+import { v4 as uuidv4 } from 'uuid';
+import { UUID } from 'crypto';
+import { Button, Input } from 'antd';
+import { MdEditor } from 'md-editor-rt';
 import { HolderOutlined, PlusOutlined } from '@ant-design/icons';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { DndContext } from '@dnd-kit/core';
@@ -9,26 +14,28 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Button, Input } from 'antd';
-import { MdEditor } from 'md-editor-rt';
-import React from 'react';
+
+import { Agent, AgentPresetQuestions } from '@/types/agent';
 import { SidebarSection } from './sidebar-section';
-import { useIntl } from '@umijs/max';
-import { v4 as uuidv4 } from 'uuid';
-import { UUID } from 'crypto';
 
-const SortableItem = ({ id, question, onChange }: { id: string; question: string, onChange: (question: string) => void }) => {
+interface SortableItemProps {
+  id: string;
+  question: string;
+  onChange: (question: string) => void;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ id, question, onChange }) => {
   const { attributes, listeners, setNodeRef, transform } = useSortable({ id });
-  const [localQuestion, setLocalQuestion] = React.useState(question);
+  const [localQuestion, setLocalQuestion] = useState(question);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setLocalQuestion(question);
   }, [question]);
 
   return (
     <div
       ref={setNodeRef}
-      className={`transform transition flex items-center mb-2`}
+      className="sortable-item flex items-center mb-2"
       style={{
         transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
       }}
@@ -50,12 +57,14 @@ const SortableItem = ({ id, question, onChange }: { id: string; question: string
   );
 };
 
-export const ConversationComponent: React.FC<{
+interface ConversationComponentProps {
   agent: Agent;
   onChange: (updates: Partial<Agent>) => void;
-}> = ({ agent, onChange }) => {
+}
+
+export const ConversationComponent: React.FC<ConversationComponentProps> = ({ agent, onChange }) => {
   const intl = useIntl();
-  const [dataSource, setDataSource] = React.useState<AgentPresetQuestions[]>(agent.questions || []);
+  const [dataSource, setDataSource] = useState<AgentPresetQuestions[]>(agent.questions || []);
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (active.id !== over?.id) {
@@ -79,6 +88,20 @@ export const ConversationComponent: React.FC<{
     });
   };
 
+  const handleAddQuestion = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setDataSource((prevDataSource) => {
+      const newQuestion: AgentPresetQuestions = {
+        id: uuidv4() as UUID,
+        content: '',
+        index: prevDataSource.length,
+      };
+      const newDataSource = [...prevDataSource, newQuestion];
+      onChange({ questions: newDataSource } as Agent);
+      return newDataSource;
+    });
+  };
+
   return (
     <SidebarSection
       title={intl.formatMessage({ id: 'agent.detail.conversationTitle' })}
@@ -94,26 +117,14 @@ export const ConversationComponent: React.FC<{
                 onChange({ prologue: value } as Agent);
               }}
               toolbars={[
-                'title',
-                '-',
-                'bold',
-                'italic',
-                'strikeThrough',
-                '-',
-                'unorderedList',
-                'orderedList',
-                'quote',
-                '-',
-                'link',
-                'image',
-                'code',
-                'pageFullscreen',
+                'title', '-', 'bold', 'italic', 'strikeThrough', '-',
+                'unorderedList', 'orderedList', 'quote', '-',
+                'link', 'image', 'code', 'pageFullscreen',
               ]}
               preview={false}
               footers={[]}
-              style={{
-                height: '120px',
-              }}
+              className="md-editor"
+              maxLength={512}
             />
           ),
         },
@@ -135,26 +146,12 @@ export const ConversationComponent: React.FC<{
             </DndContext>
           ),
           extra: (
-            <>
-              <Button
-                type="text"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setDataSource((prevDataSource) => {
-                    const newQuestion: AgentPresetQuestions = {
-                      id: uuidv4() as UUID,
-                      content: '',
-                      index: prevDataSource.length,
-                    };
-                    const newDataSource = [...prevDataSource, newQuestion];
-                    onChange({ questions: newDataSource } as Agent);
-                    return newDataSource;
-                  });
-                }}
-              ></Button>
-            </>
+            <Button
+              type="text"
+              size="small"
+              icon={<PlusOutlined />}
+              onClick={handleAddQuestion}
+            />
           ),
         },
       ]}

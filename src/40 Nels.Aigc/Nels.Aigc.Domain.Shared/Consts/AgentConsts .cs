@@ -12,3 +12,8 @@ public static class AgentPresetQuestionsConsts
 {
     public const int MaxContentLength = 256;
 }
+
+public static class AgentKnowledgeOptionConsts
+{
+    public const int MaxCustomReplyLength = 256;
+}

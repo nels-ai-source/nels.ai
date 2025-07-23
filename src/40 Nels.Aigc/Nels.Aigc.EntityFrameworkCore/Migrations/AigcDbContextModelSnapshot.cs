@@ -444,6 +444,48 @@ namespace Nels.Aigc.Migrations
                     b.ToTable("ai_AgentKnowledge", (string)null);
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledgeOption", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AgentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("AutoInvoke")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CustomReply")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<int>("MaxRecallCount")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("MinMatchScore")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("ReplyMode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SearchStrategy")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("ShowSource")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SourceDisplayMode")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgentId")
+                        .IsUnique();
+
+                    b.ToTable("ai_AgentKnowledgeOption", (string)null);
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentPresetQuestions", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2910,6 +2952,15 @@ namespace Nels.Aigc.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Nels.Aigc.Entities.AgentKnowledgeOption", b =>
+                {
+                    b.HasOne("Nels.Aigc.Entities.Agent", null)
+                        .WithOne("KnowledgeOption")
+                        .HasForeignKey("Nels.Aigc.Entities.AgentKnowledgeOption", "AgentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Nels.Aigc.Entities.AgentPresetQuestions", b =>
                 {
                     b.HasOne("Nels.Aigc.Entities.Agent", null)
@@ -3130,6 +3181,9 @@ namespace Nels.Aigc.Migrations
 
             modelBuilder.Entity("Nels.Aigc.Entities.Agent", b =>
                 {
+                    b.Navigation("KnowledgeOption")
+                        .IsRequired();
+
                     b.Navigation("Knowledges");
 
                     b.Navigation("Questions");

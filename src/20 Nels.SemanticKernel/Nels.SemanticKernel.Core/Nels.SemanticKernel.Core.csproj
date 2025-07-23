@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Onnx" Version="1.51.0-alpha" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Postgres" Version="1.51.0-preview" />
+    <PackageReference Include="System.Net.ServerSentEvents" Version="9.0.7" />
   </ItemGroup>
 
   <ItemGroup>

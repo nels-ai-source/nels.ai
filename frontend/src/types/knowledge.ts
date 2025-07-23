@@ -1,4 +1,5 @@
 import { Entity, FullAuditedEntity } from './entity';
+import { AgentType } from './agent';
 
 export interface Knowledge extends FullAuditedEntity {
   name: string;
@@ -12,6 +13,9 @@ export interface Knowledge extends FullAuditedEntity {
   embeddingModelId: string;
   agentUseCount: number;
   retrievalCount: number;
+  // 添加关联的 agent 类型信息
+  associatedAgentTypes?: AgentType[];
+  primaryAgentType?: AgentType;
 }
 export interface KnowledgeDocument extends Entity {
   name: string;

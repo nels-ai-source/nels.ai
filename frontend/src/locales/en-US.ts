@@ -1,4 +1,5 @@
 import component from './en-US/component';
+import commonality from './en-US/commonality';
 import globalHeader from './en-US/globalHeader';
 import menu from './en-US/menu';
 import pages from './en-US/pages';
@@ -23,4 +24,5 @@ export default {
   ...component,
   ...pages,
   ...knowledge,
+  ...commonality,
 };

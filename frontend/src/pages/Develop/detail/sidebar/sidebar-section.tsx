@@ -1,6 +1,6 @@
+import React from 'react';
 import type { CollapseProps } from 'antd';
 import { Collapse } from 'antd';
-import React from 'react';
 
 interface SidebarSectionProps {
   title: string;
@@ -16,8 +16,8 @@ export const SidebarSection: React.FC<SidebarSectionProps> = ({
   defaultActiveKey,
 }) => (
   <>
-    <div className="flex items-center justify-between flex-1 text-[14px] font-semibold leading-[20px] text-gray-500">
-      <div className="flex items-center space-x-2">{title}</div>
+    <div className="flex items-center justify-between flex-1 font-semibold leading-[20px] text-gray-500">
+      <div className="sidebar-section-title flex items-center space-x-2">{title}</div>
       {extra && <div className="flex items-center space-x-3">{extra}</div>}
     </div>
     <Collapse
@@ -26,7 +26,7 @@ export const SidebarSection: React.FC<SidebarSectionProps> = ({
       items={items}
       bordered={false}
       defaultActiveKey={defaultActiveKey}
-      className="mb-2"
+      className="mb-2 [&_.ant-collapse-item]:border-b [&_.ant-collapse-item]:border-gray-200"
     />
   </>
 );

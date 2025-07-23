@@ -53,11 +53,12 @@ public class AigcDbContext(DbContextOptions<AigcDbContext> options) : AbpDbConte
     #endregion
     public DbSet<Model> Models { get; set; }
     public DbSet<Prompt> Prompts { get; set; }
+
     public DbSet<Agent> Agents { get; set; }
     public DbSet<AgentPresetQuestions> AgentPresetQuestions { get; set; }
-
     public DbSet<AgentKnowledge> AgentKnowledges { get; set; }
     public DbSet<AgentTool> AgentTools { get; set; }
+    public DbSet<AgentKnowledgeOption> AgentKnowledgeOption { get; set; }
 
     public DbSet<Plugin> Plugins { get; set; }
     public DbSet<Tool> Tools { get; set; }

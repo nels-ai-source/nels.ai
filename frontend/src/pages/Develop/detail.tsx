@@ -1,7 +1,7 @@
 import Independent from '@/components/Chat/index';
 import { Agent } from '@/types/agent';
 import { getAgent, updateAgent } from '@/services/aigc/agent'
-import { message, Button, Skeleton } from 'antd';
+import { message, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from './detail/header';
@@ -9,15 +9,17 @@ import { PromptEditor } from './detail/prompt';
 import { Sidebar } from './detail/sidebar/sidebar';
 import { UUID } from 'crypto';
 import { useIntl } from '@umijs/max';
-import { error } from 'console';
+import './agent.css';
+
 export function AgentDetail() {
-  const [agent, setAgent] = useState<Agent>();
+  const [agent, setAgent] = useState<Agent>({} as Agent);
   const [loading, setLoading] = useState(false);
   const { id } = useParams<{ id: UUID }>();
   const intl = useIntl();
+
   const handleGetAgent = async (id: UUID) => {
     if (!id) return;
-    setLoading(false);
+    setLoading(true);
     try {
       const res = await getAgent(id);
       setAgent(res);
@@ -39,10 +41,11 @@ export function AgentDetail() {
       setAgent({ ...agent, ...updates });
     }
   };
-  const handleUpdateAgent = (agent: Agent) => {
+
+  const handleUpdateAgent = async (agent: Agent) => {
     try {
       setLoading(true);
-      updateAgent(agent);
+      await updateAgent(agent);
       message.success(intl.formatMessage({ id: 'actions.success' }));
     } catch (error) {
       message.error(intl.formatMessage({ id: 'actions.failed' }));
@@ -50,65 +53,48 @@ export function AgentDetail() {
       setLoading(false);
     }
   };
+
   return loading ? (
     <div className="flex items-center justify-center text-secondary">
       <Skeleton active />
     </div>
   ) : (
-    <div className="flex flex-col h-screen ">
+    <div className="flex flex-col h-screen">
       {/* Header */}
       <Header
         agent={agent}
         onChange={(updates) => {
           handleUpdatePartial(updates);
         }}
-        onSave={() => { handleUpdateAgent(agent as Agent) }}
+        onSave={() => { handleUpdateAgent(agent) }}
       />
 
       {/* Main Content*/}
-      <main className="overflow-auto flex flex-row">
-        <aside
-          className="flex flex-col bg-white border-gray-200 shadow-sm"
-          style={{ width: '65%' }}
-
-        >
-          <header
-            className="px-2 h-32 flex items-center justify-between"
-            style={{ borderBottom: '1px solid #E5E7EB' }}
-
-          >
-            <div className="flex items-center space-x-2">
-              编排
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button type="text" size="small" title="模型">
-                模型
-              </Button>
-            </div>
-          </header>
-
-          <main className="flex flex-row flex-1">
-            <aside
-              className="flex flex-col p-2 overflow-auto whitespace-pre-wrap break-words"
-              style={{ width: '50%' }}
-
-            >
+      {agent.id &&
+        <main className="overflow-auto flex flex-row">
+          <aside className="flex flex-col bg-white border-gray-200 shadow-sm agent-aside">
+            <div className="flex flex-col flex-1 overflow-auto">
               <PromptEditor agent={agent} onChange={handleUpdatePartial} />
-            </aside>
-
-            <div style={{ width: '50%', borderLeft: '1px solid #E5E7EB' }}>
-              {' '}
-              {agent && <Sidebar agent={agent} onChange={handleUpdatePartial} />}
             </div>
-          </main>
-        </aside>
+          </aside>
+          <aside className="flex flex-col bg-white border-gray-200 shadow-sm border-l border-r agent-aside">
+            <div className="flex flex-col flex-1 overflow-auto">
+              <Sidebar agent={agent} onChange={handleUpdatePartial} />
+            </div>
+          </aside>
+          <main className="p-4 agent-main">
+            <header className="flex items-center justify-between px-2 agent-header">
+              <div className="flex items-center font-semibold space-x-2 agent-title">
+                {intl.formatMessage({ id: 'agent.detail.previewAndDebug' })}
+              </div>
+              <div className="flex items-center space-x-3">
 
-        {/* Right Sidebar */}
-        <main className="p-4" style={{ width: '35%' }}>
-          {/* Right Sidebar Content */}
-          <Independent agentData={agent}></Independent>
+              </div>
+            </header>
+            <Independent agentData={agent}></Independent>
+          </main>
         </main>
-      </main>
+      }
     </div>
   );
 }

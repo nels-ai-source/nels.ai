@@ -4,7 +4,11 @@ using Nels.Abp.SysMng.EntityFrameworkCore;
 using System;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
+using Microsoft.EntityFrameworkCore;
+using Nels.Aigc.Entities;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.Modularity;
+using Volo.Abp.EntityFrameworkCore.DependencyInjection;
 
 namespace Nels.Aigc.EntityFrameworkCore;
 
@@ -40,5 +44,12 @@ public class AigcEntityFrameworkCoreModule : AbpModule
             options.UseNpgsql();
         });
 
+        Configure<AbpEntityOptions>(options =>
+        {
+            options.Entity<Agent>(orderOptions =>
+            {
+                orderOptions.DefaultWithDetailsFunc = query => query.Include(x => x.Questions).Include(x => x.Knowledges).Include(x => x.Tools).Include(x => x.KnowledgeOption);
+            });
+        });
     }
 }

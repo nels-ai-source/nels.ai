@@ -9,8 +9,7 @@ namespace Nels.Aigc.EntityFrameworkCore;
 public static class AigcDbContextModelCreatingExtensions
 {
 
-    public static void ConfigureAigc(
-        this ModelBuilder builder)
+    public static void ConfigureAigc(this ModelBuilder builder)
     {
         Check.NotNull(builder, nameof(builder));
 
@@ -31,6 +30,11 @@ public static class AigcDbContextModelCreatingExtensions
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + nameof(Agent), SysMngDbProperties.DbSchema);
 
+            b.HasMany(x => x.Questions).WithOne().HasForeignKey(x => x.AgentId);
+            b.HasMany(x => x.Knowledges).WithOne().HasForeignKey(x => x.AgentId);
+            b.HasMany(x => x.Tools).WithOne().HasForeignKey(x => x.AgentId);
+            b.HasOne(x => x.KnowledgeOption).WithOne().HasForeignKey<AgentKnowledgeOption>(x => x.AgentId);
+
             b.ConfigureByConvention();
         });
         builder.Entity<AgentPresetQuestions>(b =>
@@ -48,6 +52,12 @@ public static class AigcDbContextModelCreatingExtensions
         builder.Entity<AgentTool>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentTool), SysMngDbProperties.DbSchema);
+
+            b.ConfigureByConvention();
+        });
+        builder.Entity<AgentKnowledgeOption>(b =>
+        {
+            b.ToTable(AigcDbProperties.DbTablePrefix + nameof(AgentKnowledgeOption), SysMngDbProperties.DbSchema);
 
             b.ConfigureByConvention();
         });
@@ -72,7 +82,7 @@ public static class AigcDbContextModelCreatingExtensions
 
             b.ConfigureByConvention();
         });
-       
+
         builder.Entity<Conversation>(b =>
         {
             b.ToTable(AigcDbProperties.DbTablePrefix + "AgentConversation", SysMngDbProperties.DbSchema);

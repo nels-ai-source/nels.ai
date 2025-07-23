@@ -1,20 +1,22 @@
-import { Agent, AgentTool } from '@/types/agent';
+import React from 'react';
+import { Button, List, Popover } from 'antd';
+import { UUID } from 'crypto';
+import { useIntl } from 'umi';
 import {
   DeleteOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
   ToolOutlined,
 } from '@ant-design/icons';
-import { Button, List, Popover } from 'antd';
-import { UUID } from 'crypto';
-import React from 'react';
+
+import { Agent, AgentTool } from '@/types/agent';
 import { SidebarSection } from './sidebar-section';
 
 interface ToolPopoverContentProps {
   tool: AgentTool;
 }
 
-export const ToolPopoverContent: React.FC<ToolPopoverContentProps> = ({ tool }) => {
+const ToolPopoverContent: React.FC<ToolPopoverContentProps> = ({ tool }) => {
   return (
     <div className="max-w-[300px] p-1">
       <div className="mb-2">
@@ -34,112 +36,111 @@ export const ToolPopoverContent: React.FC<ToolPopoverContentProps> = ({ tool }) 
   );
 };
 
-export const SkillComponent: React.FC<{
+interface SkillComponentProps {
   agent: Agent;
   onChange: (updates: Partial<Agent>) => void;
-}> = ({ agent, onChange }) => {
+}
+
+export const SkillComponent: React.FC<SkillComponentProps> = ({ agent, onChange }) => {
+  const intl = useIntl();
   const handleDeleteTool = (toolId: UUID) => {
     if (agent?.tools) {
       const updatedTools = agent.tools.filter((tool) => tool.id !== toolId);
       onChange({ tools: updatedTools });
     }
   };
+
+  const handleAddTool = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
+
+  const renderEmptyState = () => (
+    <p className="pl-6 text-gray-500">
+      {intl.formatMessage({ id: 'agent.detail.skillComponent.emptyText' })}
+    </p>
+  );
+
+  const renderToolsList = () => (
+    <List
+      size="small"
+      itemLayout="horizontal"
+      dataSource={agent?.tools}
+      renderItem={(item) => (
+        <List.Item>
+          <List.Item.Meta
+            avatar={
+              !item.icon ? (
+                <ToolOutlined
+                  width={24}
+                  height={24}
+                  className="rounded-lg object-cover flex items-center justify-center text-2xl"
+                />
+              ) : (
+                <img
+                  src={`/images/agent/${item.icon}`}
+                  className="w-6 h-6 rounded-lg object-cover flex items-center"
+                  alt={item.name}
+                />
+              )
+            }
+            title={
+              <>{item.pluginName}/{item.name}</>
+            }
+            description={
+              <div className="description-text">{item.description}</div>
+            }
+          />
+
+          <List.Item
+            actions={[
+              <Popover
+                key="info"
+                placement="bottom"
+                content={<ToolPopoverContent tool={item} />}
+              >
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<ExclamationCircleOutlined />}
+                />
+              </Popover>,
+              <Button
+                key="delete"
+                type="text"
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeleteTool(item.id!)}
+              />,
+            ]}
+          />
+        </List.Item>
+      )}
+    />
+  );
+
+  const hasTools = agent?.tools && agent.tools.length > 0;
+
   return (
     <SidebarSection
-      title="技能"
+      title={intl.formatMessage({ id: 'agent.detail.sidebar.skills' })}
       defaultActiveKey={['plugin']}
       items={[
         {
           key: 'plugin',
-          label: '插件',
-          children:
-            agent === null || agent?.tools === null || agent?.tools?.length === 0 ? (
-              <p className="pl-6 text-gray-500">
-                插件能够让智能体调用外部
-                API，例如搜索信息、浏览网页、生成图片等，扩展智能体的能力和使用场景。
-              </p>
-            ) : (
-              <List
-                size="small"
-                itemLayout="horizontal"
-                dataSource={agent?.tools}
-                renderItem={(item) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={
-                        !item.icon ? (
-                          <ToolOutlined
-                            width={24}
-                            height={24}
-                            className="rounded-lg object-cover flex items-center justify-center text-2xl"
-                          />
-                        ) : (
-                          <img
-                            src={`/images/agent/${item.icon}`}
-                            className="w-6 h-6 rounded-lg object-cover flex items-center"
-                          />
-                        )
-                      }
-                      title={
-                        <>
-                          {item.pluginName}/{item.name}
-                        </>
-                      }
-                      description={
-                        <div
-                          style={{
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {item.description}
-                        </div>
-                      }
-                    />
-
-                    <List.Item
-                      actions={[
-                        <Popover
-                          key="info"
-                          placement="bottom"
-                          content={<ToolPopoverContent tool={item} />}
-                        >
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<ExclamationCircleOutlined />}
-                          ></Button>
-                        </Popover>,
-                        <Button
-                          key="delete"
-                          type="text"
-                          size="small"
-                          icon={<DeleteOutlined />}
-                          onClick={() => handleDeleteTool(item.id!)}
-                        />,
-                      ]}
-                    ></List.Item>
-                  </List.Item>
-                )}
-              />
-            ),
-
+          label: intl.formatMessage({ id: 'agent.detail.sidebar.plugin' }),
+          children: hasTools ? renderToolsList() : renderEmptyState(),
           extra: (
-            <>
-              <Button
-                type="text"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={(event) => {
-                  event.stopPropagation();
-                }}
-              ></Button>
-            </>
+            <Button
+              type="text"
+              size="small"
+              icon={<PlusOutlined />}
+              onClick={handleAddTool}
+            />
           ),
         },
       ]}
     />
   );
 };
+
 export default SkillComponent;

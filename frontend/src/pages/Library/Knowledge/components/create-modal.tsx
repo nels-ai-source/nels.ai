@@ -48,7 +48,7 @@ const CreateModal: React.FC<CreateFormProps> = ({
     <ModalForm
       form={form}
       title={<FormattedMessage id={isEdit ? 'knowledge.edit.title' : 'knowledge.create.title'} />}
-      width="480px"
+      width="800px"
       open={open}
       onOpenChange={(visible) => {
         if (!visible) {

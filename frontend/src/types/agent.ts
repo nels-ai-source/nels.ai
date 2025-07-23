@@ -11,6 +11,34 @@ export interface Agent extends FullAuditedEntity {
   questions: AgentPresetQuestions[];
   tools: AgentTool[];
   knowledges: AgentKnowledge[];
+  knowledgeOption?: KnowledgeOption;
+}
+
+export enum SearchStrategy {
+  Hybrid = 0,
+  Semantic = 1,
+  FullText = 2,
+}
+
+export enum ReplyMode {
+  Default = 0,
+  Custom = 1,
+}
+
+export enum SourceDisplayMode {
+  Card = 0,
+  Text = 1,
+}
+
+export interface KnowledgeOption extends Entity {
+  autoInvoke: boolean;
+  searchStrategy: SearchStrategy;
+  maxRecallCount: number;
+  minMatchScore: number;
+  replyMode: ReplyMode;
+  customReply: string;
+  showSource: boolean;
+  sourceDisplayMode: SourceDisplayMode;
 }
 
 export interface AgentPresetQuestions extends Entity {
@@ -33,12 +61,17 @@ export interface AgentTool extends Entity {
   outputParamters: ToolParamter[];
 }
 export interface AgentKnowledge extends Entity {
-  icon: string;
+  agentId: string;
+  knowledgeId: string;
+  icon?: string;
   name: string;
-  description: string;
+  description?: string;
 }
 export interface AgentFilter {
   keyword?: string | null;
+  type?: AgentType;
+  skipCount?: number;
+  maxResultCount?: number;
 }
 
 export interface ChatMessage {

@@ -1,5 +1,6 @@
 import { Dropdown, Tooltip } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
+import { useIntl } from 'umi';
 
 const Setting = ({
   support,
@@ -10,6 +11,8 @@ const Setting = ({
   tip: string;
   onClick: (key: string) => void;
 }) => {
+  const intl = useIntl();
+
   if (!support?.length) {
     return null;
   }
@@ -21,7 +24,7 @@ const Setting = ({
           className="inline-block w-full h-full px-[12px] py-[2px]"
           onClick={() => onClick("edit")}
         >
-          编辑
+          {intl.formatMessage({ id: 'component.setting.edit' })}
         </span>
       ),
     },
@@ -32,7 +35,7 @@ const Setting = ({
           className="inline-block w-full h-full px-[12px] py-[2px]"
           onClick={() => onClick("share")}
         >
-          分享
+          {intl.formatMessage({ id: 'component.setting.share' })}
         </span>
       ),
     },
@@ -43,7 +46,7 @@ const Setting = ({
           className="inline-block w-full h-full px-[12px] py-[2px]"
           onClick={() => onClick("unshare")}
         >
-          取消分享
+          {intl.formatMessage({ id: 'component.setting.unshare' })}
         </span>
       ),
     },
@@ -54,7 +57,7 @@ const Setting = ({
           className="inline-block w-full h-full px-[12px] py-[2px]"
           onClick={() => onClick("del")}
         >
-          删除
+          {intl.formatMessage({ id: 'component.setting.delete' })}
         </span>
       ),
     },

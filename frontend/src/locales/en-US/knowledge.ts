@@ -14,4 +14,6 @@ export default {
   'knowledge.table.unit.count': '',
   'knowledge.table.unit.char': 'chars',
   'knowledge.table.unit.times': 'times',
+  'knowledge.table.agentType': 'Agent Type',
+  'knowledge.table.filterByAgentType': 'Filter by Agent Type',
 };

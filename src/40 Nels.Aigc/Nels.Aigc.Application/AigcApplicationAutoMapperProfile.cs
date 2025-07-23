@@ -17,20 +17,16 @@ public class AigcApplicationAutoMapperProfile : Profile
         #region aigc
         CreateMap<Prompt, PromptDto>().ReverseMap();
 
-        CreateMap<Agent, AgentDto>()
-            .ReverseMap();
+        CreateMap<Agent, AgentDto>();
+        CreateMap<AgentDto, Agent>()
+            .Ignore(dest => dest.Questions)
+            .Ignore(dest => dest.Knowledges)
+            .Ignore(dest => dest.Tools);
 
-        CreateMap<Agent, LlmAgentDto>()
-            .Ignore(dest => dest.Prompt)
-            .ReverseMap();
-
-        CreateMap<Agent, WorkflowAgentDto>()
-            .Ignore(dest => dest.States)
-            .Ignore(dest => dest.Steps)
-            .ReverseMap();
-
-        CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>()
-            .ReverseMap();
+        CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>().ReverseMap();
+        CreateMap<AgentKnowledge, AgentKnowledgeDto>().ReverseMap();
+        CreateMap<AgentTool, AgentToolDto>().ReverseMap();
+        CreateMap<AgentKnowledgeOption, AgentKnowledgeOptionDto>().ReverseMap();
 
         CreateMap<Conversation, ConversationDto>().ReverseMap();
         CreateMap<Chat, ChatDto>().ReverseMap();

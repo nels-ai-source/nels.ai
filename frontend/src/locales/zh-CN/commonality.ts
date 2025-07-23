@@ -47,5 +47,8 @@ export default {
   },
   form: {
     required: '此项为必填项',
+  },
+  pagination: {
+    showTotal: '第 {start}-{end} 条/总共 {total} 条',
   }
 };

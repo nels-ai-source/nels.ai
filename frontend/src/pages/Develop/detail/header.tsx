@@ -13,9 +13,10 @@ interface HeaderProps {
   agent: Agent;
   onChange: (updates: Partial<Agent>) => void;
   onSave: () => void;
+  canUpdate?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onChange, onSave, agent }) => {
+export const Header: React.FC<HeaderProps> = ({ onChange, onSave, agent, canUpdate = false }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const intl = useIntl();
 
@@ -24,11 +25,9 @@ export const Header: React.FC<HeaderProps> = ({ onChange, onSave, agent }) => {
       <CreateModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
-        onChange={(values) => {
-          onChange(values);
+        onSuccess={() => {
           setIsCreateModalOpen(false);
         }}
-
         type="edit"
         values={agent || {}}
       />
@@ -41,27 +40,31 @@ export const Header: React.FC<HeaderProps> = ({ onChange, onSave, agent }) => {
           }} />
           <img src={agent?.icon} alt="avatar" style={{ width: '32px', height: '32px', borderRadius: '4px' }} />
           <div className="flex items-center">{agent?.name}</div>
-          <Button
-            type="text"
-            icon={<FormOutlined />}
-            title={agent?.description || ''}
-            onClick={() => {
-              setIsCreateModalOpen(true);
-            }}
-
-          />
+          {canUpdate && (
+            <Button
+              type="text"
+              icon={<FormOutlined />}
+              title={agent?.description || ''}
+              onClick={() => {
+                setIsCreateModalOpen(true);
+              }}
+            />
+          )}
 
           <AgentTypeSelect
-            onChange={(value) => onChange({ type: value as AgentType })}
+            onChange={canUpdate ? (value) => onChange({ type: value as AgentType }) : undefined}
             value={agent?.type || AgentType.chatCompletion}
             style={{ width: '250px' }}
+            disabled={!canUpdate}
           />
         </Space>
 
         <div className="flex items-center space-x-3">
-          <Button type="primary" onClick={onSave}>
-            {intl.formatMessage({ id: 'agent.detail.save' })}
-          </Button>
+          {canUpdate && (
+            <Button type="primary" onClick={onSave}>
+              {intl.formatMessage({ id: 'agent.detail.save' })}
+            </Button>
+          )}
         </div>
       </header>
     </>

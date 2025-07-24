@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Card, Button, Dropdown, Modal, Tag, Avatar } from 'antd';
 import { MoreOutlined, StarOutlined } from '@ant-design/icons';
-import { history, useIntl } from '@umijs/max';
-
+import { history, useIntl, useAccess } from '@umijs/max';
+import type { MenuInfo } from 'rc-menu/lib/interface';
 import { deleteAgent } from '@/services/aigc/agent';
 import type { Agent } from '@/types/agent';
+import { Permissions } from '@/access';
 
 interface AgentCardProps {
   data: Agent;
@@ -39,6 +40,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
 }) => {
   const { Meta } = Card;
   const intl = useIntl();
+  const access = useAccess();
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
@@ -135,26 +137,26 @@ export const AgentCard: React.FC<AgentCardProps> = ({
           <Dropdown
             menu={{
               items: [
-                {
+                ...(access.checkAccess(Permissions.Agent.Update) ? [{
                   key: 'edit',
                   label: intl.formatMessage({ id: 'actions.edit' }),
-                  onClick: (event) => {
+                  onClick: (event: MenuInfo) => {
                     event.domEvent?.stopPropagation();
                     onEdit(data);
                   },
-                },
+                }] : []),
                 {
                   key: 'duplicate',
                   label: intl.formatMessage({ id: 'actions.duplicate' }),
-                  onClick: (event) => {
+                  onClick: (event: MenuInfo) => {
                     event.domEvent?.stopPropagation();
                   },
                 },
-                {
+                ...(access.checkAccess(Permissions.Agent.Delete) ? [{
                   key: 'delete',
                   label: intl.formatMessage({ id: 'actions.delete' }),
                   danger: true,
-                  onClick: (event) => {
+                  onClick: (event: MenuInfo) => {
                     event.domEvent?.stopPropagation();
                     Modal.confirm({
                       title: intl.formatMessage({ id: 'agent.deleteConfirm.title' }),
@@ -164,7 +166,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
                       onOk: () => handleDelete(),
                     });
                   },
-                },
+                }] : []),
               ],
             }}
           >

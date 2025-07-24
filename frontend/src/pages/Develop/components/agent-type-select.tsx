@@ -40,10 +40,10 @@ export const getAgentTypeItems = (intl: any): AgentTypeItem[] => [
 export const getAgentTypeSelectOptions = (intl: any) => {
     const items = getAgentTypeItems(intl);
     return [
-        { 
-            value: 'all', 
-            label: intl.formatMessage({ id: 'agent.search.allTypes' }), 
-            icon: <HolderOutlined className="w-6 h-6 object-cover" /> 
+        {
+            value: 'all',
+            label: intl.formatMessage({ id: 'agent.search.allTypes' }),
+            icon: <HolderOutlined className="w-6 h-6 object-cover" />
         },
         ...items.map(item => ({
             value: item.key,
@@ -60,6 +60,7 @@ interface AgentTypeSelectProps {
     style?: React.CSSProperties;
     showAllOption?: boolean;
     className?: string;
+    disabled: boolean;
 }
 
 export const AgentTypeSelect: React.FC<AgentTypeSelectProps> = ({
@@ -69,6 +70,7 @@ export const AgentTypeSelect: React.FC<AgentTypeSelectProps> = ({
     style,
     showAllOption = false,
     className,
+    disabled
 }) => {
     const intl = useIntl();
 
@@ -87,6 +89,7 @@ export const AgentTypeSelect: React.FC<AgentTypeSelectProps> = ({
             placeholder={placeholder}
             style={style}
             className={className}
+            disabled={disabled}
         >
             {options.map((option) => (
                 <Select.Option key={option.value} value={option.value}>

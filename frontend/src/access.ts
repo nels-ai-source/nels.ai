@@ -13,6 +13,13 @@ export default function access(initialState: { currentUser?: API.CurrentUser } |
   };
 }
 export const Permissions = {
+  Agent: {
+    Default: 'Aigc.Agent',
+    GetList: 'Aigc.Agent.GetList',
+    Create: 'Aigc.Agent.Create',
+    Update: 'Aigc.Agent.Update',
+    Delete: 'Aigc.Agent.Delete',
+  },
   Knowledge: {
     Default: 'Aigc.Knowledge',
     GetList: 'Aigc.Knowledge.GetList',

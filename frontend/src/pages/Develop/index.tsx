@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Button, Input, Pagination, Empty, Skeleton } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useIntl } from '@umijs/max';
+import { useIntl, useAccess } from '@umijs/max';
 import { AgentTypeSelect } from './components/agent-type-select';
 import { useAgentList } from '@/hooks/useAgentList';
 import { AgentCard } from './components/agent-card';
 import { CreateModal } from './components/create-modal';
 import type { Agent } from '@/types/agent';
+import { Permissions } from '@/access';
 
 const AgentList: React.FC = () => {
   const intl = useIntl();
+  const access = useAccess();
   const {
     loading,
     data,
@@ -57,6 +59,7 @@ const AgentList: React.FC = () => {
             value={filter.type}
             onChange={(value) => filterData({ type: value === 'all' ? undefined : value })}
             showAllOption={true}
+            disabled={loading}
           />
           <Input.Search
             placeholder={intl.formatMessage({ id: 'placeholder.search' })}
@@ -65,13 +68,15 @@ const AgentList: React.FC = () => {
             onSearch={search}
           />
         </div>
-        <Button
-          icon={<PlusOutlined />}
-          type="primary"
-          onClick={handleCreate}
-        >
-          {intl.formatMessage({ id: 'actions.create' })}
-        </Button>
+        {access.checkAccess(Permissions.Agent.Create) && (
+          <Button
+            icon={<PlusOutlined />}
+            type="primary"
+            onClick={handleCreate}
+          >
+            {intl.formatMessage({ id: 'actions.create' })}
+          </Button>
+        )}
       </div>
 
       {/* Content Area */}

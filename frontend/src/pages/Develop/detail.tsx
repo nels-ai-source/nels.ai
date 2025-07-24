@@ -8,7 +8,8 @@ import { Header } from './detail/header';
 import { PromptEditor } from './detail/prompt';
 import { Sidebar } from './detail/sidebar/sidebar';
 import { UUID } from 'crypto';
-import { useIntl } from '@umijs/max';
+import { useIntl, useAccess } from '@umijs/max';
+import { Permissions } from '@/access';
 import './agent.css';
 
 export function AgentDetail() {
@@ -16,6 +17,7 @@ export function AgentDetail() {
   const [loading, setLoading] = useState(false);
   const { id } = useParams<{ id: UUID }>();
   const intl = useIntl();
+  const access = useAccess();
 
   const handleGetAgent = async (id: UUID) => {
     if (!id) return;
@@ -67,6 +69,7 @@ export function AgentDetail() {
           handleUpdatePartial(updates);
         }}
         onSave={() => { handleUpdateAgent(agent) }}
+        canUpdate={access.checkAccess(Permissions.Agent.Update)}
       />
 
       {/* Main Content*/}

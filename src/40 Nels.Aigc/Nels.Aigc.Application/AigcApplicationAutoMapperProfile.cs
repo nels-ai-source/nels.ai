@@ -23,6 +23,16 @@ public class AigcApplicationAutoMapperProfile : Profile
             .Ignore(dest => dest.Knowledges)
             .Ignore(dest => dest.Tools);
 
+        // 新增：Agent 基本信息映射
+        CreateMap<Agent, AgentUpsertDto>();
+        CreateMap<AgentUpsertDto, Agent>()
+            .Ignore(dest => dest.Questions)
+            .Ignore(dest => dest.Knowledges)
+            .Ignore(dest => dest.Tools)
+            .Ignore(dest => dest.KnowledgeOption)
+            .Ignore(dest => dest.Instructions)
+            .Ignore(dest => dest.Prologue);
+
         CreateMap<AgentPresetQuestions, AgentPresetQuestionsDto>().ReverseMap();
         CreateMap<AgentKnowledge, AgentKnowledgeDto>().ReverseMap();
         CreateMap<AgentTool, AgentToolDto>().ReverseMap();

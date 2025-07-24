@@ -1,6 +1,6 @@
 import Independent from '@/components/Chat/index';
 import { Agent } from '@/types/agent';
-import { getAgent, updateAgent } from '@/services/aigc/agent'
+import { getAgent, saveAgentDetail } from '@/services/aigc/agent'
 import { message, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -45,7 +45,7 @@ export function AgentDetail() {
   const handleUpdateAgent = async (agent: Agent) => {
     try {
       setLoading(true);
-      await updateAgent(agent);
+      await saveAgentDetail(agent);
       message.success(intl.formatMessage({ id: 'actions.success' }));
     } catch (error) {
       message.error(intl.formatMessage({ id: 'actions.failed' }));

@@ -1,7 +1,15 @@
 import { request } from '@umijs/max';
 import { Agent, AgentFilter, ChatRequest, CancellationToken } from '@/types/agent';
 import { XStream } from '@ant-design/x';
-import { UUID } from 'crypto';
+
+export interface AgentUpsert {
+  id?: string;
+  spaceId?: string;
+  name: string;
+  description: string;
+  type: string;
+  icon: string;
+}
 
 export async function getAgentList(input: AgentFilter) {
   return request<{
@@ -14,24 +22,34 @@ export async function getAgentList(input: AgentFilter) {
     },
   });
 }
-export async function getAgent(id: UUID) {
+export async function getAgent(id: string) {
   return request<Agent>(`/api/agent/get?id=${id}`, {
     method: 'POST',
   });
 }
-export async function createAgent(data: Agent) {
+
+
+export async function saveAgentDetail(data: Agent) {
+  return request<void>(`/api/agent/detailSave?id=${data.id}`, {
+    method: 'POST',
+    data: data,
+  });
+}
+
+// 保留原有方法以兼容现有代码
+export async function createAgent(data: AgentUpsert) {
   return request<void>(`/api/agent/create`, {
     method: 'POST',
     data: data,
   });
 }
-export async function updateAgent(data: Agent) {
+export async function updateAgent(data: AgentUpsert) {
   return request<void>(`/api/agent/update?id=${data.id}`, {
     method: 'POST',
     data: data,
   });
 }
-export async function deleteAgent(id: UUID) {
+export async function deleteAgent(id: string) {
   return request<void>(`/api/agent/delete?id=${id}`, {
     method: 'POST',
   });
@@ -68,6 +86,7 @@ export async function invokeStreamingAsync(
   cancellationToken?: CancellationToken
 ): Promise<ReadableStream<Uint8Array>> {
   const chatRequest: ChatRequest = {
+    conversationId: conversationId,
     agentId: agentId,
     messages: [
       {

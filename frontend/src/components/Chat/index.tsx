@@ -105,7 +105,6 @@ const Independent: React.FC<{ agentData: Agent }> = ({ agentData }) => {
   };
 
   const handleClear = () => {
-    console.log(messages);
     setMessages([]);
     setConversationId('');
   };

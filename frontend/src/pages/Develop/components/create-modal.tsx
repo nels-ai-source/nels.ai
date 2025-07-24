@@ -1,52 +1,69 @@
-import { createAgent, updateAgent } from '@/services/aigc/agent';
-import { Agent } from '@/types/agent';
-import { useIntl } from '@umijs/max';
-import type { UploadFile } from 'antd';
-import { message, Form, Input, Upload } from 'antd';
-import type { UploadChangeParam } from 'antd/lib/upload/interface';
 import React, { useEffect, useState } from 'react';
+import { Form, Input, Upload, App } from 'antd';
+import type { UploadFile } from 'antd';
 import { ModalForm } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
+import { createAgent, updateAgent } from '@/services/aigc/agent';
+import type { Agent } from '@/types/agent';
+import type { UploadChangeParam } from 'antd/lib/upload/interface';
 
-interface AgentCreateModalProps {
+interface CreateModalProps {
   open: boolean;
   values?: Partial<Agent>;
   type?: 'create' | 'edit';
-  onChange: (updates: Partial<Agent>) => void;
   onOpenChange: (visible: boolean) => void;
+  onSuccess: () => void;
+  width?: number;
 }
 
-export const CreateModal: React.FC<AgentCreateModalProps> = ({ open, type = 'create', values, onChange, onOpenChange }) => {
+export const CreateModal: React.FC<CreateModalProps> = ({
+  open,
+  type = 'create',
+  values,
+  onOpenChange,
+  onSuccess,
+  width = 600,
+}) => {
+  const { message } = App.useApp();
   const intl = useIntl();
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const [iconPath, setIconPath] = useState(`/images/agent/default_icon${Math.floor(Math.random() * 6) + 1}.png`);
-  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (open) {
-      form.resetFields();
-      if (type === 'edit' && values?.icon) {
-        setIconPath(values.icon);
-      }
-      form.setFieldsValue({
-        icon: iconPath,
-      });
-    }
-  }, [open, iconPath]);
-
-  const handleCreateOrUpdate = async () => {
-    const values = await form.validateFields();
-    try {
-      setIsLoading(true);
-      if (type === 'create') {
-        await createAgent(values);
+      if (type === 'edit' && values) {
+        form.setFieldsValue(values);
+        if (values.icon) {
+          setIconPath(values.icon);
+        }
       } else {
-        await updateAgent(values);
+        form.resetFields();
+        form.setFieldsValue({ icon: iconPath });
       }
+    }
+  }, [open, type, values, form, iconPath]);
+
+  const handleSubmit = async (formValues: any) => {
+    try {
+      setLoading(true);
+
+      if (type === 'create') {
+        await createAgent(formValues);
+      } else {
+        await updateAgent(formValues);
+      }
+
       message.success(intl.formatMessage({ id: 'actions.success' }));
-      onChange(values);
-    } catch {
+      onSuccess();
+      onOpenChange(false);
+      return true;
+    } catch (error) {
+      console.error('Submit error:', error);
       message.error(intl.formatMessage({ id: 'actions.failed' }));
+      return false;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -56,23 +73,31 @@ export const CreateModal: React.FC<AgentCreateModalProps> = ({ open, type = 'cre
     }
   };
 
+  const handleOpenChange = (visible: boolean) => {
+    if (!visible) {
+      onOpenChange(false);
+    }
+  };
+
   return (
     <ModalForm
       form={form}
-      loading={isLoading}
-      title={intl.formatMessage({ id: type === 'create' ? 'agent.createModal.title' : 'agent.editModal.title' })}
+      title={intl.formatMessage({
+        id: type === 'create' ? 'agent.createModal.title' : 'agent.editModal.title'
+      })}
       open={open}
-      onOpenChange={(visible) => {
-        if (!visible) {
-          form.resetFields();
-        }
-        onOpenChange(visible);
+      onOpenChange={handleOpenChange}
+      onFinish={handleSubmit}
+      loading={loading}
+      width={width}
+      modalProps={{
+        destroyOnHidden: true,
       }}
-      onFinish={handleCreateOrUpdate}
-      initialValues={values}
-      width={480}
     >
-      <Form.Item name="id" hidden={true}></Form.Item>
+      <Form.Item name="id" hidden>
+        <Input />
+      </Form.Item>
+
       <Form.Item
         name="name"
         label={intl.formatMessage({ id: 'agent.createModal.nameLabel' })}
@@ -114,5 +139,3 @@ export const CreateModal: React.FC<AgentCreateModalProps> = ({ open, type = 'cre
     </ModalForm>
   );
 };
-
-export default CreateModal;

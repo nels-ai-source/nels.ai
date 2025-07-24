@@ -53,6 +53,25 @@ public class AgentDto : FullAuditedEntityDto<Guid>, IAgent, ISpaceIdentifier
         get => [.. Tools.Cast<IAgentTool>()];
     }
 }
+
+public class AgentUpsertDto : EntityDto<Guid>, ISpaceIdentifier
+{
+    [Required]
+    public virtual Guid SpaceId { get; set; } = Guid.Empty;
+
+    [Required]
+    [StringLength(AgentConsts.MaxNameLength)]
+    public virtual string Name { get; set; } = default!;
+
+    [StringLength(AgentConsts.MaxIconLength)]
+    public virtual string Icon { get; set; } = default!;
+
+    [StringLength(AgentConsts.MaxDescriptionLength)]
+    public virtual string Description { get; set; } = default!;
+
+    public virtual AgentType Type { get; set; } = AgentType.ChatCompletion;
+}
+
 public class AgentPresetQuestionsDto : EntityDto<Guid>, IAgentPresetQuestions
 {
     public virtual Guid AgentId { get; set; }

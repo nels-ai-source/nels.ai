@@ -104,10 +104,10 @@ export const StandaloneScopeProvider: React.FC<StandaloneScopeProviderProps> = (
   useEffect(() => {
     return () => {
       try {
-        if (standaloneScope) {
+        if (standaloneScope && typeof standaloneScope.dispose === 'function' && typeof variableEngine?.chain.getCovers === 'function') {
           standaloneScope.dispose();
         }
-        if (variableEngine) {
+        if (variableEngine && typeof variableEngine.dispose === 'function' && typeof variableEngine.chain.getCovers === 'function') {
           variableEngine.dispose();
         }
       } catch (error) {
